@@ -25,7 +25,7 @@ export const Panel = styled.nav<{ open: boolean }>`
 	position: fixed;
 	top: 0;
 	left: 0;
-	z-index: 4;
+	z-index: 5;
 	transform: translateX(${(props) => (props.open ? '0' : '-100%')});
 	transition: transform ${transition2};
 	background: ${(props) => props.theme.colors.container.alt1.background};
@@ -142,7 +142,7 @@ export const Header = styled.header<{ navigationOpen: boolean }>`
 	transition: padding-left ${transition2};
 	position: fixed;
 	top: 0;
-	z-index: 2;
+	z-index: 4;
 	background: ${(props) => props.theme.colors.view.background};
 	border-bottom: 1px solid ${(props) => props.theme.colors.border.primary};
 

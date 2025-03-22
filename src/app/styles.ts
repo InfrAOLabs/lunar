@@ -301,7 +301,7 @@ export const View = styled.main<{ navigationOpen: boolean }>`
 	min-height: calc(100vh - ${STYLING.dimensions.nav.height} - 35px);
 	position: relative;
 	top: ${STYLING.dimensions.nav.height};
-	padding: 0 20px 20px ${(props) => (props.navigationOpen ? `calc(${STYLING.dimensions.nav.width} + 30px)` : '30px')};
+	padding: 0 0 20px ${(props) => (props.navigationOpen ? `calc(${STYLING.dimensions.nav.width})` : '0')};
 	margin: 0 auto;
 	transition: padding-left ${transition2};
 	display: flex;
@@ -317,6 +317,13 @@ export const CenteredWrapper = styled.div`
 	align-items: center;
 	justify-content: center;
 	background: ${(props) => props.theme.colors.view.background};
+`;
+
+export const ViewWrapper = styled.div`
+		width: 100%;
+    max-width: ${STYLING.cutoffs.max};
+		padding: 0 25px;
+    margin: 0 auto;
 `;
 
 export const MessageWrapper = styled.div`

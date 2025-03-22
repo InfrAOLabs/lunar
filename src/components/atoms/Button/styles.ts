@@ -64,7 +64,7 @@ export const Primary = styled.button<{
 	max-width: ${(props) => (props.useMaxWidth ? STYLING.dimensions.button.width : '100%')};
 	overflow: hidden;
 	text-overflow: ellipsis;
-	padding: 0 25px;
+	padding: 0 20px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -124,7 +124,7 @@ export const Primary = styled.button<{
 		width: fit-content;
 		text-overflow: ellipsis;
 		overflow: hidden;
-		font-size: ${(props) => props.theme.typography.size.xxSmall} !important;
+		font-size: ${(props) => props.theme.typography.size.xSmall} !important;
 		font-weight: ${(props) => props.theme.typography.weight.xBold} !important;
 		font-family: ${(props) => props.theme.typography.family.primary} !important;
 		letter-spacing: 0.15px;
@@ -147,7 +147,7 @@ export const IconPrimary = styled.div<{
 		height: 15.5px;
 		width: 15.5px;
 		padding: 2px 0 0 0;
-		margin: ${(props) => (props.leftAlign ? '3.5px 7.5px 0 0' : '3.5px 0 0 7.5px')};
+		margin: ${(props) => (props.leftAlign ? '1.5px 12.5px 0 0' : '1.5px 0 0 12.5px')};
 		color: ${(props) =>
 			props.warning
 				? props.theme.colors.font.light1
@@ -289,15 +289,15 @@ export const Alt3 = styled(Primary)`
 	min-height: 25px !important;
 	height: 25px !important;
 	padding: 0 10px !important;
-	border-radius: 20px;
+	border-radius: ${STYLING.dimensions.radius.primary};
 
 	background: ${(props) =>
 		props.warning
 			? props.theme.colors.warning.primary
 			: props.active
 			? props.theme.colors.button.alt1.active.background
-			: props.theme.colors.button.primary.background};
-	border: 1px solid
+			: props.theme.colors.button.alt1.background};
+	border: 1.25px solid
 		${(props) =>
 			props.warning
 				? props.theme.colors.warning.primary
@@ -313,13 +313,13 @@ export const Alt3 = styled(Primary)`
 				? props.theme.colors.font.light1
 				: props.active
 				? props.theme.colors.font.light1
-				: props.theme.colors.button.primary.color} !important;
+				: props.theme.colors.button.alt1.color} !important;
 	}
 
 	&:hover {
 		background: ${(props) =>
 			props.warning ? props.theme.colors.warning.alt1 : props.theme.colors.button.alt1.active.background};
-		border: 1px solid
+		border: 1.25px solid
 			${(props) => (props.warning ? props.theme.colors.warning.alt1 : props.theme.colors.button.alt1.active.border)};
 		span {
 			color: ${(props) =>
@@ -335,7 +335,7 @@ export const Alt3 = styled(Primary)`
 	&:focus {
 		background: ${(props) =>
 			props.warning ? props.theme.colors.warning.alt1 : props.theme.colors.button.alt1.active.background};
-		border: 1px solid
+		border: 1.25px solid
 			${(props) => (props.warning ? props.theme.colors.warning.alt1 : props.theme.colors.button.alt1.active.border)};
 		span {
 			color: ${(props) =>
@@ -350,7 +350,7 @@ export const Alt3 = styled(Primary)`
 	}
 	&:disabled {
 		background: ${(props) => props.theme.colors.button.primary.disabled.background};
-		border: 1px solid ${(props) => props.theme.colors.button.primary.disabled.border};
+		border: 1.25px solid ${(props) => props.theme.colors.button.primary.disabled.border};
 		span {
 			color: ${(props) => props.theme.colors.button.primary.disabled.color} !important;
 		}

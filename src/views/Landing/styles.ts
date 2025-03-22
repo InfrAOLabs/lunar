@@ -4,31 +4,38 @@ export const Wrapper = styled.div`
 	width: 100%;
 	display: flex;
 	flex-direction: column;
+	gap: 2.5px;
 `;
 
 export const HeaderWrapper = styled.div`
 	
 `;
 
-export const BodyWrapper = styled.div``;
+export const BodyWrapper = styled.div`
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: 40px;
+`;
 
-export const Section = styled.div``;
+export const SectionMain = styled.div`
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+`;
 
 export const SectionHeader = styled.div`
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	margin: 0 0 15px 0;
 	p {
-		font-size: ${(props) => props.theme.typography.size.lg};
+		font-size: ${(props) => props.theme.typography.size.xLg};
 		font-family: ${(props) => props.theme.typography.family.primary};
 		font-weight: ${(props) => props.theme.typography.weight.bold};
-		color: ${(props) => props.theme.colors.font.alt1};
+		color: ${(props) => props.theme.colors.font.primary};
 	}
 `;
 
 export const ProcessReadWrapper = styled.div`
 	display: grid;
-	grid-template-columns: repeat(2, 1fr);
-	gap: 16px;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 25px;
 `;

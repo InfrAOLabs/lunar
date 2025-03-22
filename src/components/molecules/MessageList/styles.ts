@@ -2,6 +2,23 @@ import styled, { css } from 'styled-components';
 
 import { STYLING } from 'helpers/config';
 
+export const Header = styled.div`
+	padding: 15px;
+	margin: 0;
+	border-top: 1px solid ${(props) => props.theme.colors.border.primary};
+	border-right: 1px solid ${(props) => props.theme.colors.border.primary};
+	border-left: 1px solid ${(props) => props.theme.colors.border.primary};
+	border-top-right-radius: ${STYLING.dimensions.radius.alt1};
+	border-top-left-radius: ${STYLING.dimensions.radius.alt1};
+	
+	p {
+		font-size: ${(props) => props.theme.typography.size.lg};
+		font-family: ${(props) => props.theme.typography.family.primary};
+		font-weight: ${(props) => props.theme.typography.weight.bold};
+		color: ${(props) => props.theme.colors.font.primary};
+	}
+`;
+
 export const Wrapper = styled.div<{ childList?: boolean }>`
 	width: 100%;
 	overflow: auto;
@@ -37,7 +54,7 @@ export const HeaderWrapper = styled.div`
 	}
 `;
 
-export const BodyWrapper = styled.div<{ childList?: boolean }>`
+export const BodyWrapper = styled.div<{ childList?: boolean, open?: boolean }>`
 	width: 100%;
 
 	> {
@@ -52,7 +69,6 @@ export const BodyWrapper = styled.div<{ childList?: boolean }>`
 			border-right: 1px solid ${(props) => props.childList ? props.theme.colors.border.alt4 : props.theme.colors.border.primary};
 			border-bottom: 1px solid ${(props) => props.theme.colors.border.primary};
 		}
-	
 	}
 `;
 
@@ -102,6 +118,7 @@ export const ElementWrapper = styled.button<{ open: boolean }>`
 		css`
 			border-left: 1px solid ${props.theme.colors.border.alt4} !important;
 			border-right: 1px solid ${props.theme.colors.border.alt4} !important;
+			border-bottom: 1px solid ${props.theme.colors.border.alt4} !important;
 			
 			background: ${props.theme.colors.container.primary.active};
 
@@ -143,6 +160,15 @@ export const To = styled(ElementItem)`
 	}
 `;
 
+export const Output = styled(ElementItem)`
+	min-width: 150px;
+	width: 150px;
+	justify-content: flex-end;
+	p {
+		text-align: right;
+	}
+`;
+
 export const Time = styled(ElementItem)`
 	min-width: 165px;
 	width: 165px;
@@ -167,10 +193,17 @@ export const Results = styled(ElementItem)<{ open?: boolean }>`
 
 export const UpdateWrapper = styled.div<{ childList?: boolean }>`
 	padding: ${(props) => props.childList ? '15px' : '0 15px 15px 15px'};
-	border-left: 1px solid ${(props) => props.childList ? props.theme.colors.border.alt4 : props.theme.colors.border.alt1};
-	border-right: 1px solid ${(props) => props.childList ? props.theme.colors.border.alt4 : props.theme.colors.border.alt1};
-	border-bottom: 1px solid ${(props) => props.childList ? props.theme.colors.border.alt4 : props.theme.colors.border.alt1};	
+	border-left: 1px solid ${(props) => props.childList ? props.theme.colors.border.alt4 : props.theme.colors.border.primary};
+	border-right: 1px solid ${(props) => props.childList ? props.theme.colors.border.alt4 : props.theme.colors.border.primary};
+	border-bottom: 1px solid ${(props) => (props.childList) ? props.theme.colors.border.alt4 : props.theme.colors.border.primary} !important;	
 	border-bottom-left-radius: ${(props) => props.childList ? '0' : STYLING.dimensions.radius.alt1};
 	border-bottom-right-radius: ${(props) => props.childList ? '0' : STYLING.dimensions.radius.alt1};
 	background: ${(props) => props.childList ? props.theme.colors.container.alt2.background : props.theme.colors.container.primary.background};
+
+	p {
+		font-size: ${(props) => props.theme.typography.size.xSmall};
+		font-family: ${(props) => props.theme.typography.family.primary};
+		font-weight: ${(props) => props.theme.typography.weight.bold};
+		color: ${(props) => props.theme.colors.font.primary};
+	}
 `;

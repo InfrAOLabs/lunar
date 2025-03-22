@@ -1,15 +1,21 @@
 import React from 'react';
+import { JSONTree } from 'react-json-tree';
+import { useTheme } from 'styled-components';
 
 import { Button } from 'components/atoms/Button';
 import { Loader } from 'components/atoms/Loader';
 import { TxAddress } from 'components/atoms/TxAddress';
-import { formatAddress, formatMs } from 'helpers/utils';
+import { checkValidAddress, formatAddress, formatMs } from 'helpers/utils';
+import { useLanguageProvider } from 'providers/LanguageProvider';
 import { usePermawebProvider } from 'providers/PermawebProvider';
 
 import * as S from './styles';
 
-export default function ProcessRead(props: { processId }) {
+export default function ProcessRead(props: { processId: string; autoRun: boolean; hideOutput?: boolean }) {
 	const permawebProvider = usePermawebProvider();
+	const languageProvider = useLanguageProvider();
+	const language = languageProvider.object[languageProvider.current];
+	const currentTheme: any = useTheme();
 
 	const [cuLocation, setCuLocation] = React.useState(null);
 	const [startTime, setStartTime] = React.useState(null);
@@ -17,11 +23,18 @@ export default function ProcessRead(props: { processId }) {
 	const [elapsed, setElapsed] = React.useState(0);
 	const [isFetching, setIsFetching] = React.useState(false);
 	const [toggleRead, setToggleRead] = React.useState(false);
+	const [currentOutput, setCurrentOutput] = React.useState<any>(null);
 	const [readLog, setReadLog] = React.useState([]);
 	const [errorLog, setErrorLog] = React.useState([]);
 
+	const isInitialMount = React.useRef(true);
+
 	React.useEffect(() => {
 		(async function () {
+			setCuLocation(null);
+			setCurrentOutput(null);
+			setReadLog([]);
+			setErrorLog([]);
 			try {
 				const response = await fetch(`https://cu.ao-testnet.xyz/results/${props.processId}`, {
 					method: 'GET',
@@ -35,9 +48,25 @@ export default function ProcessRead(props: { processId }) {
 		})();
 	}, [props.processId]);
 
-	React.useEffect(() => {
-		let frameId;
-		const fetchData = async () => {
+	const safelyParseNestedJSON = (input) => {
+		if (typeof input === 'string') {
+			try {
+				const parsed = JSON.parse(input);
+				return safelyParseNestedJSON(parsed);
+			} catch (e) {
+				return input;
+			}
+		} else if (Array.isArray(input)) {
+			return input.map(safelyParseNestedJSON);
+		} else if (input !== null && typeof input === 'object') {
+			return Object.fromEntries(Object.entries(input).map(([key, value]) => [key, safelyParseNestedJSON(value)]));
+		}
+		return input;
+	};
+
+	const fetchData = async () => {
+		if (props.processId && checkValidAddress(props.processId)) {
+			let frameId: any;
 			try {
 				setIsFetching(true);
 				const start = Date.now();
@@ -50,21 +79,13 @@ export default function ProcessRead(props: { processId }) {
 
 				tick();
 
-				// const requests = Array.from({ length: 12 }, () =>
-				// 	permawebProvider.libs.readProcess({
-				// 		processId: props.processId,
-				// 		action: 'Info',
-				// 	})
-				// );
-
-				// // Wait for all 20 requests to complete.
-				// const responses = await Promise.all(requests);
-				// console.log('All responses:', responses);
-
 				const response = await permawebProvider.libs.readProcess({
 					processId: props.processId,
 					action: 'Info',
 				});
+
+				const parsedResponse = safelyParseNestedJSON(response);
+				setCurrentOutput(parsedResponse);
 
 				const roundTrip = Date.now() - start;
 				setRoundtripTime(roundTrip);
@@ -78,97 +99,151 @@ export default function ProcessRead(props: { processId }) {
 				setIsFetching(false);
 				setErrorLog((prevLog) => [...prevLog, { time: Date.now(), message: e.message || 'Unknown error' }]);
 			}
-		};
+		}
+	};
 
-		fetchData();
-		return () => cancelAnimationFrame(frameId);
+	React.useEffect(() => {
+		if (props.autoRun) fetchData();
+	}, [props.processId, props.autoRun]);
+
+	React.useEffect(() => {
+		if (isInitialMount.current) {
+			isInitialMount.current = false;
+			return;
+		}
+		if (!isFetching) {
+			fetchData();
+		}
 	}, [props.processId, toggleRead]);
 
+	const theme = {
+		base00: currentTheme.colors.view.background,
+		base01: currentTheme.colors.container.alt7.background,
+		base02: currentTheme.colors.container.alt7.background,
+		base03: currentTheme.colors.container.alt7.background,
+		base04: currentTheme.colors.container.alt7.background,
+		base05: currentTheme.colors.container.alt7.background,
+		base06: currentTheme.colors.container.alt7.background,
+		base07: currentTheme.colors.container.alt7.background,
+
+		base08: '#f92672',
+		base09: currentTheme.colors.editor.alt2,
+		base0A: currentTheme.colors.editor.alt2,
+		base0B: currentTheme.colors.editor.alt1,
+		base0C: currentTheme.colors.editor.primary,
+		base0D: currentTheme.colors.editor.primary,
+		base0E: '#ae81ff',
+		base0F: '#cc6633',
+	};
+
 	return (
-		<S.Wrapper className={'border-wrapper-primary'}>
-			<S.Header>
-				<S.HeaderMain>
-					<p>{`${cuLocation ?? '-'}`}</p>
-				</S.HeaderMain>
-				<Button
-					type={'alt3'}
-					label={isFetching ? 'Running...' : 'Run'}
-					disabled={isFetching}
-					handlePress={() => setToggleRead((prev) => !prev)}
-				/>
-			</S.Header>
-			<S.Body>
-				<S.Section>
-					<S.SectionHeader>
-						<TxAddress address={props.processId} />
-					</S.SectionHeader>
-				</S.Section>
-				<S.Section>
-					<S.SectionHeader>
-						<p>Current Run</p>
-					</S.SectionHeader>
-					<S.SectionBody>
-						<S.Line>
-							<span>{startTime ? `Start Time: ${new Date(startTime).toLocaleTimeString()}` : 'Starting...'}</span>
-						</S.Line>
-						<S.Line>
-							<span>
-								{isFetching
-									? `Elapsed: ${formatMs(elapsed)}`
-									: `Roundtrip Time: ${roundtripTime ? formatMs(roundtripTime) : '-'}`}
-							</span>
-						</S.Line>
-					</S.SectionBody>
-				</S.Section>
-				{readLog.length > 0 && (
+		<S.Wrapper>
+			<S.SectionWrapper className={'border-wrapper-primary'}>
+				<S.Header>
+					<S.HeaderMain>
+						<p>{`${cuLocation ?? '-'}`}</p>
+					</S.HeaderMain>
+					<Button
+						type={'alt3'}
+						label={isFetching ? 'Running...' : 'Run'}
+						disabled={isFetching}
+						handlePress={() => setToggleRead((prev) => !prev)}
+					/>
+				</S.Header>
+				<S.Body>
 					<S.Section>
 						<S.SectionHeader>
-							<p>Read Log</p>
+							<TxAddress address={props.processId} />
+						</S.SectionHeader>
+					</S.Section>
+					<S.Section>
+						<S.SectionHeader>
+							<p>Current Run</p>
 						</S.SectionHeader>
 						<S.SectionBody>
-							{readLog.length === 0 ? (
-								<S.Line>
-									<span>No reads yet</span>
-								</S.Line>
-							) : (
-								readLog.map((log, index) => (
-									<S.Line key={index}>
-										<span>
-											{`(${index + 1}) Started at ${new Date(
-												log.startTime
-											).toLocaleTimeString()}, Roundtrip Time (${formatMs(log.roundtripTime)})`}
-										</span>
+							<S.Line>
+								<span>{startTime ? `Start Time: ${new Date(startTime).toLocaleTimeString()}` : 'Starting...'}</span>
+							</S.Line>
+							<S.Line>
+								<span>
+									{isFetching
+										? `Elapsed: ${formatMs(elapsed)}`
+										: `Roundtrip Time: ${roundtripTime ? formatMs(roundtripTime) : '-'}`}
+								</span>
+							</S.Line>
+						</S.SectionBody>
+					</S.Section>
+					{readLog.length > 0 && (
+						<S.Section>
+							<S.SectionHeader>
+								<p>Read Log</p>
+							</S.SectionHeader>
+							<S.SectionBody>
+								{readLog.length === 0 ? (
+									<S.Line>
+										<span>No reads yet</span>
 									</S.Line>
-								))
-							)}
-						</S.SectionBody>
-					</S.Section>
+								) : (
+									readLog.map((log, index) => (
+										<S.Line key={index}>
+											<span>
+												{`(${index + 1}) Started at ${new Date(
+													log.startTime
+												).toLocaleTimeString()}, Roundtrip Time (${formatMs(log.roundtripTime)})`}
+											</span>
+										</S.Line>
+									))
+								)}
+							</S.SectionBody>
+						</S.Section>
+					)}
+					{errorLog.length > 0 && (
+						<S.Section>
+							<S.SectionHeader>
+								<p>Error Log</p>
+							</S.SectionHeader>
+							<S.SectionBody>
+								{errorLog.length === 0 ? (
+									<S.Line>
+										<span>No errors</span>
+									</S.Line>
+								) : (
+									errorLog.map((err, index) => (
+										<S.Error key={index}>
+											<span>{`Error ${index + 1} at ${new Date(err.time).toLocaleTimeString()}: ${err.message}`}</span>
+										</S.Error>
+									))
+								)}
+							</S.SectionBody>
+						</S.Section>
+					)}
+				</S.Body>
+				{isFetching && (
+					<S.LoadingWrapper>
+						<Loader xSm relative />
+					</S.LoadingWrapper>
 				)}
-				{errorLog.length > 0 && (
-					<S.Section>
-						<S.SectionHeader>
-							<p>Error Log</p>
-						</S.SectionHeader>
-						<S.SectionBody>
-							{errorLog.length === 0 ? (
-								<S.Line>
-									<span>No errors</span>
-								</S.Line>
-							) : (
-								errorLog.map((err, index) => (
-									<S.Error key={index}>
-										<span>{`Error ${index + 1} at ${new Date(err.time).toLocaleTimeString()}: ${err.message}`}</span>
-									</S.Error>
-								))
-							)}
-						</S.SectionBody>
-					</S.Section>
-				)}
-			</S.Body>
-			{isFetching && (
-				<S.LoadingWrapper>
-					<Loader xSm relative />
-				</S.LoadingWrapper>
+			</S.SectionWrapper>
+			{!props.hideOutput && (
+				<S.SectionWrapper className={'border-wrapper-primary'}>
+					<S.HeaderAlt>
+						<S.HeaderMain>
+							<p>{language.currentOutput}</p>
+						</S.HeaderMain>
+						{/* <Button type={'alt3'} label={language.download} disabled={true} handlePress={() => {}} /> */}
+					</S.HeaderAlt>
+					<S.Output className={'scroll-wrapper'}>
+						{currentOutput ? (
+							<S.JSONTree>
+								<JSONTree data={currentOutput} hideRoot={true} theme={theme} shouldExpandNodeInitially={() => true} />
+							</S.JSONTree>
+						) : (
+							<S.UpdateWrapper>
+								<p>Output will display here</p>
+							</S.UpdateWrapper>
+						)}
+					</S.Output>
+				</S.SectionWrapper>
 			)}
 		</S.Wrapper>
 	);

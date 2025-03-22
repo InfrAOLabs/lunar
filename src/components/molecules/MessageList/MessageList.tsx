@@ -1,8 +1,8 @@
 import React from 'react';
 import { ReactSVG } from 'react-svg';
-
 import { GQLNodeResponseType } from '@permaweb/libs';
 
+import { Button } from 'components/atoms/Button';
 import { TxAddress } from 'components/atoms/TxAddress';
 import { ASSETS, DEFAULT_MESSAGE_TAGS } from 'helpers/config';
 import { getRelativeDate, getTagValue } from 'helpers/utils';
@@ -12,6 +12,9 @@ import { usePermawebProvider } from 'providers/PermawebProvider';
 import * as S from './styles';
 
 function Message(props: { element: GQLNodeResponseType; parentId: string }) {
+	const languageProvider = useLanguageProvider();
+	const language = languageProvider.object[languageProvider.current];
+
 	const [open, setOpen] = React.useState<boolean>(false);
 
 	return (
@@ -21,13 +24,18 @@ function Message(props: { element: GQLNodeResponseType; parentId: string }) {
 					<TxAddress address={props.element.node.id} />
 				</S.ID>
 				<S.Action>
-					<p>{getTagValue(props.element.node.tags, 'Action')}</p>
+					<p>{getTagValue(props.element.node.tags, 'Action') ?? language.none}</p>
 				</S.Action>
 				<S.To>
 					<TxAddress address={props.element.node.id} />
 				</S.To>
+				<S.Output>
+					<Button type={'alt3'} label={language.view} handlePress={() => {}} />
+				</S.Output>
 				<S.Time>
-					<p>{getRelativeDate(props.element.node.block.timestamp * 1000)}</p>
+					<p>
+						{props.element.node?.block?.timestamp ? getRelativeDate(props.element.node.block.timestamp * 1000) : '-'}
+					</p>
 				</S.Time>
 				<S.Results open={open}>
 					<ReactSVG src={ASSETS.arrow} />
@@ -108,41 +116,51 @@ export default function MessageList(props: {
 		if (currentData?.length <= 0) message = language.associatedMessagesNotFound;
 		return (
 			<S.UpdateWrapper childList={props.childList}>
-				<div className={'update-wrapper'}>
-					<span>{message}</span>
-				</div>
+				<p>{message}</p>
 			</S.UpdateWrapper>
 		);
 	}
 
-	return currentData?.length > 0 ? (
-		<S.Wrapper childList={props.childList}>
+	return (
+		<div>
 			{!props.childList && (
-				<S.HeaderWrapper>
-					<S.ID>
-						<p>{language.id}</p>
-					</S.ID>
-					<S.Action>
-						<p>{language.action}</p>
-					</S.Action>
-					<S.To>
-						<p>{language.to}</p>
-					</S.To>
-					<S.Time>
-						<p>{language.time}</p>
-					</S.Time>
-					<S.Results>
-						<p>{language.results}</p>
-					</S.Results>
-				</S.HeaderWrapper>
+				<S.Header>
+					<p>Messages</p>
+				</S.Header>
 			)}
-			<S.BodyWrapper childList={props.childList}>
-				{currentData.map((element: GQLNodeResponseType) => (
-					<Message key={element.node.id} element={element} parentId={props.parentId} />
-				))}
-			</S.BodyWrapper>
-		</S.Wrapper>
-	) : (
-		getMessage()
+			{currentData?.length > 0 ? (
+				<S.Wrapper childList={props.childList}>
+					{!props.childList && (
+						<S.HeaderWrapper>
+							<S.ID>
+								<p>{language.id}</p>
+							</S.ID>
+							<S.Action>
+								<p>{language.action}</p>
+							</S.Action>
+							<S.To>
+								<p>{language.to}</p>
+							</S.To>
+							<S.Output>
+								<p>{language.output}</p>
+							</S.Output>
+							<S.Time>
+								<p>{language.time}</p>
+							</S.Time>
+							<S.Results>
+								<p>{language.results}</p>
+							</S.Results>
+						</S.HeaderWrapper>
+					)}
+					<S.BodyWrapper childList={props.childList} open={false}>
+						{currentData.map((element: GQLNodeResponseType, index: number) => {
+							return <Message key={element.node.id} element={element} parentId={props.parentId} />;
+						})}
+					</S.BodyWrapper>
+				</S.Wrapper>
+			) : (
+				getMessage()
+			)}
+		</div>
 	);
 }

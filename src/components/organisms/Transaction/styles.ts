@@ -2,46 +2,64 @@ import styled from 'styled-components';
 
 import { STYLING } from 'helpers/config';
 
+export const Wrapper = styled.div`
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: 25px;
+`;
+
+export const HeaderWrapper = styled.form`
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 20px;
+`;
+
+export const HeaderActionsWrapper = styled.div`
+	display: flex;
+	align-items: center;
+	/* justify-content: space-between; */
+	gap: 20px;
+
+	/* button {
+		margin: 7.5px 0 0 0;
+
+		span {
+			
+		}
+	} */
+`
+
 export const BodyWrapper = styled.div`
 	width: 100%;
 	display: flex;
 	flex-direction: column;
-	gap: 15px;
-
-	@media (max-width: ${STYLING.cutoffs.initial}) {
-		flex-direction: column;
-	}
-`;
-
-export const BodySectionsWrapper = styled.div`
-	width: 100%;
-	display: flex;
-	flex-direction: column;
-	flex-wrap: wrap;
+	justify-content: space-between;
 	gap: 25px;
-
-	@media (max-width: ${STYLING.cutoffs.initial}) {
-		flex-direction: column;
-	}
 `;
 
-export const SectionWrapper = styled.div`
+export const InfoWrapper = styled.div`
+	width: 100%;
 	display: flex;
 	justify-content: space-between;
 	gap: 25px;
 
 	@media (max-width: ${STYLING.cutoffs.initial}) {
-		width: 100%;
 		flex-direction: column;
 	}
 `;
 
-export const MessagesWrapper = styled(SectionWrapper)`
+export const ReadWrapper = styled.div`
+	width: calc(100% - 475px);
+`;
+
+export const TagsWrapper = styled.div`
+	width: 450px;
+`;
+export const MessagesWrapper = styled.div`
 	width: 100%;
-	
-	@media (max-width: ${STYLING.cutoffs.initial}) {
-		width: 100%;
-	}
 `;
 
 export const Section = styled.div`
@@ -54,9 +72,7 @@ export const Section = styled.div`
 	}
 `;
 
-export const TagsSection = styled(Section)`
-	height: 297.5px;
-`;
+export const TagsSection = styled(Section)``;
 
 export const SectionFull = styled.div`
 	width: 100%;
@@ -89,19 +105,23 @@ export const SectionFullUpdateWrapper = styled.div`
 	padding: 0 15px 15px 15px;
 `;
 
-export const InputWrapper = styled.form`
-	width: 100%;
-	display: flex;
-	align-items: center;
-	gap: 20px;
-	margin: 5px 0 0 0;
+export const SearchWrapper = styled.div`
+	width: 510px;
+	position: relative;
 
-	button {
-		margin: 7.5px 0 0 0;
+	input {
+		padding: 10px 10px 10px 43.5px !important;
+	}
 
-		span {
-			
-		}
+	svg {
+		height: 15px;
+		width: 15px;
+		color: ${(props) => props.theme.colors.font.alt1};
+		fill: ${(props) => props.theme.colors.font.alt1};
+		position: absolute;
+		z-index: 1;
+		top: 12.5px;
+		left: 15.5px;
 	}
 `;
 
@@ -182,5 +202,62 @@ export const MessagesPlaceholder = styled.div`
 		font-size: ${(props) => props.theme.typography.size.xSmall};
 		font-family: ${(props) => props.theme.typography.family.primary};
 		font-weight: ${(props) => props.theme.typography.weight.bold};
+	}
+`;
+
+export const WrapperEmpty = styled.div`
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 20px;
+	padding: 40px 0 0 0;
+`;
+
+export const WrapperEmptyIcon = styled.div`
+	height: 150px;
+	width: 150px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background: ${(props) => props.theme.colors.container.alt1.background};
+	border: 1px solid ${(props) => props.theme.colors.border.primary};
+	border-radius: 50%;
+
+	svg {
+		height: 85px;
+		width: 85px;
+		color: ${(props) => props.theme.colors.icon.primary.fill};
+		fill: ${(props) => props.theme.colors.icon.primary.fill};
+		margin: 7.5px 0 0 0;
+	}
+`;
+
+export const WrapperEmptyDescription = styled.div`
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 10px;
+
+	p,span {
+		text-align: center;
+	}
+	
+	p {
+		font-size: ${(props) => props.theme.typography.size.small};
+		font-family: ${(props) => props.theme.typography.family.primary};
+		font-weight: ${(props) => props.theme.typography.weight.bold};
+		color: ${(props) => props.theme.colors.font.primary};
+	}
+	
+	span {
+		display: block;
+		max-width: 350px;
+		font-size: ${(props) => props.theme.typography.size.xSmall};
+		font-family: ${(props) => props.theme.typography.family.primary};
+		font-weight: ${(props) => props.theme.typography.weight.medium};
+		color: ${(props) => props.theme.colors.font.alt1};
 	}
 `;

@@ -85,3 +85,17 @@ export type NotificationType = {
 };
 
 export type TransactionType = { id: string; label: string; type: 'process' | 'message' };
+
+export type MetricDataPoint = {
+	created_date: string;
+	tx_count: number;
+	eval_count: number;
+	transfer_count: number;
+	new_process_count: number;
+	new_module_count: number;
+	active_users: number;
+	active_processes: number;
+	tx_count_rolling: number;
+	processes_rolling: number;
+	modules_rolling: number;
+}

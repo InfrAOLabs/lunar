@@ -109,8 +109,8 @@ export const STYLING = {
 			width: 'fit-content',
 		},
 		form: {
-			small: '42.5px',
-			max: '47.5px',
+			small: '40px',
+			max: '45px',
 		},
 		nav: {
 			height: '65px',

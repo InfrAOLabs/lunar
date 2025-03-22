@@ -4,6 +4,14 @@ import { STYLING } from 'helpers/config';
 
 export const Wrapper = styled.div`
 	width: 100%;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 25px;
+`;
+
+export const SectionWrapper = styled.div`
+	width: 100%;
 	padding: 15px;
 	position: relative;
 `;
@@ -20,6 +28,10 @@ export const Header = styled.div`
 		font-weight: ${(props) => props.theme.typography.weight.bold};
 		color: ${(props) => props.theme.colors.font.primary};
 	}
+`;
+
+export const HeaderAlt = styled(Header)`
+	margin: 0;
 `;
 
 export const HeaderMain = styled.div`
@@ -81,6 +93,25 @@ export const Line = styled.div`
 		p {
 			text-align: left;
 		}
+	}
+`;
+
+export const Output = styled(Body)`
+	max-height: 500px;
+`;
+
+export const JSONTree = styled.div`
+	font-family: ${(props) => props.theme.typography.family.primary};
+	font-weight: ${(props) => props.theme.typography.weight.bold};
+	font-size: ${(props) => props.theme.typography.size.xxSmall};
+`;
+
+export const UpdateWrapper = styled.div`
+	margin: 15px 0 0 0;
+	p {
+		font-family: ${(props) => props.theme.typography.family.primary};
+		font-weight: ${(props) => props.theme.typography.weight.medium};
+		font-size: ${(props) => props.theme.typography.size.xSmall};
 	}
 `;
 

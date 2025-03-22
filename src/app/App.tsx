@@ -39,7 +39,7 @@ export default function App() {
 			return (
 				<>
 					<Navigation open={settings.sidebarOpen} toggle={() => updateSettings('sidebarOpen', !settings.sidebarOpen)} />
-					<S.View className={'max-view-wrapper'} navigationOpen={settings.sidebarOpen}>
+					<S.View navigationOpen={settings.sidebarOpen}>
 						{element}
 					</S.View>
 					<S.Footer navigationOpen={settings.sidebarOpen}>
@@ -64,6 +64,7 @@ export default function App() {
 					<Routes>
 						{getRoute(URLS.base, <Landing />)}
 						{getRoute(URLS.explorer, <Explorer />)}
+						{getRoute(`${URLS.explorer}/:txid`, <Explorer />)}
 						{/* {getRoute(URLS.console, <Console />)} */}
 						{getRoute(URLS.docs, <Docs />)}
 						{getRoute(`${URLS.docs}:active/*`, <Docs />)}
