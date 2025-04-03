@@ -1,8 +1,7 @@
 import React from 'react';
-import { JSONTree } from 'react-json-tree';
-import { useTheme } from 'styled-components';
 
 import { Button } from 'components/atoms/Button';
+import { JSONTree } from 'components/atoms/JSONTree';
 import { Loader } from 'components/atoms/Loader';
 import { TxAddress } from 'components/atoms/TxAddress';
 import { checkValidAddress, formatAddress, formatMs } from 'helpers/utils';
@@ -15,7 +14,6 @@ export default function ProcessRead(props: { processId: string; autoRun: boolean
 	const permawebProvider = usePermawebProvider();
 	const languageProvider = useLanguageProvider();
 	const language = languageProvider.object[languageProvider.current];
-	const currentTheme: any = useTheme();
 
 	const [cuLocation, setCuLocation] = React.useState(null);
 	const [startTime, setStartTime] = React.useState(null);
@@ -116,26 +114,6 @@ export default function ProcessRead(props: { processId: string; autoRun: boolean
 		}
 	}, [props.processId, toggleRead]);
 
-	const theme = {
-		base00: currentTheme.colors.view.background,
-		base01: currentTheme.colors.container.alt7.background,
-		base02: currentTheme.colors.container.alt7.background,
-		base03: currentTheme.colors.container.alt7.background,
-		base04: currentTheme.colors.container.alt7.background,
-		base05: currentTheme.colors.container.alt7.background,
-		base06: currentTheme.colors.container.alt7.background,
-		base07: currentTheme.colors.container.alt7.background,
-
-		base08: '#f92672',
-		base09: currentTheme.colors.editor.alt2,
-		base0A: currentTheme.colors.editor.alt2,
-		base0B: currentTheme.colors.editor.alt1,
-		base0C: currentTheme.colors.editor.primary,
-		base0D: currentTheme.colors.editor.primary,
-		base0E: '#ae81ff',
-		base0F: '#cc6633',
-	};
-
 	return (
 		<S.Wrapper>
 			<S.SectionWrapper className={'border-wrapper-primary'}>
@@ -151,11 +129,6 @@ export default function ProcessRead(props: { processId: string; autoRun: boolean
 					/>
 				</S.Header>
 				<S.Body>
-					<S.Section>
-						<S.SectionHeader>
-							<TxAddress address={props.processId} />
-						</S.SectionHeader>
-					</S.Section>
 					<S.Section>
 						<S.SectionHeader>
 							<p>Current Run</p>
@@ -234,9 +207,7 @@ export default function ProcessRead(props: { processId: string; autoRun: boolean
 					</S.HeaderAlt>
 					<S.Output className={'scroll-wrapper'}>
 						{currentOutput ? (
-							<S.JSONTree>
-								<JSONTree data={currentOutput} hideRoot={true} theme={theme} shouldExpandNodeInitially={() => true} />
-							</S.JSONTree>
+							<JSONTree data={currentOutput} />
 						) : (
 							<S.UpdateWrapper>
 								<p>Output will display here</p>

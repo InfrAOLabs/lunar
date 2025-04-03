@@ -2,6 +2,7 @@ type URLViewType = {
 	label: string;
 	disabled: boolean;
 	url: any;
+	icon: string;
 	view: React.ComponentType;
 };
 

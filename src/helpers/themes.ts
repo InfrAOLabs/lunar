@@ -361,7 +361,7 @@ export const darkThemeAlt2 = {
 	neutral2: '#1A1C22',
 	neutral3: '#262834',
 	neutral4: '#2E2F34',
-	neutral5: '#22232A',
+	neutral5: '#35373e',
 	neutral6: '#27282F',
 	neutral7: '#52545F',
 	neutral8: '#4D4F57',
@@ -420,12 +420,12 @@ export const theme = (currentTheme: any): DefaultTheme => ({
 		button: {
 			primary: {
 				background: currentTheme.neutral2,
-				border: currentTheme.neutral4,
+				border: currentTheme.neutral5,
 				color: currentTheme.neutralA1,
 				active: {
-					background: currentTheme.neutral3,
-					border: currentTheme.neutral8,
-					color: currentTheme.neutralA1,
+					background: currentTheme.primary1,
+					border: currentTheme.primary1,
+					color: currentTheme.light1,
 				},
 				disabled: {
 					background: currentTheme.neutral3,
@@ -438,8 +438,8 @@ export const theme = (currentTheme: any): DefaultTheme => ({
 				border: currentTheme.primary1,
 				color: currentTheme.neutralA1,
 				active: {
-					background: currentTheme.primary2,
-					border: currentTheme.primary2,
+					background: currentTheme.primary1,
+					border: currentTheme.primary1,
 					color: currentTheme.light1,
 				},
 				disabled: {
@@ -634,7 +634,7 @@ export const theme = (currentTheme: any): DefaultTheme => ({
 			alt2: `'Source Code Pro', serif`,
 		},
 		size: {
-			xxxSmall: '12px',
+			xxxSmall: '11px',
 			xxSmall: '13px',
 			xSmall: '14px',
 			small: '15px',

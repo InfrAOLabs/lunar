@@ -9,6 +9,7 @@ export default function ViewHeader(props: IProps) {
 	return (
 		<S.HeaderWrapper>
 			<ViewWrapper>
+				<S.HeaderContent>
 				<p>{props.header}</p>
 				{props.actions && (
 					<S.HeaderActions>
@@ -17,6 +18,7 @@ export default function ViewHeader(props: IProps) {
 						))}
 					</S.HeaderActions>
 				)}
+				</S.HeaderContent>
 			</ViewWrapper>
 		</S.HeaderWrapper>
 	);

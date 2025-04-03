@@ -15,7 +15,9 @@ export const HeaderWrapper = styled.div`
 
 export const TabsWrapper = styled.div`
 	width: 100%;
+	/* border-top: 1px solid ${(props) => props.theme.colors.border.primary};
 	border-bottom: 1px solid ${(props) => props.theme.colors.border.primary};
+	background: ${(props) => props.theme.colors.container.alt1.background}; */
 `;
 
 export const BodyWrapper = styled.div`
@@ -79,7 +81,7 @@ export const TabAction = styled.div<{ active: boolean }>`
 	justify-content: center;
 	align-items: center;
 	gap: 12.5px;
-	padding: 10px 20px 10px 16.6px;
+	padding: 10px 20px 10px 16.5px;
 	border-top-left-radius: ${STYLING.dimensions.radius.primary};
 	border-top-right-radius: ${STYLING.dimensions.radius.primary};
 	white-space: nowrap;

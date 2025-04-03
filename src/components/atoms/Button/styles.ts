@@ -124,10 +124,10 @@ export const Primary = styled.button<{
 		width: fit-content;
 		text-overflow: ellipsis;
 		overflow: hidden;
-		font-size: ${(props) => props.theme.typography.size.xSmall} !important;
-		font-weight: ${(props) => props.theme.typography.weight.xBold} !important;
+		font-size: ${(props) => props.theme.typography.size.xxSmall} !important;
+		font-weight: ${(props) => props.theme.typography.weight.bold} !important;
 		font-family: ${(props) => props.theme.typography.family.primary} !important;
-		letter-spacing: 0.15px;
+		letter-spacing: 0.5px;
 		color: ${(props) =>
 			props.warning
 				? props.theme.colors.font.light1
@@ -290,14 +290,15 @@ export const Alt3 = styled(Primary)`
 	height: 25px !important;
 	padding: 0 10px !important;
 	border-radius: ${STYLING.dimensions.radius.primary};
+	border-radius: 20px;
 
 	background: ${(props) =>
 		props.warning
 			? props.theme.colors.warning.primary
 			: props.active
 			? props.theme.colors.button.alt1.active.background
-			: props.theme.colors.button.alt1.background};
-	border: 1.25px solid
+			: props.theme.colors.button.primary.background};
+	border: 1px solid
 		${(props) =>
 			props.warning
 				? props.theme.colors.warning.primary
@@ -308,6 +309,8 @@ export const Alt3 = styled(Primary)`
 	span {
 		font-size: ${(props) => props.theme.typography.size.xxxSmall} !important;
 		font-weight: ${(props) => props.theme.typography.weight.bold} !important;
+		font-family: ${(props) => props.theme.typography.family.primary} !important;
+		letter-spacing: 0.35px;
 		color: ${(props) =>
 			props.warning
 				? props.theme.colors.font.light1
@@ -319,7 +322,7 @@ export const Alt3 = styled(Primary)`
 	&:hover {
 		background: ${(props) =>
 			props.warning ? props.theme.colors.warning.alt1 : props.theme.colors.button.alt1.active.background};
-		border: 1.25px solid
+		border: 1px solid
 			${(props) => (props.warning ? props.theme.colors.warning.alt1 : props.theme.colors.button.alt1.active.border)};
 		span {
 			color: ${(props) =>
@@ -335,7 +338,7 @@ export const Alt3 = styled(Primary)`
 	&:focus {
 		background: ${(props) =>
 			props.warning ? props.theme.colors.warning.alt1 : props.theme.colors.button.alt1.active.background};
-		border: 1.25px solid
+		border: 1px solid
 			${(props) => (props.warning ? props.theme.colors.warning.alt1 : props.theme.colors.button.alt1.active.border)};
 		span {
 			color: ${(props) =>
@@ -350,7 +353,7 @@ export const Alt3 = styled(Primary)`
 	}
 	&:disabled {
 		background: ${(props) => props.theme.colors.button.primary.disabled.background};
-		border: 1.25px solid ${(props) => props.theme.colors.button.primary.disabled.border};
+		border: 1px solid ${(props) => props.theme.colors.button.primary.disabled.border};
 		span {
 			color: ${(props) => props.theme.colors.button.primary.disabled.color} !important;
 		}

@@ -151,6 +151,27 @@ export const Header = styled.header<{ navigationOpen: boolean }>`
 	}
 `;
 
+export const SearchWrapper = styled.div`
+	width: 510px;
+	position: relative;
+	margin: 0 0 0 10px;
+
+	input {
+		padding: 10px 10px 10px 43.5px !important;
+	}
+
+	svg {
+		height: 15px;
+		width: 15px;
+		color: ${(props) => props.theme.colors.font.alt1};
+		fill: ${(props) => props.theme.colors.font.alt1};
+		position: absolute;
+		z-index: 1;
+		top: 11.5px;
+		left: 14.5px;
+	}
+`;
+
 export const Content = styled.div`
 	height: 100%;
 	width: 100%;
@@ -401,7 +422,7 @@ export const DNavWrapper = styled.div`
 export const ActionsWrapper = styled.div`
 	display: flex;
 	align-items: center;
-	gap: 20px;
+	gap: 12.5px;
 `;
 
 export const MWrapper = styled.div`

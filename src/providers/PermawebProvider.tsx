@@ -1,7 +1,7 @@
 import React from 'react';
+import PermawebLibs, { ProfileType } from '@permaweb/libs';
 
 import Arweave from 'arweave';
-import PermawebLibs, { ProfileType } from '@permaweb/libs';
 import { connect, createDataItemSigner } from '@permaweb/aoconnect';
 
 import { Panel } from 'components/atoms/Panel';

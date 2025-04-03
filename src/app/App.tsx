@@ -3,7 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 
 const Landing = getLazyImport('Landing');
 const Explorer = getLazyImport('Explorer');
-// const Console = getLazyImport('Console');
+const Console = getLazyImport('Console');
 const Docs = getLazyImport('Docs');
 const NotFound = getLazyImport('NotFound');
 
@@ -64,8 +64,9 @@ export default function App() {
 					<Routes>
 						{getRoute(URLS.base, <Landing />)}
 						{getRoute(URLS.explorer, <Explorer />)}
-						{getRoute(`${URLS.explorer}/:txid`, <Explorer />)}
-						{/* {getRoute(URLS.console, <Console />)} */}
+						{getRoute(`${URLS.explorer}:txid`, <Explorer />)}
+						{getRoute(`${URLS.explorer}:txid/:active`, <Explorer />)}
+						{getRoute(URLS.console, <Console />)}
 						{getRoute(URLS.docs, <Docs />)}
 						{getRoute(`${URLS.docs}:active/*`, <Docs />)}
 						{getRoute(URLS.notFound, <NotFound />)}

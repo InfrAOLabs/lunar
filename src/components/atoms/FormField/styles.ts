@@ -49,7 +49,7 @@ export const Input = styled.input<{
 	color: ${(props) =>
 		props.disabled ? props.theme.colors.button.primary.disabled.color : props.theme.colors.font.primary};
 	font-family: ${(props) => props.theme.typography.family.primary};
-	font-size: ${(props) => props.theme.typography.size.base};
+	font-size: ${(props) => props.theme.typography.size.small};
 	font-weight: ${(props) => props.theme.typography.weight.bold};
 	letter-spacing: 0.15px;
 	background: ${(props) => props.theme.colors.form.background};

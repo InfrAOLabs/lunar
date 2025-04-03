@@ -4,6 +4,7 @@ import { ReactSVG } from 'react-svg';
 import { GQLNodeResponseType } from '@permaweb/libs';
 
 import { ViewWrapper } from 'app/styles';
+import { Button } from 'components/atoms/Button';
 import { IconButton } from 'components/atoms/IconButton';
 import { ViewHeader } from 'components/atoms/ViewHeader';
 import { Transaction } from 'components/organisms/Transaction';
@@ -82,12 +83,12 @@ export default function Explorer() {
 		});
 		setActiveTabIndex(tabIndex);
 
-		navigate(`${URLS.explorer}/${newTx.node.id}`);
+		navigate(`${URLS.explorer}${newTx.node.id}`);
 	};
 
 	const handleTabRedirect = (index: number) => {
 		setActiveTabIndex(index);
-		navigate(`${URLS.explorer}/${transactions[index].id}`);
+		navigate(`${URLS.explorer}${transactions[index].id}`);
 	};
 
 	const handleAddTab = () => {
@@ -165,9 +166,26 @@ export default function Explorer() {
 	return (
 		<S.Wrapper>
 			<S.HeaderWrapper>
-				<ViewHeader header={language.explorer} />
+				<ViewHeader header={language.explorer} actions={[
+					<Button
+						type={'primary'}
+						label={'New Tab'}
+						handlePress={() => {}}
+						icon={ASSETS.add}
+						iconLeftAlign
+					/>,
+					<Button
+						type={'warning'}
+						label={'Clear Tabs'}
+						handlePress={() => {}}
+						icon={ASSETS.delete}
+						iconLeftAlign
+					/>
+				]} />
 				<S.TabsWrapper>
-					<ViewWrapper>{tabs}</ViewWrapper>
+					<ViewWrapper>
+						{tabs}
+					</ViewWrapper>
 				</S.TabsWrapper>
 			</S.HeaderWrapper>
 			<ViewWrapper>

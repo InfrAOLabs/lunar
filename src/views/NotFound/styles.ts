@@ -30,5 +30,5 @@ export const Divider = styled.div`
 `;
 
 export const Message = styled.p`
-	font-size: 18px;
+	font-size: ${(props) => props.theme.typography.size.base};
 `;

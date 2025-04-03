@@ -2,6 +2,7 @@ import React from 'react';
 import { useTheme } from 'styled-components';
 import { Terminal } from 'xterm';
 
+import { ViewWrapper } from 'app/styles';
 import { ViewHeader } from 'components/atoms/ViewHeader';
 import { useArweaveProvider } from 'providers/ArweaveProvider';
 import { useLanguageProvider } from 'providers/LanguageProvider';
@@ -45,6 +46,8 @@ export default function Console() {
 
 			// Write initial welcome message and prompt
 			// termInstance.current.write('Lunar Console\r\n');
+      		termInstance.current.write('Welcome to AOS' + "\r\n\r\n");
+      		termInstance.current.write('AOS Client Version: 2.0.6. 2024' + "\r\n\r\n");
 			termInstance.current.write('> ');
 
 			// Simple command buffer to store user input
@@ -87,15 +90,9 @@ export default function Console() {
 	return (
 		<S.Wrapper>
 			<ViewHeader header={language.console} />
-			<div
-				ref={terminalRef}
-				style={{
-					width: '100%',
-					height: '300px',
-					backgroundColor: '#1e1e1e',
-					overflow: 'hidden',
-				}}
-			/>
+			<ViewWrapper>
+				<S.Console className={'border-wrapper-alt3'} ref={terminalRef} />
+			</ViewWrapper>
 		</S.Wrapper>
 	);
 }

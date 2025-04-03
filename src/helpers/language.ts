@@ -31,10 +31,11 @@ export const language = {
 		fetching: `Fetching`,
 		filter: `Filter`,
 		filterBy: `Filter by`,
-		goBack: `Go back`,
+		goBack: `Go Back`,
 		handle: `Handle`,
 		home: `Home`,
 		id: `ID`,
+		incoming: `Incoming`,
 		language: `Language`,
 		loading: `Loading`,
 		maxCharsReached: `Max chars reached`,
@@ -44,6 +45,7 @@ export const language = {
 		new: `New`,
 		next: `Next`,
 		none: `None`,
+		outgoing: `Outgoing`,
 		output: `Output`,
 		overview: `Overview`,
 		owner: `Owner`,
@@ -58,6 +60,7 @@ export const language = {
 		profileMenu: `Profile menu`,
 		profileUpdated: `Profile updated`,
 		profileUpdatingInfo: `Updating your profile`,
+		read: `Read`,
 		remove: `Remove`,
 		removeAvatar: `Remove avatar`,
 		removeBanner: `Remove banner`,
@@ -81,6 +84,7 @@ export const language = {
 		updating: `Updating`,
 		uploadAvatar: `Upload avatar`,
 		uploadBanner: `Upload banner`,
-		view: `View`
+		view: `View`,
+		write: `Write`
 	},
 };

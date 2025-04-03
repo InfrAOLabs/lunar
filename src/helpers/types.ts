@@ -99,3 +99,5 @@ export type MetricDataPoint = {
 	processes_rolling: number;
 	modules_rolling: number;
 }
+
+export type MessageFilterType = 'incoming' | 'outgoing';

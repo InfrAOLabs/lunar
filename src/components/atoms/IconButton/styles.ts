@@ -130,7 +130,7 @@ export const Alt1 = styled(Primary)`
 			? props.theme.colors.button.primary.active.background
 			: props.disabled
 			? props.theme.colors.button.primary.disabled.background
-			: props.theme.colors.button.primary.background};
+			: props.theme.colors.view.background};
 	border: 1px solid
 		${(props) =>
 			props.active
@@ -146,13 +146,13 @@ export const Alt1 = styled(Primary)`
 				? props.theme.colors.font.light1
 				: props.disabled
 				? props.theme.colors.button.primary.disabled.color
-				: props.theme.colors.button.primary.color};
+				: props.theme.colors.icon.primary.fill};
 		fill: ${(props) =>
 			props.active
 				? props.theme.colors.font.light1
 				: props.disabled
 				? props.theme.colors.button.primary.disabled.color
-				: props.theme.colors.button.primary.color};
+				: props.theme.colors.icon.primary.fill};
 	}
 
 	&:hover {
@@ -160,5 +160,20 @@ export const Alt1 = styled(Primary)`
 			props.disabled
 				? props.theme.colors.button.primary.disabled.background
 				: props.theme.colors.button.primary.active.background};
+
+svg {
+		color: ${(props) =>
+			props.active
+				? props.theme.colors.font.light1
+				: props.disabled
+				? props.theme.colors.button.primary.disabled.color
+				: props.theme.colors.button.primary.active.color};
+		fill: ${(props) =>
+			props.active
+				? props.theme.colors.font.light1
+				: props.disabled
+				? props.theme.colors.button.primary.disabled.color
+				: props.theme.colors.button.primary.active.color};
+	}
 	}
 `;

@@ -15,6 +15,7 @@ export const ASSETS = {
 	close: getTxEndpoint('BASlMnOWcLCcLUSrO2wUybQL_06231dLONeVkdTWs3o'),
 	code: getTxEndpoint('Nv6GexQXf2PpTv8zYoLzysv0DzOiUK_aguqjnNraqDg'),
 	console: getTxEndpoint('Ap7QY41qgc7v5cTjQOOnFgJRO3gC7wgIZx2uSVTS3RM'),
+	copy: getTxEndpoint('-Qc2PsDF3sVDiT56iaYMfGWttrjI8eRg-1U3WeQmKu0'),
 	dark: getTxEndpoint('frDBQmgmo9MLraz4dcGqknHOeUVj9Yx8XNfSozJd4Uo'),
 	delete: getTxEndpoint('aKjWuVXkSeYOKzGP0MnnhHwoYUXqTHFMJfVCbqzYEo0'),
 	design: getTxEndpoint('UUvx4WWSyuNC8fOQ5OsYudP77Reae8wmvHh1PDB196c'),
@@ -52,7 +53,9 @@ export const ASSETS = {
 	posts: getTxEndpoint('scJ-YfxBggKURU_lF7eLLrKSe9L7cBD1GB1bcIpzKJI'),
 	process: getTxEndpoint('XSoMPxwQ5GxKeodpvMkrA3lAYr9h7EK0YfMoHegpWus'),
 	othent: getTxEndpoint('jDmU1yqdfK41qZ8mUj61MZlji-rX7bHJV12s1lMlw3A'),
+	overview: getTxEndpoint('st_CQJkd7AK8eyz9bJZ8YwpXN1Hf6UkCeIFuX6x5bpk'),
 	quotes: getTxEndpoint('2D6HWs0jkqXe4aBVkJv2OTnaZ-heyGYzUJwDxp-Dqaw'),
+	read: getTxEndpoint('uL2Wval3ulK_oVLskrkcXkBy0GikxLm7GUk0zevUWW4'),
 	search: getTxEndpoint('yRgUeadiTV769j2tbEg2HnpXUohA_3M2oFZsHwNRqOU'),
 	send: getTxEndpoint('uft--f1NcNnW5XHJtRETzRTlAEDXSDTSHOVIOlILtv8'),
 	settings: getTxEndpoint('e3jdELVw-3jNIOCbWTYCh1fuH4zIa7tDqmOqE6HyizY'),
@@ -109,11 +112,11 @@ export const STYLING = {
 			width: 'fit-content',
 		},
 		form: {
-			small: '40px',
+			small: '37.5px',
 			max: '45px',
 		},
 		nav: {
-			height: '65px',
+			height: '70px',
 			width: '260px',
 		},
 		radius: {
@@ -129,10 +132,15 @@ function createURLs() {
 	const base = `/`;
 
 	const docs = `${base}docs/`;
+	const explorer = `${base}explorer/`
 
 	return {
 		base: base,
-		explorer: `${base}explorer`,
+		explorer: explorer,
+		explorerInfo: (id: string) => `${explorer}${id}/info`,
+		explorerMessages: (id: string) => `${explorer}${id}/messages`,
+		explorerRead: (id: string) => `${explorer}${id}/read`,
+		explorerWrite: (id: string) => `${explorer}${id}/write`,
 		console: `${base}console`,
 		docs: docs,
 		docsIntro: `${docs}overview/introduction`,

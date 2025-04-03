@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom';
 import { ReactSVG } from 'react-svg';
 import { debounce } from 'lodash';
 
+import { FormField } from 'components/atoms/FormField';
 import { IconButton } from 'components/atoms/IconButton';
 import { ASSETS, STYLING, URLS } from 'helpers/config';
+import { checkValidAddress } from 'helpers/utils';
 import { checkWindowCutoff } from 'helpers/window';
 import { useNavigationConfirm } from 'hooks/useNavigationConfirm';
 import { useLanguageProvider } from 'providers/LanguageProvider';
@@ -22,6 +24,14 @@ export default function Navigation(props: { open: boolean; toggle: () => void })
 	const language = languageProvider.object[languageProvider.current];
 
 	const [desktop, setDesktop] = React.useState(checkWindowCutoff(parseInt(STYLING.cutoffs.desktop)));
+	const [inputTxId, setInputTxId] = React.useState<string>('');
+	const [loadingTx, setLoadingTx] = React.useState<boolean>(false);
+
+	React.useEffect(() => {
+		if (checkValidAddress(inputTxId)) {
+			// confirmNavigation(`${URLS.explorer}/${inputTxId}`); // TODO
+		}
+	}, [inputTxId]);
 
 	const paths = React.useMemo(() => {
 		return [
@@ -35,11 +45,11 @@ export default function Navigation(props: { open: boolean; toggle: () => void })
 				icon: ASSETS.explorer,
 				label: language.explorer,
 			},
-			// {
-			// 	path: URLS.console,
-			// 	icon: ASSETS.console,
-			// 	label: language.console,
-			// },
+			{
+				path: URLS.console,
+				icon: ASSETS.console,
+				label: language.console,
+			},
 		];
 	}, []);
 
@@ -71,12 +81,12 @@ export default function Navigation(props: { open: boolean; toggle: () => void })
 		return (
 			<S.ToggleWrapper>
 				<IconButton
-					type={'primary'}
+					type={props.open ? 'primary' : 'alt1'}
 					src={ASSETS.navigation}
 					handlePress={props.toggle}
 					dimensions={{
 						wrapper: 36.5,
-						icon: 23.5,
+						icon: 20,
 					}}
 					tooltip={props.open ? language.sidebarClose : language.sidebarOpen}
 					tooltipPosition={props.open ? 'right' : 'bottom-left'}
@@ -136,8 +146,30 @@ export default function Navigation(props: { open: boolean; toggle: () => void })
 				<S.Content>
 					<S.C1Wrapper>
 						{!props.open && navigationToggle}
+						{/* <S.SearchWrapper>
+							<ReactSVG src={ASSETS.search} />
+							<FormField
+								value={inputTxId}
+								onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputTxId(e.target.value)}
+								placeholder={language.processOrMessageId}
+								invalid={{ status: false, message: null }}
+								disabled={loadingTx}
+								hideErrorMessage
+								sm
+							/>
+						</S.SearchWrapper> */}
 					</S.C1Wrapper>
 					<S.ActionsWrapper>
+						<IconButton
+							type={'alt1'}
+							src={ASSETS.settings}
+							handlePress={props.toggle}
+							dimensions={{
+								wrapper: 35, icon: 21.5 
+							}}
+							tooltip={props.open ? language.sidebarClose : language.sidebarOpen}
+							tooltipPosition={'bottom'}
+						/>
 						<WalletConnect />
 					</S.ActionsWrapper>
 				</S.Content>

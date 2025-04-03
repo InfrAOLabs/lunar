@@ -106,11 +106,18 @@ export const SectionFullUpdateWrapper = styled.div`
 `;
 
 export const SearchWrapper = styled.div`
+	display: flex;
+	align-items: center;
+	gap: 15px;
+	position: relative;
+`;
+
+export const SearchInputWrapper = styled.div`
 	width: 510px;
 	position: relative;
 
 	input {
-		padding: 10px 10px 10px 43.5px !important;
+		padding: 10px 10px 10px 42.5px !important;
 	}
 
 	svg {
@@ -120,8 +127,8 @@ export const SearchWrapper = styled.div`
 		fill: ${(props) => props.theme.colors.font.alt1};
 		position: absolute;
 		z-index: 1;
-		top: 12.5px;
-		left: 15.5px;
+		top: 11.5px;
+		left: 14.5px;
 	}
 `;
 
@@ -205,17 +212,17 @@ export const MessagesPlaceholder = styled.div`
 	}
 `;
 
-export const WrapperEmpty = styled.div`
+export const Placeholder = styled.div`
 	width: 100%;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 	gap: 20px;
-	padding: 40px 0 0 0;
+	padding: 60px 0 0 0;
 `;
 
-export const WrapperEmptyIcon = styled.div`
+export const PlaceholderIcon = styled.div`
 	height: 150px;
 	width: 150px;
 	display: flex;
@@ -234,7 +241,7 @@ export const WrapperEmptyIcon = styled.div`
 	}
 `;
 
-export const WrapperEmptyDescription = styled.div`
+export const PlaceholderDescription = styled.div`
 	display: flex;
 	flex-direction: column;
 	justify-content: center;

@@ -5,6 +5,10 @@ import { STYLING } from 'helpers/config';
 export const Header = styled.div`
 	padding: 15px;
 	margin: 0;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 20px;
 	border-top: 1px solid ${(props) => props.theme.colors.border.primary};
 	border-right: 1px solid ${(props) => props.theme.colors.border.primary};
 	border-left: 1px solid ${(props) => props.theme.colors.border.primary};
@@ -19,10 +23,18 @@ export const Header = styled.div`
 	}
 `;
 
+export const HeaderActions = styled.div`
+	display: flex;
+	align-items: center;
+	gap: 12.5px;
+`;
+
 export const Wrapper = styled.div<{ childList?: boolean }>`
 	width: 100%;
 	overflow: auto;
 	background: ${(props) => props.childList ? props.theme.colors.container.alt2.background : props.theme.colors.container.primary.background};
+	border-bottom-left-radius: ${(props) => props.childList ? '0' : STYLING.dimensions.radius.alt1} !important;
+	border-bottom-right-radius: ${(props) => props.childList ? '0' : STYLING.dimensions.radius.alt1} !important;
 `;
 
 export const HeaderWrapper = styled.div`
@@ -54,25 +66,44 @@ export const HeaderWrapper = styled.div`
 	}
 `;
 
-export const BodyWrapper = styled.div<{ childList?: boolean, open?: boolean }>`
+export const BodyWrapper = styled.div<{
+	childList?: boolean;
+	isOverallLast?: boolean;
+}>`
 	width: 100%;
-
-	> {
-		&:last-child {
-			border-bottom-left-radius: ${(props) => props.childList ? '0' : STYLING.dimensions.radius.alt1};
-			border-bottom-right-radius: ${(props) => props.childList ? '0' : STYLING.dimensions.radius.alt1};
-			border-bottom: 1px solid ${(props) => props.childList ? props.theme.colors.border.alt4 : props.theme.colors.border.primary};
-		}
-	
-		button {
-			border-left: 1px solid ${(props) => props.childList ? props.theme.colors.border.alt4 : props.theme.colors.border.primary};
-			border-right: 1px solid ${(props) => props.childList ? props.theme.colors.border.alt4 : props.theme.colors.border.primary};
-			border-bottom: 1px solid ${(props) => props.theme.colors.border.primary};
-		}
+  
+	> *:last-child {
+	  border-bottom-left-radius: ${(props) =>
+		props.childList && !props.isOverallLast
+			? '0'
+			: STYLING.dimensions.radius.alt1};
+	  border-bottom-right-radius: ${(props) =>
+		props.childList && !props.isOverallLast
+			? '0'
+			: STYLING.dimensions.radius.alt1};
+	  border-bottom: 1px solid
+		${(props) =>
+		props.childList && !props.isOverallLast
+			? props.theme.colors.border.alt4
+			: props.theme.colors.border.primary} !important;
 	}
-`;
+  
+	.message-list-element {
+	  border-left: 1px solid
+		${(props) =>
+		props.childList
+			? props.theme.colors.border.alt4
+			: props.theme.colors.border.primary};
+	  border-right: 1px solid
+		${(props) =>
+		props.childList
+			? props.theme.colors.border.alt4
+			: props.theme.colors.border.primary};
+	  border-bottom: 1px solid ${(props) => props.theme.colors.border.primary};
+	}
+  `;
 
-export const ElementWrapper = styled.button<{ open: boolean }>`
+export const ElementWrapper = styled.div<{ open: boolean; lastChild?: boolean }>`
 	height: 40px;
 	min-width: 100%;
 	width: fit-content;
@@ -81,6 +112,7 @@ export const ElementWrapper = styled.button<{ open: boolean }>`
 	align-items: center;
 	justify-content: space-between;
 	padding: 0 15px;
+	cursor: pointer;
 	background: ${(props) => props.theme.colors.container.primary.background};
 
 	p {
@@ -95,9 +127,9 @@ export const ElementWrapper = styled.button<{ open: boolean }>`
 	
 	&:hover {
 		background: ${(props) => props.theme.colors.container.primary.active};
-		border-left: 1px solid ${(props) => props.theme.colors.border.alt4};
-		border-right: 1px solid ${(props) => props.theme.colors.border.alt4};
-		border-bottom: 1px solid ${(props) => props.theme.colors.border.alt4};
+		border-left: 1px solid ${(props) => props.theme.colors.border.alt4} !important;
+		border-right: 1px solid ${(props) => props.theme.colors.border.alt4} !important;
+		border-bottom: 1px solid ${(props) => props.theme.colors.border.alt4} !important;
 	}
 
 	&:hover::after {
@@ -118,7 +150,7 @@ export const ElementWrapper = styled.button<{ open: boolean }>`
 		css`
 			border-left: 1px solid ${props.theme.colors.border.alt4} !important;
 			border-right: 1px solid ${props.theme.colors.border.alt4} !important;
-			border-bottom: 1px solid ${props.theme.colors.border.alt4} !important;
+			/* border-bottom: 1px solid ${props.theme.colors.border.alt4} !important; */
 			
 			background: ${props.theme.colors.container.primary.active};
 
@@ -178,7 +210,7 @@ export const Time = styled(ElementItem)`
 	}
 `;
 
-export const Results = styled(ElementItem)<{ open?: boolean }>`
+export const Results = styled(ElementItem) <{ open?: boolean }>`
 	min-width: 90px;
 	width: 90px;
 	justify-content: flex-end;
@@ -189,6 +221,14 @@ export const Results = styled(ElementItem)<{ open?: boolean }>`
 		transform: rotate(${(props) => props.open ? '180deg' : '0deg'});
 		transition: transform 0.15s ease-in-out;
 	}
+`;
+
+export const ResultWrapper = styled.div`
+	padding: 0 20px 20px 20px;
+`;
+
+export const ResultOutput = styled.div`
+	width: 100%;
 `;
 
 export const UpdateWrapper = styled.div<{ childList?: boolean }>`

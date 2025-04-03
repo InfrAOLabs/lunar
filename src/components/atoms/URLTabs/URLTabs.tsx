@@ -1,7 +1,10 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { ReactSVG } from 'react-svg';
 
 import NotFound from 'views/NotFound';
+
+import { Button } from '../Button';
 
 import * as S from './styles';
 import { ICProps, ITProps, IUProps } from './types';
@@ -14,7 +17,26 @@ function Tab(props: ITProps) {
 
 	return (
 		<S.Tab active={props.active}>
-			<button onClick={handlePress}>{props.label}</button>
+		<Button
+			type={'primary'}
+			label={props.label}
+			handlePress={handlePress}
+			active={props.active}
+			icon={props.icon}
+			iconLeftAlign
+			height={45}
+		/>
+		</S.Tab>
+	)
+
+	return (
+		<S.Tab active={props.active}>
+			<button onClick={handlePress}>
+				{props.icon && (
+					<ReactSVG src={props.icon} />
+				)}
+				{props.label}
+			</button>
 		</S.Tab>
 	);
 }
