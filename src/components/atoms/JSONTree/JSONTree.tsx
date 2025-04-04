@@ -3,11 +3,11 @@ import { useTheme } from 'styled-components';
 
 import * as S from './styles';
 
-export default function _JSONTree(props: { data: any }) {
+export default function _JSONTree(props: { data: any, header?: string, maxHeight?: number }) {
 	const currentTheme: any = useTheme();
 
 	const theme = {
-		base00: currentTheme.colors.view.background,
+		base00: currentTheme.colors.container.alt1.background,
 		base01: currentTheme.colors.container.alt7.background,
 		base02: currentTheme.colors.container.alt7.background,
 		base03: currentTheme.colors.container.alt7.background,
@@ -27,8 +27,13 @@ export default function _JSONTree(props: { data: any }) {
 	};
 
 	return props.data ? (
-		<S.JSONTree>
+		<S.Wrapper className={'border-wrapper-alt3 scroll-wrapper'} maxHeight={props.maxHeight}>
+			{props.header && (
+				<S.Header>
+					<p>{props.header}</p>
+				</S.Header>
+			)}
 			<JSONTree data={props.data} hideRoot={true} theme={theme} shouldExpandNodeInitially={() => true} />
-		</S.JSONTree>
+		</S.Wrapper>
 	) : null;
 }

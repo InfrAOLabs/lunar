@@ -9,12 +9,14 @@ import { IconButton } from 'components/atoms/IconButton';
 import { ViewHeader } from 'components/atoms/ViewHeader';
 import { Transaction } from 'components/organisms/Transaction';
 import { ASSETS, URLS } from 'helpers/config';
-import { TransactionType } from 'helpers/types';
+import { TransactionTabType } from 'helpers/types';
 import { checkValidAddress, formatAddress, getTagValue } from 'helpers/utils';
 import { useLanguageProvider } from 'providers/LanguageProvider';
 
 import * as S from './styles';
 
+// TODO: Create tab if visiting from link - pasting link with no tabs does not redirect correctly
+// https://tpj5zwvqvqxbt5dkdrsnat42ddbqtyysp27kf6ar3wiajtjb32sa.arweave.net/m9Pc2rCsLhn0ahxk0E-aGMMJ4xJ-vqL4Ed2QBM0h3qQ/#/explorer/0syT13r0s0tgPmIed95bJnuSqaD29HQNN8D3ElLSrsc/info
 export default function Explorer() {
 	const location = useLocation();
 	const navigate = useNavigate();
@@ -24,7 +26,7 @@ export default function Explorer() {
 	const languageProvider = useLanguageProvider();
 	const language = languageProvider.object[languageProvider.current];
 
-	const [transactions, setTransactions] = React.useState<TransactionType[]>(() => {
+	const [transactions, setTransactions] = React.useState<TransactionTabType[]>(() => {
 		const stored = localStorage.getItem('transactions');
 		return stored && JSON.parse(stored).length > 0 ? JSON.parse(stored) : [{ id: '', label: '', type: 'message' }];
 	});
@@ -54,7 +56,16 @@ export default function Explorer() {
 
 	function getInitialIndex() {
 		if (transactions.length <= 0) return 0;
-		const currentTxId = location.pathname.replace(`${URLS.explorer}/`, '');
+		let currentTxId = location.pathname.replace(`${URLS.explorer}/`, '');
+		
+		const parts = location.pathname.split('/');
+		for (const part of parts) {
+			if (checkValidAddress(part)) {
+				currentTxId = part;
+				break;
+			}
+		}
+
 		for (let i = 0; i < transactions.length; i++) {
 			if (transactions[i].id === currentTxId) return i;
 		}
@@ -62,6 +73,7 @@ export default function Explorer() {
 	}
 
 	const handleTxChange = (tabIndex: number, newTx: GQLNodeResponseType) => {
+		const name = getTagValue(newTx.node.tags, 'Name');
 		const type = getTagValue(newTx.node.tags, 'Type');
 		setTransactions((prev) => {
 			const updated = [...prev];
@@ -69,21 +81,43 @@ export default function Explorer() {
 				updated[tabIndex] = {
 					...updated[tabIndex],
 					id: newTx.node.id,
-					label: newTx.node.id,
+					label: name ?? newTx.node.id,
 					type: type ? (type.toLowerCase() as any) : 'message',
 				};
 			} else {
 				updated.push({
 					id: newTx.node.id,
-					label: newTx.node.id,
+					label: name ?? newTx.node.id,
 					type: type ? (type.toLowerCase() as any) : 'message',
 				});
 			}
 			return updated;
 		});
 		setActiveTabIndex(tabIndex);
+		
+		const currentParts = window.location.hash.replace('#', '').split('/');
+		const currentRoute = currentParts[currentParts.length - 1];
+		
+		let toRoute = `${URLS.explorer}${newTx.node.id}`
 
-		navigate(`${URLS.explorer}${newTx.node.id}`);
+		switch (currentRoute) {
+			case 'info':
+				toRoute = URLS.explorerInfo(newTx.node.id);
+				break;
+			case 'messages':
+				toRoute = URLS.explorerMessages(newTx.node.id);
+				break;
+			case 'read':
+				toRoute = URLS.explorerRead(newTx.node.id);
+				break;
+			case 'write':
+				toRoute = URLS.explorerWrite(newTx.node.id);
+				break;
+			default:
+				break;
+		}
+
+		navigate(toRoute);
 	};
 
 	const handleTabRedirect = (index: number) => {
@@ -169,18 +203,18 @@ export default function Explorer() {
 				<ViewHeader header={language.explorer} actions={[
 					<Button
 						type={'primary'}
-						label={'New Tab'}
-						handlePress={() => {}}
+						label={language.newTab}
+						handlePress={() => handleAddTab()}
 						icon={ASSETS.add}
 						iconLeftAlign
 					/>,
-					<Button
-						type={'warning'}
-						label={'Clear Tabs'}
-						handlePress={() => {}}
-						icon={ASSETS.delete}
-						iconLeftAlign
-					/>
+					// <Button
+					// 	type={'warning'}
+					// 	label={language.clearTabs}
+					// 	handlePress={() => {}}
+					// 	icon={ASSETS.delete}
+					// 	iconLeftAlign
+					// />
 				]} />
 				<S.TabsWrapper>
 					<ViewWrapper>
@@ -189,7 +223,7 @@ export default function Explorer() {
 				</S.TabsWrapper>
 			</S.HeaderWrapper>
 			<ViewWrapper>
-				{transactions.map((tx: TransactionType, index) => (
+				{transactions.map((tx: TransactionTabType, index) => (
 					<S.TransactionWrapper key={index} active={index === activeTabIndex}>
 						<Transaction
 							txId={tx.id}

@@ -56,6 +56,7 @@ export const ASSETS = {
 	overview: getTxEndpoint('st_CQJkd7AK8eyz9bJZ8YwpXN1Hf6UkCeIFuX6x5bpk'),
 	quotes: getTxEndpoint('2D6HWs0jkqXe4aBVkJv2OTnaZ-heyGYzUJwDxp-Dqaw'),
 	read: getTxEndpoint('uL2Wval3ulK_oVLskrkcXkBy0GikxLm7GUk0zevUWW4'),
+	refresh: getTxEndpoint('XppZbO5Jjk9PHR-AeW9aPIIjMJ0txpUCrffaCeDuDms'),
 	search: getTxEndpoint('yRgUeadiTV769j2tbEg2HnpXUohA_3M2oFZsHwNRqOU'),
 	send: getTxEndpoint('uft--f1NcNnW5XHJtRETzRTlAEDXSDTSHOVIOlILtv8'),
 	settings: getTxEndpoint('e3jdELVw-3jNIOCbWTYCh1fuH4zIa7tDqmOqE6HyizY'),
@@ -108,7 +109,7 @@ export const STYLING = {
 	},
 	dimensions: {
 		button: {
-			height: '35px',
+			height: '33.5px',
 			width: 'fit-content',
 		},
 		form: {

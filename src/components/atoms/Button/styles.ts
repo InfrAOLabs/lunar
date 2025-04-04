@@ -64,7 +64,7 @@ export const Primary = styled.button<{
 	max-width: ${(props) => (props.useMaxWidth ? STYLING.dimensions.button.width : '100%')};
 	overflow: hidden;
 	text-overflow: ellipsis;
-	padding: 0 20px;
+	padding: 0 17.5px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -147,7 +147,7 @@ export const IconPrimary = styled.div<{
 		height: 15.5px;
 		width: 15.5px;
 		padding: 2px 0 0 0;
-		margin: ${(props) => (props.leftAlign ? '1.5px 12.5px 0 0' : '1.5px 0 0 12.5px')};
+		margin: ${(props) => (props.leftAlign ? '2.5px 9.5px 0 0' : '2.5px 0 0 9.5px')};
 		color: ${(props) =>
 			props.warning
 				? props.theme.colors.font.light1
@@ -288,7 +288,7 @@ export const IconAlt2 = styled(IconAlt1)`
 export const Alt3 = styled(Primary)`
 	min-height: 25px !important;
 	height: 25px !important;
-	padding: 0 10px !important;
+	padding: 4.5px 20px !important;
 	border-radius: ${STYLING.dimensions.radius.primary};
 	border-radius: 20px;
 
@@ -307,7 +307,7 @@ export const Alt3 = styled(Primary)`
 				: props.theme.colors.button.primary.border};
 
 	span {
-		font-size: ${(props) => props.theme.typography.size.xxxSmall} !important;
+		font-size: ${(props) => props.theme.typography.size.xxSmall} !important;
 		font-weight: ${(props) => props.theme.typography.weight.bold} !important;
 		font-family: ${(props) => props.theme.typography.family.primary} !important;
 		letter-spacing: 0.35px;

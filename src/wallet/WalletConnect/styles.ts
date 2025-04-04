@@ -89,8 +89,7 @@ export const DHeaderFlex = styled.div`
 	display: flex;
 	align-items: center;
 	gap: 12.5px;
-	margin: 15px 0 0 0;
-	padding: 0 5px 15px 5px;
+	padding: 5px 5px 15px 5px;
 	border-bottom: 1px solid ${(props) => props.theme.colors.border.primary};
 
 	svg {

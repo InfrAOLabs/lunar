@@ -29,12 +29,16 @@ export const HeaderActions = styled.div`
 	gap: 12.5px;
 `;
 
+export const HeaderActionsDivider = styled.div`
+	height: 20px;
+	width: 1px;
+	border-right: 1px solid ${(props) => props.theme.colors.border.primary}
+`;
+
 export const Wrapper = styled.div<{ childList?: boolean }>`
 	width: 100%;
 	overflow: auto;
 	background: ${(props) => props.childList ? props.theme.colors.container.alt2.background : props.theme.colors.container.primary.background};
-	border-bottom-left-radius: ${(props) => props.childList ? '0' : STYLING.dimensions.radius.alt1} !important;
-	border-bottom-right-radius: ${(props) => props.childList ? '0' : STYLING.dimensions.radius.alt1} !important;
 `;
 
 export const HeaderWrapper = styled.div`
@@ -48,7 +52,8 @@ export const HeaderWrapper = styled.div`
 	border: 1px solid ${(props) => props.theme.colors.border.primary};
 	background: ${(props) => props.theme.colors.container.alt1.background};
 
-	div,p {
+	div,
+	p {
 		font-size: ${(props) => props.theme.typography.size.xSmall};
 		font-family: ${(props) => props.theme.typography.family.primary};
 		font-weight: ${(props) => props.theme.typography.weight.bold};
@@ -73,14 +78,6 @@ export const BodyWrapper = styled.div<{
 	width: 100%;
   
 	> *:last-child {
-	  border-bottom-left-radius: ${(props) =>
-		props.childList && !props.isOverallLast
-			? '0'
-			: STYLING.dimensions.radius.alt1};
-	  border-bottom-right-radius: ${(props) =>
-		props.childList && !props.isOverallLast
-			? '0'
-			: STYLING.dimensions.radius.alt1};
 	  border-bottom: 1px solid
 		${(props) =>
 		props.childList && !props.isOverallLast
@@ -102,7 +99,6 @@ export const BodyWrapper = styled.div<{
 	  border-bottom: 1px solid ${(props) => props.theme.colors.border.primary};
 	}
   `;
-
 export const ElementWrapper = styled.div<{ open: boolean; lastChild?: boolean }>`
 	height: 40px;
 	min-width: 100%;
@@ -150,7 +146,7 @@ export const ElementWrapper = styled.div<{ open: boolean; lastChild?: boolean }>
 		css`
 			border-left: 1px solid ${props.theme.colors.border.alt4} !important;
 			border-right: 1px solid ${props.theme.colors.border.alt4} !important;
-			/* border-bottom: 1px solid ${props.theme.colors.border.alt4} !important; */
+			border-bottom: 1px solid ${props.theme.colors.border.alt4} !important;
 			
 			background: ${props.theme.colors.container.primary.active};
 
@@ -181,6 +177,25 @@ export const ID = styled(ElementItem)`
 export const Action = styled(ElementItem)`
 	min-width: 270px;
 	width: 270px;
+`;
+
+export const ActionValue = styled(Action) <{ background?: string }>`
+	min-width: 270px;
+	width: 270px;
+
+	/* p {
+		width: 100px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding: 2.5px 10px;
+		border: 1px solid ${(props) => props.theme.colors.border.primary};
+		background: ${(props) => props.background ? props.background : props.theme.colors.container.alt8.background};
+		color: ${(props) => props.theme.colors.font.light1};
+		border-radius: ${STYLING.dimensions.radius.alt2};
+		font-size: ${(props) => props.theme.typography.size.xxSmall};
+		text-align: center;
+	} */
 `;
 
 export const To = styled(ElementItem)`
@@ -224,11 +239,63 @@ export const Results = styled(ElementItem) <{ open?: boolean }>`
 `;
 
 export const ResultWrapper = styled.div`
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
 	padding: 0 20px 20px 20px;
+`;
+
+export const ResultInfo = styled.div`
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+`;
+
+export const ResultInfoLine = styled.div`
+	display: flex;
+	gap: 7.5px;
+`;
+
+export const ResultInfoLineValue = styled.div`
+	p {
+		font-size: ${(props) => props.theme.typography.size.xSmall};
+		font-family: ${(props) => props.theme.typography.family.primary};
+		font-weight: ${(props) => props.theme.typography.weight.bold};
+		color: ${(props) => props.theme.colors.font.primary};
+	}
 `;
 
 export const ResultOutput = styled.div`
 	width: 100%;
+
+	p {
+		font-size: ${(props) => props.theme.typography.size.xSmall};
+		font-family: ${(props) => props.theme.typography.family.primary};
+		font-weight: ${(props) => props.theme.typography.weight.bold};
+		color: ${(props) => props.theme.colors.font.primary};
+	}
+`;
+
+export const ResultActions = styled.div`
+	width: fit-content;
+	display: flex;
+	align-items: center;
+	gap: 15px;
+	margin: 5px 0 0 auto;
+`;
+
+export const FooterWrapper = styled.div`
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 15px;
+	background: ${(props) => props.theme.colors.container.alt1.background};
+	border-left: 1px solid ${(props) => props.theme.colors.border.primary};
+	border-right: 1px solid ${(props) => props.theme.colors.border.primary};
+	border-bottom: 1px solid ${(props) => props.theme.colors.border.primary} !important;	
+	border-bottom-left-radius: ${STYLING.dimensions.radius.alt1};
+	border-bottom-right-radius: ${STYLING.dimensions.radius.alt1};
 `;
 
 export const UpdateWrapper = styled.div<{ childList?: boolean }>`
@@ -236,8 +303,6 @@ export const UpdateWrapper = styled.div<{ childList?: boolean }>`
 	border-left: 1px solid ${(props) => props.childList ? props.theme.colors.border.alt4 : props.theme.colors.border.primary};
 	border-right: 1px solid ${(props) => props.childList ? props.theme.colors.border.alt4 : props.theme.colors.border.primary};
 	border-bottom: 1px solid ${(props) => (props.childList) ? props.theme.colors.border.alt4 : props.theme.colors.border.primary} !important;	
-	border-bottom-left-radius: ${(props) => props.childList ? '0' : STYLING.dimensions.radius.alt1};
-	border-bottom-right-radius: ${(props) => props.childList ? '0' : STYLING.dimensions.radius.alt1};
 	background: ${(props) => props.childList ? props.theme.colors.container.alt2.background : props.theme.colors.container.primary.background};
 
 	p {

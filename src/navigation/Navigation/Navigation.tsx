@@ -146,7 +146,7 @@ export default function Navigation(props: { open: boolean; toggle: () => void })
 				<S.Content>
 					<S.C1Wrapper>
 						{!props.open && navigationToggle}
-						{/* <S.SearchWrapper>
+						<S.SearchWrapper>
 							<ReactSVG src={ASSETS.search} />
 							<FormField
 								value={inputTxId}
@@ -157,19 +157,9 @@ export default function Navigation(props: { open: boolean; toggle: () => void })
 								hideErrorMessage
 								sm
 							/>
-						</S.SearchWrapper> */}
+						</S.SearchWrapper>
 					</S.C1Wrapper>
 					<S.ActionsWrapper>
-						<IconButton
-							type={'alt1'}
-							src={ASSETS.settings}
-							handlePress={props.toggle}
-							dimensions={{
-								wrapper: 35, icon: 21.5 
-							}}
-							tooltip={props.open ? language.sidebarClose : language.sidebarOpen}
-							tooltipPosition={'bottom'}
-						/>
 						<WalletConnect />
 					</S.ActionsWrapper>
 				</S.Content>

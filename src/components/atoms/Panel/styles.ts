@@ -30,7 +30,6 @@ export const Container = styled.div<{
 	right: 10px;
 	transform: translateX(${(props) => (props.open ? '0' : '105%')});
 	transition: transform ${transition2};
-	border: 1.25px solid ${(props) => props.theme.colors.border.alt4} !important;
 	@media (max-width: ${STYLING.cutoffs.secondary}) {
 		min-width: 82.5vw;
 	}

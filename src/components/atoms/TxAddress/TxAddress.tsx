@@ -1,5 +1,7 @@
 import React from 'react';
+import { ReactSVG } from 'react-svg';
 
+import { ASSETS } from 'helpers/config';
 import { formatAddress } from 'helpers/utils';
 import { useLanguageProvider } from 'providers/LanguageProvider';
 
@@ -12,23 +14,25 @@ export default function TxAddress(props: IProps) {
 
 	const [copied, setCopied] = React.useState<boolean>(false);
 
-	const copyAddress = React.useCallback(async (e: any) => {
-		if (props.address) {
-			if (props.address.length > 0) {
-				e.stopPropagation();
-				await navigator.clipboard.writeText(props.address);
-				setCopied(true);
-				setTimeout(() => setCopied(false), 2000);
+	const copyAddress = React.useCallback(
+		async (e: any) => {
+			if (props.address) {
+				if (props.address.length > 0) {
+					e.stopPropagation();
+					await navigator.clipboard.writeText(props.address);
+					setCopied(true);
+					setTimeout(() => setCopied(false), 2000);
+				}
 			}
-		}
-	}, [props.address]);
+		},
+		[props.address]
+	);
 
 	return (
 		<>
-			<S.Wrapper disabled={copied}>
-				<p onClick={copied ? () => {} : (e) => (copyAddress(e))}>
-					{copied ? `${language.copied}!` : formatAddress(props.address, props.wrap)}
-				</p>
+			<S.Wrapper disabled={copied} onClick={copied ? () => {} : (e) => copyAddress(e)}>
+				<p>{copied ? `${language.copied}!` : formatAddress(props.address, props.wrap)}</p>
+				<ReactSVG src={ASSETS.copy} />
 			</S.Wrapper>
 		</>
 	);

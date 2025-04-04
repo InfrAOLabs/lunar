@@ -48,6 +48,14 @@ export const lightTheme = {
 		alt9: '#3E5C6E',
 		alt10: '#8A8A8A',
 	},
+	actions: {
+		eval: '#baa2be',
+		info: '#f4be91',
+		balance: '#dc8ec4',
+		transfer: '#97c7af',
+		none: '#929292',
+		other: '#9bb4d4',
+	}
 };
 
 export const lightThemeHighContrast = {
@@ -98,6 +106,14 @@ export const lightThemeHighContrast = {
 		alt9: '#3E5C6E',
 		alt10: '#8A8A8A',
 	},
+	actions: {
+		eval: '#baa2be',
+		info: '#f4be91',
+		balance: '#dc8ec4',
+		transfer: '#97c7af',
+		none: '#929292',
+		other: '#9bb4d4',
+	}
 };
 
 export const lightThemeAlt1 = {
@@ -148,6 +164,14 @@ export const lightThemeAlt1 = {
 		alt9: '#3E5C6E',
 		alt10: '#8A8A8A',
 	},
+	actions: {
+		eval: '#baa2be',
+		info: '#f4be91',
+		balance: '#dc8ec4',
+		transfer: '#97c7af',
+		none: '#929292',
+		other: '#9bb4d4',
+	}
 };
 
 export const lightThemeAlt2 = {
@@ -198,6 +222,14 @@ export const lightThemeAlt2 = {
 		alt9: '#3E5C6E',
 		alt10: '#8A8A8A',
 	},
+	actions: {
+		eval: '#baa2be',
+		info: '#f4be91',
+		balance: '#dc8ec4',
+		transfer: '#97c7af',
+		none: '#929292',
+		other: '#9bb4d4',
+	}
 };
 
 export const darkTheme = {
@@ -248,6 +280,14 @@ export const darkTheme = {
 		alt9: '#6D909E',
 		alt10: '#BFBFBF',
 	},
+	actions: {
+		eval: '#baa2be',
+		info: '#f4be91',
+		balance: '#dc8ec4',
+		transfer: '#97c7af',
+		none: '#929292',
+		other: '#9bb4d4',
+	}
 };
 
 export const darkThemeHighContrast = {
@@ -257,11 +297,11 @@ export const darkThemeHighContrast = {
 	caution1: '#EECA00',
 	negative1: '#F16A82',
 	negative2: '#EE4463',
-	neutral1: '#171819',
-	neutral2: '#1E1E1E',
+	neutral1: '#18191c',
+	neutral2: '#202124',
 	neutral3: '#2A2A2A',
-	neutral4: '#606060',
-	neutral5: '#424242',
+	neutral4: '#424242',
+	neutral5: '#606060',
 	neutral6: '#4E4E4E',
 	neutral7: '#5A5A5A',
 	neutral8: '#666666',
@@ -298,6 +338,14 @@ export const darkThemeHighContrast = {
 		alt9: '#6D909E',
 		alt10: '#BFBFBF',
 	},
+	actions: {
+		eval: '#baa2be',
+		info: '#f4be91',
+		balance: '#dc8ec4',
+		transfer: '#97c7af',
+		none: '#929292',
+		other: '#9bb4d4',
+	}
 };
 
 export const darkThemeAlt1 = {
@@ -348,6 +396,14 @@ export const darkThemeAlt1 = {
 		alt9: '#6D909E',
 		alt10: '#BFBFBF',
 	},
+	actions: {
+		eval: '#baa2be',
+		info: '#f4be91',
+		balance: '#dc8ec4',
+		transfer: '#97c7af',
+		none: '#929292',
+		other: '#9bb4d4',
+	}
 };
 
 export const darkThemeAlt2 = {
@@ -398,6 +454,14 @@ export const darkThemeAlt2 = {
 		alt9: '#6D909E',
 		alt10: '#BFBFBF',
 	},
+	actions: {
+		eval: '#baa2be',
+		info: '#f4be91',
+		balance: '#dc8ec4',
+		transfer: '#97c7af',
+		none: '#929292',
+		other: '#9bb4d4',
+	}
 };
 
 export const theme = (currentTheme: any): DefaultTheme => ({
@@ -407,6 +471,14 @@ export const theme = (currentTheme: any): DefaultTheme => ({
 			background: currentTheme.neutral1,
 			hover: currentTheme.neutral2,
 			color: currentTheme.neutralA1,
+		},
+		actions: {
+			eval: currentTheme.actions.eval,
+			info: currentTheme.actions.info,
+			balance: currentTheme.actions.balance,
+			transfer: currentTheme.actions.transfer,
+			none: currentTheme.actions.none,
+			other: currentTheme.actions.other,
 		},
 		border: {
 			primary: currentTheme.neutral5,

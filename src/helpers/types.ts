@@ -84,7 +84,9 @@ export type NotificationType = {
 	status: 'success' | 'warning';
 };
 
-export type TransactionType = { id: string; label: string; type: 'process' | 'message' };
+export type TransactionType = 'process' | 'message';
+
+export type TransactionTabType = { id: string; label: string; type: TransactionType };
 
 export type MetricDataPoint = {
 	created_date: string;

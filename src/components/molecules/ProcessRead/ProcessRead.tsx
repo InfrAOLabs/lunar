@@ -197,24 +197,10 @@ export default function ProcessRead(props: { processId: string; autoRun: boolean
 					</S.LoadingWrapper>
 				)}
 			</S.SectionWrapper>
-			{!props.hideOutput && (
-				<S.SectionWrapper className={'border-wrapper-primary'}>
-					<S.HeaderAlt>
-						<S.HeaderMain>
-							<p>{language.currentOutput}</p>
-						</S.HeaderMain>
-						{/* <Button type={'alt3'} label={language.download} disabled={true} handlePress={() => {}} /> */}
-					</S.HeaderAlt>
-					<S.Output className={'scroll-wrapper'}>
-						{currentOutput ? (
-							<JSONTree data={currentOutput} />
-						) : (
-							<S.UpdateWrapper>
-								<p>Output will display here</p>
-							</S.UpdateWrapper>
-						)}
-					</S.Output>
-				</S.SectionWrapper>
+			{!props.hideOutput && currentOutput && (
+				<S.OutputWrapper>
+					<JSONTree data={currentOutput} header={'Info'} maxHeight={600} />
+				</S.OutputWrapper>
 			)}
 		</S.Wrapper>
 	);

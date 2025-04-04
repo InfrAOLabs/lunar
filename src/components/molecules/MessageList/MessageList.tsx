@@ -1,20 +1,30 @@
 import React from 'react';
 import { ReactSVG } from 'react-svg';
 import { DefaultGQLResponseType, GQLNodeResponseType } from '@permaweb/libs';
+import { useTheme } from 'styled-components';
 
 import { Button } from 'components/atoms/Button';
 import { JSONTree } from 'components/atoms/JSONTree';
 import { Panel } from 'components/atoms/Panel';
 import { TxAddress } from 'components/atoms/TxAddress';
 import { ASSETS, DEFAULT_MESSAGE_TAGS } from 'helpers/config';
-import { MessageFilterType } from 'helpers/types';
+import { MessageFilterType, TransactionType } from 'helpers/types';
 import { formatCount, getRelativeDate, getTagValue } from 'helpers/utils';
 import { useLanguageProvider } from 'providers/LanguageProvider';
 import { usePermawebProvider } from 'providers/PermawebProvider';
 
 import * as S from './styles';
 
-function Message(props: { element: GQLNodeResponseType; parentId: string; lastChild?: boolean }) {
+// TODO: To field value
+function Message(props: {
+	element: GQLNodeResponseType;
+	type: TransactionType;
+	parentId: string;
+	lastChild?: boolean;
+	isOverallLast?: boolean;
+}) {
+	const currentTheme: any = useTheme();
+
 	const permawebProvider = usePermawebProvider();
 
 	const languageProvider = useLanguageProvider();
@@ -40,6 +50,34 @@ function Message(props: { element: GQLNodeResponseType; parentId: string; lastCh
 		})();
 	}, [result, showViewResult]);
 
+	function handleShowViewResult(e: any) {
+		e.preventDefault();
+		e.stopPropagation();
+		setShowViewResult((prev) => !prev);
+	}
+
+	function getAction() {
+		return getTagValue(props.element.node.tags, 'Action') ?? language.none;
+	}
+
+	function getActionBackground() {
+		const action = getAction();
+		switch (action) {
+			case 'Eval':
+				return currentTheme.colors.actions.eval;
+			case 'Info':
+				return currentTheme.colors.actions.info;
+			case 'Balance':
+				return currentTheme.colors.actions.balance;
+			case 'Transfer':
+				return currentTheme.colors.actions.transfer;
+			case 'None':
+				return currentTheme.colors.actions.none;
+			default:
+				return currentTheme.colors.actions.other;
+		}
+	}
+
 	return (
 		<>
 			<S.ElementWrapper
@@ -52,22 +90,14 @@ function Message(props: { element: GQLNodeResponseType; parentId: string; lastCh
 				<S.ID>
 					<TxAddress address={props.element.node.id} />
 				</S.ID>
-				<S.Action>
-					<p>{getTagValue(props.element.node.tags, 'Action') ?? language.none}</p>
-				</S.Action>
+				<S.ActionValue background={getActionBackground()}>
+					<p>{getAction()}</p>
+				</S.ActionValue>
 				<S.To>
 					<TxAddress address={props.element.node.id} />
 				</S.To>
 				<S.Output>
-					<Button
-						type={'alt3'}
-						label={language.view}
-						handlePress={(e) => {
-							e.preventDefault();
-							e.stopPropagation();
-							setShowViewResult((prev) => !prev);
-						}}
-					/>
+					<Button type={'alt3'} label={language.view} handlePress={(e) => handleShowViewResult(e)} />
 				</S.Output>
 				<S.Time>
 					<p>
@@ -81,16 +111,38 @@ function Message(props: { element: GQLNodeResponseType; parentId: string; lastCh
 			{open && (
 				<MessageList
 					txId={props.element.node.id}
+					type={props.type}
 					recipient={props.element.node.recipient}
 					parentId={props.parentId}
 					childList
-					isOverallLast={props.lastChild}
+					isOverallLast={props.isOverallLast && props.lastChild}
 				/>
 			)}
 
-			<Panel open={showViewResult} width={550} header={'Result'} handleClose={() => setShowViewResult(false)}>
+			<Panel open={showViewResult} width={550} header={language.result} handleClose={() => setShowViewResult(false)}>
 				<S.ResultWrapper>
-					<S.ResultOutput>{result ? <JSONTree data={result} /> : null}</S.ResultOutput>
+					<S.ResultInfo>
+						<S.ResultInfoLine>
+							<S.ResultInfoLineValue>
+								<p>Message: </p>
+							</S.ResultInfoLineValue>
+							<TxAddress address={props.element.node.id} />
+						</S.ResultInfoLine>
+						<S.ResultInfoLine>
+							<S.ResultInfoLineValue>
+								<p>Action: </p>
+							</S.ResultInfoLineValue>
+							<S.ResultInfoLineValue>
+								<p>{getAction()}</p>
+							</S.ResultInfoLineValue>
+						</S.ResultInfoLine>
+					</S.ResultInfo>
+					<S.ResultOutput>
+						{result ? <JSONTree data={result} header={language.output} /> : <p>{`${language.loading}...`}</p>}
+					</S.ResultOutput>
+					<S.ResultActions>
+						<Button type={'primary'} label={language.close} handlePress={() => setShowViewResult(false)} />
+					</S.ResultActions>
 				</S.ResultWrapper>
 			</Panel>
 		</>
@@ -99,6 +151,7 @@ function Message(props: { element: GQLNodeResponseType; parentId: string; lastCh
 
 export default function MessageList(props: {
 	txId: string;
+	type: TransactionType;
 	recipient: string | null;
 	parentId: string;
 	childList?: boolean;
@@ -116,13 +169,34 @@ export default function MessageList(props: {
 	const [incomingCount, setIncomingCount] = React.useState<number | null>(null);
 	const [outgoingCount, setOutgoingCount] = React.useState<number | null>(null);
 
+	React.useEffect(() => {
+		(async function () {
+			try {
+				const [gqlResponseIncoming, gqlResponseOutgoing] = await Promise.all([
+					permawebProvider.libs.getGQLData({
+						tags: [...DEFAULT_MESSAGE_TAGS],
+						recipients: [props.txId],
+					}),
+					permawebProvider.libs.getGQLData({
+						tags: [...DEFAULT_MESSAGE_TAGS, { name: 'From-Process', values: [props.txId] }],
+						paginator: 20, // TODO
+					}),
+				]);
+				setIncomingCount(gqlResponseIncoming.count);
+				setOutgoingCount(gqlResponseOutgoing.count);
+			} catch (e: any) {
+				console.error(e);
+			}
+		})();
+	}, [props.txId]);
+
 	// TODO: Result type
 	React.useEffect(() => {
 		(async function () {
 			if (props.txId) {
 				setLoadingMessages(true);
 				try {
-					if (!props.childList) {
+					if (!props.childList && props.type === 'process') {
 						let gqlResponse: DefaultGQLResponseType;
 						switch (currentFilter) {
 							case 'incoming':
@@ -131,14 +205,12 @@ export default function MessageList(props: {
 									recipients: [props.txId],
 									paginator: 20, // TODO
 								});
-								setIncomingCount(gqlResponse.count);
 								break;
 							case 'outgoing':
 								gqlResponse = await permawebProvider.libs.getGQLData({
 									tags: [...DEFAULT_MESSAGE_TAGS, { name: 'From-Process', values: [props.txId] }],
 									paginator: 20, // TODO
 								});
-								setOutgoingCount(gqlResponse.count);
 								break;
 							default:
 								break;
@@ -204,6 +276,16 @@ export default function MessageList(props: {
 							handlePress={() => setCurrentFilter('outgoing')}
 							active={currentFilter === 'outgoing'}
 						/>
+						<S.HeaderActionsDivider />
+						<Button
+							type={'alt3'}
+							label={language.filter}
+							handlePress={() => console.log('TODO')}
+							active={false}
+							disabled={true}
+							icon={ASSETS.filter}
+							iconLeftAlign
+						/>
 					</S.HeaderActions>
 				</S.Header>
 			)}
@@ -231,20 +313,43 @@ export default function MessageList(props: {
 							</S.Results>
 						</S.HeaderWrapper>
 					)}
-					<S.BodyWrapper
-						childList={props.childList}
-						isOverallLast={true} // for top-level lists you can assume it is overall last
-					>
+					<S.BodyWrapper childList={props.childList} isOverallLast={props.isOverallLast}>
 						{currentData.map((element: GQLNodeResponseType, index: number) => {
-							const isLast = index === currentData.length - 1;
+							const isLastChild = index === currentData.length - 1;
+
 							return (
-								<Message key={element.node.id} element={element} parentId={props.parentId} lastChild={isLast} />
+								<Message
+									key={element.node.id}
+									element={element}
+									type={props.type}
+									parentId={props.parentId}
+									lastChild={isLastChild}
+									isOverallLast={props.isOverallLast && isLastChild}
+								/>
 							);
 						})}
 					</S.BodyWrapper>
 				</S.Wrapper>
 			) : (
 				getMessage()
+			)}
+			{!props.childList && (
+				<S.FooterWrapper>
+					<Button
+						type={'alt3'}
+						label={language.previous}
+						handlePress={() => setCurrentFilter('incoming')}
+						active={currentFilter === 'incoming'}
+						disabled={true}
+					/>
+					<Button
+						type={'alt3'}
+						label={language.next}
+						handlePress={() => setCurrentFilter('outgoing')}
+						active={currentFilter === 'outgoing'}
+						disabled={true}
+					/>
+				</S.FooterWrapper>
 			)}
 		</div>
 	);

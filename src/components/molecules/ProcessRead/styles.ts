@@ -16,6 +16,12 @@ export const SectionWrapper = styled.div`
 	position: relative;
 `;
 
+export const SectionWrapperFull = styled(SectionWrapper)`
+	padding: 0;
+`;
+
+export const OutputWrapper = styled(SectionWrapperFull)``;
+
 export const Header = styled.div`
 	width: 100%;
 	display: flex;

@@ -10,9 +10,11 @@ import { TxAddress } from 'components/atoms/TxAddress';
 import { URLTabs } from 'components/atoms/URLTabs';
 import { ViewHeader } from 'components/atoms/ViewHeader';
 import { MessageList } from 'components/molecules/MessageList';
+import { MessageResult } from 'components/molecules/MessageResult';
 import { ProcessRead } from 'components/molecules/ProcessRead';
 import { ASSETS, STYLING, URLS } from 'helpers/config';
 import { getTxEndpoint } from 'helpers/endpoints';
+import { TransactionType } from 'helpers/types';
 import { checkValidAddress, formatDate, getTagValue } from 'helpers/utils';
 import { useArweaveProvider } from 'providers/ArweaveProvider';
 import { useLanguageProvider } from 'providers/LanguageProvider';
@@ -22,7 +24,7 @@ import * as S from './styles';
 
 export default function Transaction(props: {
 	txId: string;
-	type: 'process' | 'message';
+	type: TransactionType;
 	active: boolean;
 	onTxChange?: (newTx: GQLNodeResponseType) => void;
 }) {
@@ -31,10 +33,15 @@ export default function Transaction(props: {
 	const languageProvider = useLanguageProvider();
 	const language = languageProvider.object[languageProvider.current];
 
+	const currentHash = window.location.hash.replace('#', '');
+
 	const [inputTxId, setInputTxId] = React.useState<string>(props.txId);
 	const [loadingTx, setLoadingTx] = React.useState<boolean>(false);
 	const [txResponse, setTxResponse] = React.useState<GQLNodeResponseType | null>(null);
 	const [hasFetched, setHasFetched] = React.useState<boolean>(false);
+
+	const [idCopied, setIdCopied] = React.useState<boolean>(false);
+	const [urlCopied, setUrlCopied] = React.useState<boolean>(false);
 
 	const excludedTagNames = ['Type', 'Authority', 'Module', 'Scheduler'];
 	const filteredTags =
@@ -75,6 +82,20 @@ export default function Transaction(props: {
 		}
 	}
 
+	const copyAddress = React.useCallback(async (address: string) => {
+		if (address?.length > 0) {
+			await navigator.clipboard.writeText(address);
+			setIdCopied(true);
+			setTimeout(() => setIdCopied(false), 2000);
+		}
+	}, []);
+
+	const copyUrl = React.useCallback(async () => {
+		await navigator.clipboard.writeText(window.location.href);
+		setUrlCopied(true);
+		setTimeout(() => setUrlCopied(false), 2000);
+	}, []);
+
 	const OverviewLine = ({ label, value, render }: { label: string; value: any; render?: (v: any) => JSX.Element }) => {
 		const defaultRender = (v: any) => {
 			if (typeof v === 'string' && checkValidAddress(v)) {
@@ -93,66 +114,69 @@ export default function Transaction(props: {
 		);
 	};
 
-	const TABS = React.useMemo(
-		() => [
-			// {
-			// 	label: language.overview,
-			// 	icon: ASSETS.overview,
-			// 	disabled: false,
-			// 	url: URLS.explorerInfo(inputTxId),
-			// 	view: () => (
-			// 		<S.InfoWrapper>
-			// 			<S.ReadWrapper>
-			// 				{props.type === 'process' && <ProcessRead processId={inputTxId} autoRun={true} />}
-			// 			</S.ReadWrapper>
-			// 			<S.TagsWrapper>
-			// 				<S.TagsSection className={'border-wrapper-primary'}>
-			// 					<S.SectionHeader>
-			// 						<p>{language.tags}</p>
-			// 					</S.SectionHeader>
-			// 					<S.OverviewWrapper>
-			// 						<OverviewLine
-			// 							label={language.type}
-			// 							value={txResponse?.node?.tags && getTagValue(txResponse.node.tags, 'Type')}
-			// 						/>
-			// 						<OverviewLine
-			// 							label={language.dateCreated}
-			// 							value={
-			// 								txResponse?.node?.block?.timestamp &&
-			// 								formatDate(txResponse.node.block.timestamp * 1000, 'timestamp')
-			// 							}
-			// 						/>
-			// 						<OverviewLine label={language.owner} value={txResponse?.node?.owner?.address} />
-			// 						<S.OverviewDivider />
-			// 						<OverviewLine
-			// 							label={'Authority'}
-			// 							value={txResponse?.node?.tags && getTagValue(txResponse.node.tags, 'Authority')}
-			// 						/>
-			// 						<OverviewLine
-			// 							label={'Module'}
-			// 							value={txResponse?.node?.tags && getTagValue(txResponse.node.tags, 'Module')}
-			// 						/>
-			// 						<OverviewLine
-			// 							label={'Scheduler'}
-			// 							value={txResponse?.node?.tags && getTagValue(txResponse.node.tags, 'Scheduler')}
-			// 						/>
-			// 						{txResponse ? (
-			// 							<>
-			// 								{filteredTags.map((tag: { name: string; value: string }, index: number) => (
-			// 									<OverviewLine key={index} label={tag.name} value={tag.value} />
-			// 								))}
-			// 							</>
-			// 						) : (
-			// 							<S.OverviewLine>
-			// 								<span>{language.processOrMessageTagsInfo}</span>
-			// 							</S.OverviewLine>
-			// 						)}
-			// 					</S.OverviewWrapper>
-			// 				</S.TagsSection>
-			// 			</S.TagsWrapper>
-			// 		</S.InfoWrapper>
-			// 	),
-			// },
+	const TABS = React.useMemo(() => {
+		const tabs = [
+			{
+				label: language.overview,
+				icon: ASSETS.overview,
+				disabled: false,
+				url: URLS.explorerInfo(inputTxId),
+				view: () => (
+					<S.InfoWrapper>
+						<S.ReadWrapper>
+							{props.type === 'process' && <ProcessRead processId={inputTxId} autoRun={true} />}
+							{props.type === 'message' && (
+								<MessageResult processId={txResponse?.node?.recipient} messageId={inputTxId} />
+							)}
+						</S.ReadWrapper>
+						<S.TagsWrapper>
+							<S.TagsSection className={'border-wrapper-primary'}>
+								<S.SectionHeader>
+									<p>{language.tags}</p>
+								</S.SectionHeader>
+								<S.OverviewWrapper>
+									<OverviewLine
+										label={language.type}
+										value={txResponse?.node?.tags && getTagValue(txResponse.node.tags, 'Type')}
+									/>
+									<OverviewLine
+										label={language.dateCreated}
+										value={
+											txResponse?.node?.block?.timestamp &&
+											formatDate(txResponse.node.block.timestamp * 1000, 'timestamp')
+										}
+									/>
+									<OverviewLine label={language.owner} value={txResponse?.node?.owner?.address} />
+									<S.OverviewDivider />
+									<OverviewLine
+										label={'Authority'}
+										value={txResponse?.node?.tags && getTagValue(txResponse.node.tags, 'Authority')}
+									/>
+									<OverviewLine
+										label={'Module'}
+										value={txResponse?.node?.tags && getTagValue(txResponse.node.tags, 'Module')}
+									/>
+									<OverviewLine
+										label={'Scheduler'}
+										value={txResponse?.node?.tags && getTagValue(txResponse.node.tags, 'Scheduler')}
+									/>
+									{txResponse ? (
+										<>
+											{filteredTags.map((tag: { name: string; value: string }, index: number) => (
+												<OverviewLine key={index} label={tag.name} value={tag.value} />
+											))}
+										</>
+									) : (
+										<S.OverviewLine>
+											<span>{language.processOrMessageTagsInfo}</span>
+										</S.OverviewLine>
+									)}
+								</S.OverviewWrapper>
+							</S.TagsSection>
+						</S.TagsWrapper>
+					</S.InfoWrapper>
+				),
+			},
 			{
 				label: language.messages,
 				icon: ASSETS.message,
@@ -162,36 +186,45 @@ export default function Transaction(props: {
 					<S.MessagesWrapper>
 						<S.MessagesSection>
 							{inputTxId && checkValidAddress(inputTxId) && (
-								<MessageList txId={inputTxId} recipient={null} parentId={inputTxId} />
+								<MessageList
+									txId={inputTxId}
+									type={props.type}
+									recipient={props.type === 'message' ? txResponse?.node?.recipient : null}
+									parentId={inputTxId}
+								/>
 							)}
 						</S.MessagesSection>
 					</S.MessagesWrapper>
 				),
 			},
-			{
-				label: language.read,
-				icon: ASSETS.read,
-				disabled: false,
-				url: URLS.explorerRead(inputTxId),
-				view: () => (
-					<p>Read</p>
-				),
-			},
-			{
-				label: language.write,
-				icon: ASSETS.write,
-				disabled: false,
-				url: URLS.explorerWrite(inputTxId),
-				view: () => (
-					<p>Write</p>
-				),
-			},
-		],
-		[inputTxId, txResponse, language]
-	);
+		];
+
+		if (props.type === 'process') {
+			tabs.push(
+				{
+					label: language.read,
+					icon: ASSETS.read,
+					disabled: false,
+					url: URLS.explorerRead(inputTxId),
+					view: () => <p>Read</p>,
+				},
+				{
+					label: language.write,
+					icon: ASSETS.write,
+					disabled: false,
+					url: URLS.explorerWrite(inputTxId),
+					view: () => <p>Write</p>,
+				}
+			);
+		}
+
+		return tabs;
+	}, [props.type, inputTxId, txResponse, language]);
 
 	const transactionTabs = React.useMemo(() => {
-		return <URLTabs tabs={TABS} activeUrl={TABS[0].url} />;
+		const matchingTab = TABS.find((tab) => tab.url === currentHash);
+		const activeUrl = matchingTab ? matchingTab.url : TABS[0].url;
+		return <URLTabs tabs={TABS} activeUrl={activeUrl} />;
 	}, [TABS]);
 
 	function getTransaction() {
@@ -202,7 +235,7 @@ export default function Transaction(props: {
 						<ReactSVG src={ASSETS.process} />
 					</S.PlaceholderIcon>
 					<S.PlaceholderDescription>
-						<p>{loadingTx ? `Loading...` : `Enter a Process or Message ID`}</p>
+						<p>{loadingTx ? `${language.loading}...` : language.processOrMessageId}</p>
 					</S.PlaceholderDescription>
 				</S.Placeholder>
 			);
@@ -231,19 +264,33 @@ export default function Transaction(props: {
 					<IconButton
 						type={'alt1'}
 						src={ASSETS.copy}
-						handlePress={() => {}}
+						handlePress={() => copyAddress(inputTxId)}
+						disabled={!checkValidAddress(inputTxId)}
 						dimensions={{
 							wrapper: 32.5,
-							icon: 17.5
+							icon: 17.5,
 						}}
-						tooltip={'Copy ID'}
+						tooltip={idCopied ? `${language.copied}!` : language.copyId}
+					/>
+					<IconButton
+						type={'alt1'}
+						src={ASSETS.refresh}
+						handlePress={() => handleSubmit()}
+						disabled={loadingTx || !checkValidAddress(inputTxId)}
+						dimensions={{
+							wrapper: 32.5,
+							icon: 17.5,
+						}}
+						tooltip={loadingTx ? `${language.loading}!` : language.refresh}
 					/>
 				</S.SearchWrapper>
 				<S.HeaderActionsWrapper>
 					<Button
 						type={'primary'}
-						label={'Copy Full URL'}
-						handlePress={() => {}}
+						label={urlCopied ? `${language.copied}!` : language.copyFullUrl}
+						handlePress={() => copyUrl()}
+						icon={ASSETS.copy}
+						iconLeftAlign
 					/>
 				</S.HeaderActionsWrapper>
 			</S.HeaderWrapper>
