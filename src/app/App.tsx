@@ -66,7 +66,8 @@ export default function App() {
 						{getRoute(URLS.explorer, <Explorer />)}
 						{getRoute(`${URLS.explorer}:txid`, <Explorer />)}
 						{getRoute(`${URLS.explorer}:txid/:active`, <Explorer />)}
-						{getRoute(URLS.console, <Console />)}
+						{getRoute(URLS.aos, <Console />)}
+						{getRoute(`${URLS.aos}:txid`, <Console />)}
 						{getRoute(URLS.docs, <Docs />)}
 						{getRoute(`${URLS.docs}:active/*`, <Docs />)}
 						{getRoute(URLS.notFound, <NotFound />)}

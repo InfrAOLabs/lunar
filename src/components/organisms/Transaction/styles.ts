@@ -219,7 +219,7 @@ export const Placeholder = styled.div`
 	align-items: center;
 	justify-content: center;
 	gap: 20px;
-	padding: 60px 0 0 0;
+	padding: 80px 0;
 `;
 
 export const PlaceholderIcon = styled.div`

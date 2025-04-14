@@ -1,0 +1,321 @@
+import React from 'react';
+import { flushSync } from 'react-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { ReactSVG } from 'react-svg';
+import { GQLNodeResponseType } from '@permaweb/libs';
+
+import { ViewWrapper } from 'app/styles';
+import { Button } from 'components/atoms/Button';
+import { IconButton } from 'components/atoms/IconButton';
+import { ViewHeader } from 'components/atoms/ViewHeader';
+import { Transaction } from 'components/organisms/Transaction';
+import { ASSETS, URLS } from 'helpers/config';
+import { TransactionTabType } from 'helpers/types';
+import { checkValidAddress, formatAddress, getTagValue } from 'helpers/utils';
+import { useLanguageProvider } from 'providers/LanguageProvider';
+
+import { ConsoleInstance } from '../ConsoleInstance';
+
+import * as S from './styles';
+
+export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
+	const location = useLocation();
+	const navigate = useNavigate();
+
+	const tabsRef = React.useRef<HTMLDivElement>(null);
+
+	const storageKey = `${props.type}-transactions`;
+
+	const languageProvider = useLanguageProvider();
+	const language = languageProvider.object[languageProvider.current];
+
+	const [transactions, setTransactions] = React.useState<TransactionTabType[]>(() => {
+		const stored = localStorage.getItem(storageKey);
+		return stored && JSON.parse(stored).length > 0 ? JSON.parse(stored) : [{ id: '', label: '', type: 'message' }];
+	});
+	const [activeTabIndex, setActiveTabIndex] = React.useState<number>(getInitialIndex());
+	const [ignorePathChange, setIgnorePathChange] = React.useState<boolean>(false);
+	const [isClearing, setIsClearing] = React.useState<boolean>(false);
+
+	React.useEffect(() => {
+		if (ignorePathChange) {
+			setIgnorePathChange(false);
+			return;
+		}
+
+		const txId = extractTxIdFromPath(location.pathname);
+
+		if (txId && !transactions.some((tab) => tab.id === txId)) {
+			if (transactions.length === 1 && transactions[0].id === '') {
+				setTransactions((prev) => {
+					const updated = [...prev];
+					updated[0] = { id: txId, label: txId, type: 'message' };
+					return updated;
+				});
+				setActiveTabIndex(0);
+			} else {
+				const newIndex = transactions.length;
+				setTransactions((prev) => [...prev, { id: txId, label: txId, type: 'message' }]);
+				setActiveTabIndex(newIndex);
+				navigate(`${URLS[props.type]}${txId}`);
+			}
+			navigate(`${URLS[props.type]}${txId}`);
+		}
+	}, [location.pathname]);
+
+	React.useEffect(() => {
+		const el = tabsRef.current;
+		if (!el) return;
+
+		const onWheel = (e: WheelEvent) => {
+			if (e.deltaY !== 0) {
+				e.preventDefault();
+				el.scrollLeft += e.deltaY;
+			}
+		};
+
+		el.addEventListener('wheel', onWheel, { passive: false });
+
+		return () => {
+			el.removeEventListener('wheel', onWheel);
+		};
+	}, []);
+
+	React.useEffect(() => {
+		localStorage.setItem(storageKey, JSON.stringify(transactions));
+	}, [transactions]);
+
+	const extractTxIdFromPath = (path: string): string => {
+		let txId = null;
+		const parts = path.split('/');
+		for (const part of parts) {
+			if (checkValidAddress(part)) {
+				txId = part;
+				break;
+			}
+		}
+		return txId;
+	};
+
+	function getInitialIndex() {
+		if (transactions.length <= 0) return 0;
+		let currentTxId = location.pathname.replace(`${URLS[props.type]}/`, '');
+
+		const parts = location.pathname.split('/');
+		for (const part of parts) {
+			if (checkValidAddress(part)) {
+				currentTxId = part;
+				break;
+			}
+		}
+
+		for (let i = 0; i < transactions.length; i++) {
+			if (transactions[i].id === currentTxId) return i;
+		}
+
+		return 0;
+	}
+
+	const handleTxChange = (tabIndex: number, newTx: GQLNodeResponseType) => {
+		if (isClearing) return;
+
+		const name = getTagValue(newTx.node.tags, 'Name');
+		const type = getTagValue(newTx.node.tags, 'Type');
+		setTransactions((prev) => {
+			const updated = [...prev];
+			if (updated[tabIndex]) {
+				updated[tabIndex] = {
+					...updated[tabIndex],
+					id: newTx.node.id,
+					label: name ?? newTx.node.id,
+					type: type ? (type.toLowerCase() as any) : 'message',
+				};
+			} else {
+				updated.push({
+					id: newTx.node.id,
+					label: name ?? newTx.node.id,
+					type: type ? (type.toLowerCase() as any) : 'message',
+				});
+			}
+			return updated;
+		});
+		setActiveTabIndex(tabIndex);
+
+		const currentParts = window.location.hash.replace('#', '').split('/');
+		const currentRoute = currentParts[currentParts.length - 1];
+
+		let toRoute = `${URLS[props.type]}${newTx.node.id}`;
+
+		if (props.type === 'explorer') {
+			switch (currentRoute) {
+				case 'info':
+					toRoute = URLS.explorerInfo(newTx.node.id);
+					break;
+				case 'messages':
+					toRoute = URLS.explorerMessages(newTx.node.id);
+					break;
+				case 'read':
+					toRoute = URLS.explorerRead(newTx.node.id);
+					break;
+				case 'write':
+					toRoute = URLS.explorerWrite(newTx.node.id);
+					break;
+				case 'aos':
+					toRoute = URLS.explorerAOS(newTx.node.id);
+					break;
+				default:
+					break;
+			}
+		}
+
+		navigate(toRoute);
+	};
+
+	const handleTabRedirect = (index: number) => {
+		setActiveTabIndex(index);
+		navigate(`${URLS[props.type]}${transactions[index].id}`);
+	};
+
+	const handleAddTab = () => {
+		setTransactions((prev) => [...prev, { id: '', label: '', type: 'message' }]);
+		setActiveTabIndex(transactions.length);
+		navigate(URLS[props.type]);
+	};
+
+	const handleDeleteTab = (deletedIndex: number) => {
+		const updatedTransactions = transactions.filter((_, i) => i !== deletedIndex);
+
+		let newActiveIndex = activeTabIndex;
+
+		if (deletedIndex === activeTabIndex) {
+			newActiveIndex = deletedIndex === 0 ? 0 : deletedIndex - 1;
+		} else if (deletedIndex < activeTabIndex) {
+			newActiveIndex = activeTabIndex - 1;
+		}
+		newActiveIndex = Math.max(0, Math.min(newActiveIndex, updatedTransactions.length - 1));
+
+		setTransactions(updatedTransactions.length > 0 ? updatedTransactions : [{ id: '', label: '', type: 'message' }]);
+		setActiveTabIndex(newActiveIndex);
+	};
+
+	const handleClearTabs = () => {
+		flushSync(() => {
+			setIsClearing(true);
+			setTransactions([{ id: '', label: '', type: 'message' }]);
+			setActiveTabIndex(0);
+		});
+
+		navigate(URLS[props.type], { replace: true });
+
+		setTimeout(() => setIsClearing(false), 50);
+	};
+
+	const tabs = React.useMemo(() => {
+		return (
+			<S.TabsContent ref={tabsRef} className={'scroll-wrapper-hidden'}>
+				{transactions.map((tx, index) => {
+					let label = language.untitled;
+					if (tx.label) {
+						label = checkValidAddress(tx.label) ? formatAddress(tx.label, false) : tx.label;
+					}
+					return (
+						<React.Fragment key={index}>
+							<S.TabHeader>
+								<S.TabAction active={index === activeTabIndex} onClick={() => handleTabRedirect(index)}>
+									<div className={'icon-wrapper'}>
+										<div className={'normal-icon'}>
+											<ReactSVG src={ASSETS[tx.type]} />
+										</div>
+										<div className={'delete-icon'}>
+											<IconButton
+												type={'primary'}
+												src={ASSETS.close}
+												handlePress={() => {
+													handleDeleteTab(index);
+												}}
+												dimensions={{ wrapper: 10, icon: 10 }}
+											/>
+										</div>
+									</div>
+									{label}
+								</S.TabAction>
+							</S.TabHeader>
+							{index !== transactions.length - 1 && <S.TabDivider />}
+						</React.Fragment>
+					);
+				})}
+				<S.TabDivider />
+				<S.TabAction active={false} onClick={() => handleAddTab()}>
+					<div className={'add-icon'}>
+						<ReactSVG src={ASSETS.add} />
+					</div>
+					{language.new}
+				</S.TabAction>
+				<S.TabDivider />
+			</S.TabsContent>
+		);
+	}, [transactions, activeTabIndex, language]);
+
+	function getTab(tx: TransactionTabType, index: number) {
+		switch (props.type) {
+			case 'explorer':
+				return (
+					<Transaction
+						txId={tx.id}
+						type={tx.type}
+						active={index === activeTabIndex}
+						onTxChange={(newTx: GQLNodeResponseType) => handleTxChange(index, newTx)}
+					/>
+				);
+			case 'aos':
+				return (
+					<ConsoleInstance
+						processId={tx.id}
+						active={index === activeTabIndex}
+						onTxChange={(newTx: GQLNodeResponseType) => handleTxChange(index, newTx)}
+						noWrapper
+					/>
+				);
+		}
+	}
+
+	return (
+		<S.Wrapper>
+			<S.HeaderWrapper>
+				<ViewHeader
+					header={language[props.type]}
+					actions={[
+						<Button
+							type={'primary'}
+							label={language.newTab}
+							handlePress={() => handleAddTab()}
+							icon={ASSETS.add}
+							iconLeftAlign
+						/>,
+						<Button
+							type={'warning'}
+							label={language.clearTabs}
+							handlePress={() => handleClearTabs()}
+							icon={ASSETS.delete}
+							iconLeftAlign
+						/>,
+					]}
+				/>
+				<S.TabsWrapper>
+					<ViewWrapper>{tabs}</ViewWrapper>
+				</S.TabsWrapper>
+			</S.HeaderWrapper>
+			<ViewWrapper>
+				{!isClearing ? (
+					<>
+						{transactions.map((tx: TransactionTabType, index) => (
+							<S.TransactionWrapper key={index} active={index === activeTabIndex}>
+								{getTab(tx, index)}
+							</S.TransactionWrapper>
+						))}
+					</>
+				) : null}
+			</ViewWrapper>
+		</S.Wrapper>
+	);
+}

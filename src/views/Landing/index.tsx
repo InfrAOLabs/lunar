@@ -32,7 +32,7 @@ export default function Landing() {
 			</S.HeaderWrapper>
 			<S.BodyWrapper>
 				<Metrics />
-				<ViewWrapper>
+				{/* <ViewWrapper>
 					<S.SectionMain>
 						<S.SectionHeader>
 							<p>Active Nodes</p>
@@ -46,8 +46,8 @@ export default function Landing() {
 							<ProcessRead processId={'SaXnsUgxJLkJRghWQOUs9-wB0npVviewTkUbh2Yk64M'} autoRun hideOutput />
 						</S.ProcessReadWrapper>
 					</S.SectionMain>
-				</ViewWrapper>
-				<ViewWrapper>
+				</ViewWrapper> */}
+				{/* <ViewWrapper>
 					<S.SectionMain>
 						<S.SectionHeader>
 							<p>Recent Messages</p>
@@ -58,7 +58,7 @@ export default function Landing() {
 							parentId={'0syT13r0s0tgPmIed95bJnuSqaD29HQNN8D3ElLSrsc'}
 						/>
 					</S.SectionMain>
-				</ViewWrapper>
+				</ViewWrapper> */}
 			</S.BodyWrapper>
 		</S.Wrapper>
 	);

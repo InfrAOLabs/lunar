@@ -27,6 +27,7 @@ export const ASSETS = {
 	explorer: getTxEndpoint('yRgUeadiTV769j2tbEg2HnpXUohA_3M2oFZsHwNRqOU'),
 	facebook: getTxEndpoint('mEcWrUwBKrp_9azlko-h2sta-UJu07UeCXPRBi8yDpA'),
 	filter: getTxEndpoint('S7PKyYrmK3EbqWBTAHG66B9rzeVXXkL3VzmyE6jU8Io'),
+	go: getTxEndpoint('uPGHtrtkOiGXWvpn77GGh76CxFuQDIEMRStynGz7mAs'),
 	header1: getTxEndpoint('Me8rAW3kmQxPclDnl7lupTXyWg2t3vV3yfFdCzyXbNA'),
 	header2: getTxEndpoint('6U8907x3L_phk9loiiBCHIXqDBWaV5IfK19IJnH8Q4A'),
 	header3: getTxEndpoint('fBTN-aLZM0VFaLGw7VhBiGSdHuNDGcO0qGKbtXLiwnA'),
@@ -134,6 +135,7 @@ function createURLs() {
 
 	const docs = `${base}docs/`;
 	const explorer = `${base}explorer/`
+	const aos = `${base}aos/`
 
 	return {
 		base: base,
@@ -142,7 +144,8 @@ function createURLs() {
 		explorerMessages: (id: string) => `${explorer}${id}/messages`,
 		explorerRead: (id: string) => `${explorer}${id}/read`,
 		explorerWrite: (id: string) => `${explorer}${id}/write`,
-		console: `${base}console`,
+		explorerAOS: (id: string) => `${explorer}${id}/aos`,
+		aos: aos,
 		docs: docs,
 		docsIntro: `${docs}overview/introduction`,
 		notFound: `${base}404`,

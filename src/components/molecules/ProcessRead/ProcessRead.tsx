@@ -1,9 +1,9 @@
 import React from 'react';
 
 import { Button } from 'components/atoms/Button';
-import { JSONTree } from 'components/atoms/JSONTree';
 import { Loader } from 'components/atoms/Loader';
 import { TxAddress } from 'components/atoms/TxAddress';
+import { JSONReader } from 'components/molecules/JSONReader';
 import { checkValidAddress, formatAddress, formatMs } from 'helpers/utils';
 import { useLanguageProvider } from 'providers/LanguageProvider';
 import { usePermawebProvider } from 'providers/PermawebProvider';
@@ -199,7 +199,7 @@ export default function ProcessRead(props: { processId: string; autoRun: boolean
 			</S.SectionWrapper>
 			{!props.hideOutput && currentOutput && (
 				<S.OutputWrapper>
-					<JSONTree data={currentOutput} header={'Info'} maxHeight={600} />
+					<JSONReader data={currentOutput} header={'Info'} maxHeight={600} />
 				</S.OutputWrapper>
 			)}
 		</S.Wrapper>

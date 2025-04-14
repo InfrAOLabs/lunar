@@ -1,24 +1,25 @@
 import React from 'react';
 import { ReactSVG } from 'react-svg';
-import { DefaultGQLResponseType, GQLNodeResponseType } from '@permaweb/libs';
+import { GQLNodeResponseType } from '@permaweb/libs';
 
 import { Button } from 'components/atoms/Button';
 import { FormField } from 'components/atoms/FormField';
 import { IconButton } from 'components/atoms/IconButton';
-import { Loader } from 'components/atoms/Loader';
+import { Notification } from 'components/atoms/Notification';
 import { TxAddress } from 'components/atoms/TxAddress';
 import { URLTabs } from 'components/atoms/URLTabs';
-import { ViewHeader } from 'components/atoms/ViewHeader';
 import { MessageList } from 'components/molecules/MessageList';
 import { MessageResult } from 'components/molecules/MessageResult';
 import { ProcessRead } from 'components/molecules/ProcessRead';
-import { ASSETS, STYLING, URLS } from 'helpers/config';
-import { getTxEndpoint } from 'helpers/endpoints';
+import { ASSETS, URLS } from 'helpers/config';
 import { TransactionType } from 'helpers/types';
 import { checkValidAddress, formatDate, getTagValue } from 'helpers/utils';
 import { useArweaveProvider } from 'providers/ArweaveProvider';
 import { useLanguageProvider } from 'providers/LanguageProvider';
 import { usePermawebProvider } from 'providers/PermawebProvider';
+
+import { ConsoleInstance } from '../ConsoleInstance';
+import { ProcessEditor } from '../ProcessEditor';
 
 import * as S from './styles';
 
@@ -39,6 +40,7 @@ export default function Transaction(props: {
 	const [loadingTx, setLoadingTx] = React.useState<boolean>(false);
 	const [txResponse, setTxResponse] = React.useState<GQLNodeResponseType | null>(null);
 	const [hasFetched, setHasFetched] = React.useState<boolean>(false);
+	const [error, setError] = React.useState<string | null>(null);
 
 	const [idCopied, setIdCopied] = React.useState<boolean>(false);
 	const [urlCopied, setUrlCopied] = React.useState<boolean>(false);
@@ -72,11 +74,13 @@ export default function Transaction(props: {
 				const response = await permawebProvider.libs.getGQLData({ ids: [inputTxId] });
 				const responseData = response?.data?.[0];
 				setTxResponse(responseData ?? null);
-				if (props.onTxChange) {
-					props.onTxChange(responseData);
+				if (responseData) {
+					if (props.onTxChange) props.onTxChange(responseData);
+				} else {
+					setError(language.txNotFound);
 				}
 			} catch (e: any) {
-				console.error(e);
+				setError(e.message ?? language.errorFetchingTx);
 			}
 			setLoadingTx(false);
 		}
@@ -148,18 +152,22 @@ export default function Transaction(props: {
 									/>
 									<OverviewLine label={language.owner} value={txResponse?.node?.owner?.address} />
 									<S.OverviewDivider />
-									<OverviewLine
-										label={'Authority'}
-										value={txResponse?.node?.tags && getTagValue(txResponse.node.tags, 'Authority')}
-									/>
-									<OverviewLine
-										label={'Module'}
-										value={txResponse?.node?.tags && getTagValue(txResponse.node.tags, 'Module')}
-									/>
-									<OverviewLine
-										label={'Scheduler'}
-										value={txResponse?.node?.tags && getTagValue(txResponse.node.tags, 'Scheduler')}
-									/>
+									{props.type === 'process' && (
+										<>
+											<OverviewLine
+												label={'Authority'}
+												value={txResponse?.node?.tags && getTagValue(txResponse.node.tags, 'Authority')}
+											/>
+											<OverviewLine
+												label={'Module'}
+												value={txResponse?.node?.tags && getTagValue(txResponse.node.tags, 'Module')}
+											/>
+											<OverviewLine
+												label={'Scheduler'}
+												value={txResponse?.node?.tags && getTagValue(txResponse.node.tags, 'Scheduler')}
+											/>
+										</>
+									)}
 									{txResponse ? (
 										<>
 											{filteredTags.map((tag: { name: string; value: string }, index: number) => (
@@ -206,20 +214,34 @@ export default function Transaction(props: {
 					icon: ASSETS.read,
 					disabled: false,
 					url: URLS.explorerRead(inputTxId),
-					view: () => <p>Read</p>,
+					view: () => <ProcessEditor processId={inputTxId} type={'read'} />,
 				},
 				{
 					label: language.write,
 					icon: ASSETS.write,
 					disabled: false,
 					url: URLS.explorerWrite(inputTxId),
-					view: () => <p>Write</p>,
+					view: () => <ProcessEditor processId={inputTxId} type={'write'} />,
 				}
 			);
+
+			console.log(txResponse?.node?.owner?.address)
+
+			if (arProvider.walletAddress && txResponse?.node?.owner?.address === arProvider.walletAddress) {
+				tabs.push({
+					label: language.aos,
+					icon: ASSETS.console,
+					disabled: false,
+					url: URLS.explorerAOS(inputTxId),
+					view: () => (
+						<ConsoleInstance processId={inputTxId} active={true} />
+					)
+				})
+			}
 		}
 
 		return tabs;
-	}, [props.type, inputTxId, txResponse, language]);
+	}, [props.type, inputTxId, txResponse, arProvider.walletAddress, language]);
 
 	const transactionTabs = React.useMemo(() => {
 		const matchingTab = TABS.find((tab) => tab.url === currentHash);
@@ -245,56 +267,68 @@ export default function Transaction(props: {
 	}
 
 	return props.active ? (
-		<S.Wrapper>
-			<S.HeaderWrapper>
-				<S.SearchWrapper>
-					<S.SearchInputWrapper>
-						<ReactSVG src={ASSETS.search} />
-						<FormField
-							value={inputTxId}
-							onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputTxId(e.target.value)}
-							placeholder={language.processOrMessageId}
-							invalid={{ status: false, message: null }}
-							disabled={loadingTx}
-							autoFocus
-							hideErrorMessage
-							sm
+		<>
+			<S.Wrapper>
+				<S.HeaderWrapper>
+					<S.SearchWrapper>
+						<S.SearchInputWrapper>
+							<ReactSVG src={ASSETS.search} />
+							<FormField
+								value={inputTxId}
+								onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputTxId(e.target.value)}
+								placeholder={language.processOrMessageId}
+								invalid={{ status: inputTxId ? !checkValidAddress(inputTxId) : false, message: null }}
+								disabled={loadingTx}
+								autoFocus
+								hideErrorMessage
+								sm
+							/>
+						</S.SearchInputWrapper>
+						<IconButton
+							type={'alt1'}
+							src={ASSETS.copy}
+							handlePress={() => copyAddress(inputTxId)}
+							disabled={!checkValidAddress(inputTxId)}
+							dimensions={{
+								wrapper: 32.5,
+								icon: 17.5,
+							}}
+							tooltip={idCopied ? `${language.copied}!` : language.copyId}
 						/>
-					</S.SearchInputWrapper>
-					<IconButton
-						type={'alt1'}
-						src={ASSETS.copy}
-						handlePress={() => copyAddress(inputTxId)}
-						disabled={!checkValidAddress(inputTxId)}
-						dimensions={{
-							wrapper: 32.5,
-							icon: 17.5,
-						}}
-						tooltip={idCopied ? `${language.copied}!` : language.copyId}
-					/>
-					<IconButton
-						type={'alt1'}
-						src={ASSETS.refresh}
-						handlePress={() => handleSubmit()}
-						disabled={loadingTx || !checkValidAddress(inputTxId)}
-						dimensions={{
-							wrapper: 32.5,
-							icon: 17.5,
-						}}
-						tooltip={loadingTx ? `${language.loading}!` : language.refresh}
-					/>
-				</S.SearchWrapper>
-				<S.HeaderActionsWrapper>
-					<Button
-						type={'primary'}
-						label={urlCopied ? `${language.copied}!` : language.copyFullUrl}
-						handlePress={() => copyUrl()}
-						icon={ASSETS.copy}
-						iconLeftAlign
-					/>
-				</S.HeaderActionsWrapper>
-			</S.HeaderWrapper>
-			<S.BodyWrapper>{getTransaction()}</S.BodyWrapper>
-		</S.Wrapper>
+						<IconButton
+							type={'alt1'}
+							src={ASSETS.refresh}
+							handlePress={() => handleSubmit()}
+							disabled={loadingTx || !checkValidAddress(inputTxId)}
+							dimensions={{
+								wrapper: 32.5,
+								icon: 17.5,
+							}}
+							tooltip={loadingTx ? `${language.loading}...` : language.refresh}
+						/>
+					</S.SearchWrapper>
+					<S.HeaderActionsWrapper>
+						<Button
+							type={'primary'}
+							label={urlCopied ? `${language.copied}!` : language.copyFullUrl}
+							handlePress={() => copyUrl()}
+							icon={ASSETS.copy}
+							iconLeftAlign
+						/>
+					</S.HeaderActionsWrapper>
+				</S.HeaderWrapper>
+				<S.BodyWrapper>{getTransaction()}</S.BodyWrapper>
+			</S.Wrapper>
+			{error && (
+				<Notification
+					type={'warning'}
+					message={error}
+					callback={() => {
+						setError(null);
+						setInputTxId('');
+					}}
+				/>
+			)}
+		</>
 	) : null;
 }

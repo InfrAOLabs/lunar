@@ -24,21 +24,21 @@ function Tab(props: ITProps) {
 			active={props.active}
 			icon={props.icon}
 			iconLeftAlign
-			height={45}
+			height={42.5}
 		/>
 		</S.Tab>
 	)
 
-	return (
-		<S.Tab active={props.active}>
-			<button onClick={handlePress}>
-				{props.icon && (
-					<ReactSVG src={props.icon} />
-				)}
-				{props.label}
-			</button>
-		</S.Tab>
-	);
+	// return (
+	// 	<S.Tab active={props.active}>
+	// 		<button onClick={handlePress}>
+	// 			{props.icon && (
+	// 				<ReactSVG src={props.icon} />
+	// 			)}
+	// 			{props.label}
+	// 		</button>
+	// 	</S.Tab>
+	// );
 }
 
 function TabContent(props: ICProps) {

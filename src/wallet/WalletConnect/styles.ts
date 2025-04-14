@@ -189,7 +189,8 @@ export const ThemeSectionHeader = styled.div`
 export const ThemeSectionBody = styled.div`
 	display: flex;
 	flex-wrap: wrap;
-	gap: 20px;
+	gap: 30px 20px;
+	justify-content: space-between;
 `;
 
 export const Indicator = styled.div<{ active: boolean }>`
@@ -235,7 +236,7 @@ export const Preview = styled.div<{ background: string; accent: string }>`
 	width: 100%;
 	border-radius: ${STYLING.dimensions.radius.primary};
 	background: ${(props) => props.background};
-	border: 1.25px solid ${(props) => props.theme.colors.border.alt4};
+	border: 1.25px solid ${(props) => props.theme.colors.border.alt1};
 
 	#preview-accent-1 {
 		height: 32.5px;

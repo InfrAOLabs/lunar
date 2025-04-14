@@ -20,7 +20,7 @@
 	"dependencies": {
 		"@hello-pangea/dnd": "^17.0.0",
 		"@othent/kms": "^1.0.7",
-		"@permaweb/aoconnect": "^0.0.69",
+		"@permaweb/aoconnect": "^0.0.79",
 		"@permaweb/libs": "../permaweb-libs/sdk",
 		"arweave": "^1.15.5",
 		"html-react-parser": "^5.1.18",
@@ -38,7 +38,8 @@
 		"redux-persist": "^6.0.0",
 		"redux-thunk": "^2.4.2",
 		"styled-components": "^5.3.6",
-		"xterm": "^5.3.0"
+		"xterm": "^5.3.0",
+		"xterm-addon-fit": "^0.8.0"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.20.12",

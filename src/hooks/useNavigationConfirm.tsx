@@ -1,11 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export function useNavigationConfirm(url: string, message: string) {
+export function useNavigationConfirm(url?: string, message?: string) {
 	const navigate = useNavigate();
 
 	React.useEffect(() => {
-		if (process.env.NODE_ENV === 'development') return;
+		if (process.env.NODE_ENV === 'development' || !url) return;
 
 		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
 			e.preventDefault();
@@ -26,7 +26,7 @@ export function useNavigationConfirm(url: string, message: string) {
 	}, [url]);
 
 	const confirmNavigation = (to: string) => {
-		if (process.env.NODE_ENV === 'development') {
+		if (process.env.NODE_ENV === 'development' || !url) {
 			navigate(to);
 			return;
 		}

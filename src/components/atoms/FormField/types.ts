@@ -5,6 +5,7 @@ import { FormFieldType, ValidationType } from 'helpers/types';
 export interface IProps {
 	value: number | string;
 	onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+	onFocus?: () => void;
 	invalid: ValidationType;
 	disabled: boolean;
 	label?: string;

@@ -64,7 +64,7 @@ export const HeaderValue = styled.div`
 	p {
 		font-size: ${(props) => props.theme.typography.size.lg};
 		font-family: ${(props) => props.theme.typography.family.primary};
-		font-weight: ${(props) => props.theme.typography.weight.bold};
+		font-weight: ${(props) => props.theme.typography.weight.xBold};
 		color: ${(props) => props.theme.colors.font.primary};
 	}
 `;

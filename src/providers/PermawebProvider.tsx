@@ -2,7 +2,7 @@ import React from 'react';
 import PermawebLibs, { ProfileType } from '@permaweb/libs';
 
 import Arweave from 'arweave';
-import { connect, createDataItemSigner } from '@permaweb/aoconnect';
+import { connect, createSigner } from '@permaweb/aoconnect';
 
 import { Panel } from 'components/atoms/Panel';
 import { ProfileManager } from 'components/organisms/ProfileManager';
@@ -51,7 +51,7 @@ export function PermawebProvider(props: { children: React.ReactNode }) {
 	React.useEffect(() => {
 		const ao = connect({ MODE: 'legacy' });
 		const arweave = Arweave.init({});
-		const signer = arProvider.wallet ? createDataItemSigner(arProvider.wallet) : null;
+		const signer = arProvider.wallet ? createSigner(arProvider.wallet) : null;
 		
 		setAo(ao);
 		setLibs(PermawebLibs.init({ ao, arweave, signer }));

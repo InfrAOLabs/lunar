@@ -316,7 +316,7 @@ export const Alt3 = styled(Primary)`
 				? props.theme.colors.font.light1
 				: props.active
 				? props.theme.colors.font.light1
-				: props.theme.colors.button.alt1.color} !important;
+				: props.theme.colors.button.primary.color} !important;
 	}
 
 	&:hover {

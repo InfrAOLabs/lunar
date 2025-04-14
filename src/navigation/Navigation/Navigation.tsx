@@ -1,37 +1,34 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ReactSVG } from 'react-svg';
+import { GQLNodeResponseType } from '@permaweb/libs';
 import { debounce } from 'lodash';
 
 import { FormField } from 'components/atoms/FormField';
 import { IconButton } from 'components/atoms/IconButton';
 import { ASSETS, STYLING, URLS } from 'helpers/config';
-import { checkValidAddress } from 'helpers/utils';
+import { checkValidAddress, formatAddress, getTagValue } from 'helpers/utils';
 import { checkWindowCutoff } from 'helpers/window';
 import { useNavigationConfirm } from 'hooks/useNavigationConfirm';
 import { useLanguageProvider } from 'providers/LanguageProvider';
+import { usePermawebProvider } from 'providers/PermawebProvider';
 import { WalletConnect } from 'wallet/WalletConnect';
 import { CloseHandler } from 'wrappers/CloseHandler';
 
 import * as S from './styles';
 
-// TODO: Remove confirm nav
 export default function Navigation(props: { open: boolean; toggle: () => void }) {
-	/* Confirm navigation from inside the post editor */
-	const { confirmNavigation } = useNavigationConfirm('post', 'Changes you made may not be saved.');
+	const { confirmNavigation } = useNavigationConfirm();
 
+	const permawebProvider = usePermawebProvider();
 	const languageProvider = useLanguageProvider();
 	const language = languageProvider.object[languageProvider.current];
 
 	const [desktop, setDesktop] = React.useState(checkWindowCutoff(parseInt(STYLING.cutoffs.desktop)));
 	const [inputTxId, setInputTxId] = React.useState<string>('');
+	const [txOutputOpen, setTxOutputOpen] = React.useState<boolean>(false);
 	const [loadingTx, setLoadingTx] = React.useState<boolean>(false);
-
-	React.useEffect(() => {
-		if (checkValidAddress(inputTxId)) {
-			// confirmNavigation(`${URLS.explorer}/${inputTxId}`); // TODO
-		}
-	}, [inputTxId]);
+	const [txResponse, setTxResponse] = React.useState<GQLNodeResponseType | null>(null);
 
 	const paths = React.useMemo(() => {
 		return [
@@ -46,9 +43,9 @@ export default function Navigation(props: { open: boolean; toggle: () => void })
 				label: language.explorer,
 			},
 			{
-				path: URLS.console,
+				path: URLS.aos,
 				icon: ASSETS.console,
-				label: language.console,
+				label: language.aos,
 			},
 		];
 	}, []);
@@ -70,6 +67,26 @@ export default function Navigation(props: { open: boolean; toggle: () => void })
 			window.removeEventListener('resize', debouncedResize);
 		};
 	}, [debouncedResize]);
+
+	React.useEffect(() => {
+		(async function () {
+			if (inputTxId && checkValidAddress(inputTxId)) {
+				setTxOutputOpen(true);
+				setLoadingTx(true);
+				try {
+					const response = await permawebProvider.libs.getGQLData({ ids: [inputTxId] });
+					const responseData = response?.data?.[0];
+					setTxResponse(responseData ?? null);
+				} catch (e: any) {
+					console.error(e);
+				}
+				setLoadingTx(false);
+			} else {
+				setTxResponse(null);
+				setTxOutputOpen(false);
+			}
+		})();
+	}, [inputTxId]);
 
 	const handleNavigate = (e: React.MouseEvent<HTMLAnchorElement>, to: string) => {
 		e.preventDefault();
@@ -139,6 +156,45 @@ export default function Navigation(props: { open: boolean; toggle: () => void })
 		}
 	}, [props.open, desktop]);
 
+	const searchOutput = React.useMemo(() => {
+		if (loadingTx) {
+			return (
+				<S.SearchOutputPlaceholder>
+					<p>{`${language.loading}...`}</p>
+				</S.SearchOutputPlaceholder>
+			);
+		}
+
+		if (txResponse) {
+			const name = getTagValue(txResponse.node.tags, 'Name');
+			return (
+				<S.SearchResult>
+					<Link
+						to={`${URLS.explorer}${txResponse.node.id}`}
+						onClick={() => {
+							setTxResponse(null);
+							setInputTxId('');
+							setTxOutputOpen(false);
+						}}
+					>
+						{name ?? formatAddress(txResponse.node.id, false)}
+						<ReactSVG src={ASSETS.go} />
+					</Link>
+				</S.SearchResult>
+			);
+		}
+
+		if (checkValidAddress(inputTxId)) {
+			return (
+				<S.SearchOutputPlaceholder>
+					<p>{language.txNotFound}</p>
+				</S.SearchOutputPlaceholder>
+			);
+		}
+
+		return null;
+	}, [loadingTx, txResponse]);
+
 	return (
 		<>
 			{panel}
@@ -146,18 +202,32 @@ export default function Navigation(props: { open: boolean; toggle: () => void })
 				<S.Content>
 					<S.C1Wrapper>
 						{!props.open && navigationToggle}
-						<S.SearchWrapper>
-							<ReactSVG src={ASSETS.search} />
-							<FormField
-								value={inputTxId}
-								onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputTxId(e.target.value)}
-								placeholder={language.processOrMessageId}
-								invalid={{ status: false, message: null }}
-								disabled={loadingTx}
-								hideErrorMessage
-								sm
-							/>
-						</S.SearchWrapper>
+						<CloseHandler
+							callback={() => {
+								setTxOutputOpen(false);
+							}}
+							active={txOutputOpen}
+							disabled={!txOutputOpen}
+						>
+							<S.SearchWrapper>
+								<S.SearchInputWrapper>
+									<ReactSVG src={ASSETS.search} />
+									<FormField
+										value={inputTxId}
+										onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputTxId(e.target.value)}
+										onFocus={() => setTxOutputOpen(true)}
+										placeholder={language.processOrMessageId}
+										invalid={{ status: inputTxId ? !checkValidAddress(inputTxId) : false, message: null }}
+										disabled={loadingTx}
+										hideErrorMessage
+										sm
+									/>
+								</S.SearchInputWrapper>
+								{(txOutputOpen && checkValidAddress(inputTxId)) && (
+									<S.SearchOutputWrapper>{searchOutput}</S.SearchOutputWrapper>
+								)}
+							</S.SearchWrapper>
+						</CloseHandler>
 					</S.C1Wrapper>
 					<S.ActionsWrapper>
 						<WalletConnect />

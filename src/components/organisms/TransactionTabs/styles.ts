@@ -15,9 +15,6 @@ export const HeaderWrapper = styled.div`
 
 export const TabsWrapper = styled.div`
 	width: 100%;
-	/* border-top: 1px solid ${(props) => props.theme.colors.border.primary};
-	border-bottom: 1px solid ${(props) => props.theme.colors.border.primary};
-	background: ${(props) => props.theme.colors.container.alt1.background}; */
 `;
 
 export const BodyWrapper = styled.div`
@@ -34,6 +31,10 @@ export const TabsContent = styled.div`
 	white-space: nowrap;
 	overflow-x: auto;
 	overflow-y: hidden;
+
+	border: 1px solid ${(props) => props.theme.colors.border.primary};
+	background: ${(props) => props.theme.colors.container.alt1.background};
+	border-radius: ${STYLING.dimensions.radius.primary};
 `;
 
 export const TabHeader = styled.div`
@@ -166,7 +167,7 @@ export const TabAction = styled.div<{ active: boolean }>`
 		props.active ? props.theme.colors.tabs.active.background : 'transparent'};
 		height: 3.5px;
 		border-radius: ${STYLING.dimensions.radius.primary};
-		width: 100%;
+		width: calc(100% - 30.5px);
 		pointer-events: none;
 	}
 `;

@@ -144,7 +144,6 @@ export const Header = styled.header<{ navigationOpen: boolean }>`
 	top: 0;
 	z-index: 4;
 	background: ${(props) => props.theme.colors.view.background};
-	border-bottom: 1px solid ${(props) => props.theme.colors.border.primary};
 
 	@media (max-width: ${STYLING.cutoffs.desktop}) {
 		padding: 0 20px 0 10px;
@@ -155,6 +154,11 @@ export const SearchWrapper = styled.div`
 	width: 510px;
 	position: relative;
 	margin: 0 0 0 10px;
+`;
+
+export const SearchInputWrapper = styled.div`
+	width: 100%;
+	position: relative;
 
 	input {
 		padding: 10px 10px 10px 43.5px !important;
@@ -169,6 +173,64 @@ export const SearchWrapper = styled.div`
 		z-index: 1;
 		top: 11.5px;
 		left: 14.5px;
+	}
+`;
+
+export const SearchOutputWrapper = styled.div`
+	width: 100%;
+	position: absolute;
+	top: 45px;
+	overflow: hidden;
+
+	p {
+		color: ${(props) => props.theme.colors.font.alt1};
+		font-size: ${(props) => props.theme.typography.size.xxSmall} !important;
+		font-weight: ${(props) => props.theme.typography.weight.bold} !important;
+		font-family: ${(props) => props.theme.typography.family.primary} !important;
+	}
+`;
+
+export const SearchOutputPlaceholder = styled.div`
+	padding: 20px 15px;
+	background: ${(props) => props.theme.colors.container.alt1.background};
+	border-radius: ${STYLING.dimensions.radius.primary};
+    border: 1px solid ${(props) => props.theme.colors.border.primary};
+	p {
+		color: ${(props) => props.theme.colors.font.alt1};
+		font-size: ${(props) => props.theme.typography.size.xxSmall} !important;
+		font-weight: ${(props) => props.theme.typography.weight.bold} !important;
+		font-family: ${(props) => props.theme.typography.family.primary} !important;
+	}
+`;
+
+export const SearchResult = styled.div`
+	a {
+		height: 100%;
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 15px;
+		background: ${(props) => props.theme.colors.container.alt1.background};
+		border-radius: ${STYLING.dimensions.radius.primary};
+		border: 1px solid ${(props) => props.theme.colors.border.primary};
+		
+		font-size: ${(props) => props.theme.typography.size.xSmall} !important;
+		font-weight: ${(props) => props.theme.typography.weight.bold} !important;
+		font-family: ${(props) => props.theme.typography.family.primary} !important;
+
+		svg {
+			height: 23.5px;
+			width: 23.5px;
+			padding: 5.5px 0 0 0;
+			color: ${(props) => props.theme.colors.link.color};
+			fill: ${(props) => props.theme.colors.link.color};
+		}
+		
+		&:hover {
+			background: ${(props) => props.theme.colors.container.alt3.background};
+			border: 1px solid ${(props) => props.theme.colors.border.alt4};
+		}
 	}
 `;
 
@@ -200,196 +262,6 @@ export const LogoWrapper = styled.div`
 		&:hover {
 			fill: ${(props) => props.theme.colors.icon.alt2.active};
 			opacity: 0.85;
-		}
-	}
-`;
-
-export const PortalWrapper = styled.div`
-	position: relative;
-	display: flex;
-	align-items: center;
-	gap: 10px;
-
-	@media (max-width: ${STYLING.cutoffs.desktop}) {
-		max-width: calc(100% - 45px);
-	}
-`;
-
-export const PortalUpdateWrapper = styled.div`
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 4.5px 13.5px;
-	background: ${(props) => props.theme.colors.contrast.background};
-	border: 1px solid ${(props) => props.theme.colors.contrast.border};
-	border-radius: ${STYLING.dimensions.radius.alt2};
-	span {
-		color: ${(props) => props.theme.colors.contrast.color};
-		font-size: ${(props) => props.theme.typography.size.xxSmall} !important;
-		font-weight: ${(props) => props.theme.typography.weight.bold} !important;
-		font-family: ${(props) => props.theme.typography.family.primary} !important;
-	}
-`;
-
-export const Portal = styled.button<{ active: boolean }>`
-	max-width: 100%;
-	display: flex;
-	align-items: center;
-	cursor: pointer;
-	background: ${(props) =>
-		props.active ? props.theme.colors.container.primary.active : props.theme.colors.container.primary.background};
-	border-radius: ${STYLING.dimensions.radius.alt2};
-	padding: 7.5px 16.5px;
-
-	span {
-		color: ${(props) => props.theme.colors.font.alt1};
-		font-size: ${(props) => props.theme.typography.size.lg} !important;
-		font-weight: ${(props) => props.theme.typography.weight.bold} !important;
-		font-family: ${(props) => props.theme.typography.family.primary} !important;
-		display: block;
-		white-space: nowrap;
-		text-overflow: ellipsis;
-		overflow: hidden;
-	}
-
-	svg {
-		height: 16.5px;
-		width: 16.5px;
-		color: ${(props) => props.theme.colors.font.alt1};
-		fill: ${(props) => props.theme.colors.font.alt1};
-		margin: 2.5px 0px 0 12.5px;
-	}
-	&:hover {
-		background: ${(props) => props.theme.colors.container.primary.active};
-	}
-	&:focus {
-		background: ${(props) => props.theme.colors.container.primary.active};
-	}
-
-	&:disabled {
-		background: ${(props) => props.theme.colors.container.primary.background};
-	}
-`;
-
-export const PortalDropdown = styled.div`
-	max-height: 65vh;
-	width: 350px;
-	max-width: 80vw;
-	position: absolute;
-	top: 47.5px;
-	left: 0;
-	padding: 11.5px 10px;
-`;
-
-export const PDropdownHeader = styled.div`
-	padding: 0 7.5px;
-	p {
-		color: ${(props) => props.theme.colors.font.alt1};
-		font-size: ${(props) => props.theme.typography.size.xSmall} !important;
-		font-weight: ${(props) => props.theme.typography.weight.medium} !important;
-		font-family: ${(props) => props.theme.typography.family.primary} !important;
-		text-transform: uppercase;
-	}
-`;
-
-export const PDropdownBody = styled.div`
-	margin: 7.5px 0 0 0;
-`;
-
-export const PDropdownLink = styled.div<{ active: boolean }>`
-	a {
-		height: 40px;
-		width: 100%;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		cursor: ${(props) => (props.active ? 'default' : 'pointer')};
-		pointer-events: ${(props) => (props.active ? 'none' : 'auto')};
-		background: ${(props) => props.theme.colors.container.primary.background};
-		border-radius: ${STYLING.dimensions.radius.alt2};
-		transition: all 100ms;
-		padding: 0 10px;
-		span {
-			color: ${(props) => props.theme.colors.font.primary} !important;
-			font-size: ${(props) => props.theme.typography.size.xSmall} !important;
-			font-weight: ${(props) => props.theme.typography.weight.medium} !important;
-			font-family: ${(props) => props.theme.typography.family.primary} !important;
-			display: block;
-			white-space: nowrap;
-			text-overflow: ellipsis;
-			max-width: 85%;
-			overflow: hidden;
-		}
-		svg {
-			height: 17.5px;
-			width: 17.5px;
-			margin: 2.5px 0 0 0;
-			color: ${(props) => props.theme.colors.font.alt1};
-			fill: ${(props) => props.theme.colors.font.alt1};
-		}
-		img {
-			height: 22.5px;
-			width: 22.5px;
-			margin: 0 12.5px 0 0;
-		}
-		&:hover {
-			background: ${(props) => props.theme.colors.container.primary.active};
-		}
-	}
-`;
-
-export const PIndicator = styled.div`
-	height: 17.5px;
-	width: 17.5px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	border: 1px solid ${(props) => props.theme.colors.indicator.active};
-	background: ${(props) => props.theme.colors.indicator.active};
-	border-radius: 50%;
-
-	svg {
-		height: 10.5px !important;
-		width: 10.5px !important;
-		color: ${(props) => props.theme.colors.font.light1} !important;
-		fill: ${(props) => props.theme.colors.font.light1} !important;
-		margin: 0 0 0.5px 0 !important;
-
-		polyline {
-			stroke-width: 40px !important;
-		}
-	}
-`;
-
-export const PDropdownFooter = styled.div`
-	padding: 10px 0 0 0;
-	margin: 10px 0 0 0;
-	border-top: 1px solid ${(props) => props.theme.colors.border.primary};
-
-	button {
-		height: 40px;
-		width: 100%;
-		display: flex;
-		align-items: center;
-		cursor: pointer;
-		text-overflow: ellipsis;
-		overflow: hidden;
-		color: ${(props) => props.theme.colors.font.primary} !important;
-		font-size: ${(props) => props.theme.typography.size.xSmall} !important;
-		font-weight: ${(props) => props.theme.typography.weight.medium} !important;
-		font-family: ${(props) => props.theme.typography.family.primary} !important;
-		border-radius: ${STYLING.dimensions.radius.alt2};
-		transition: all 100ms;
-		padding: 0 10px;
-		svg {
-			height: 16.5px;
-			width: 16.5px;
-			margin: 5.5px 9.5px 0 0;
-			color: ${(props) => props.theme.colors.font.alt1};
-			fill: ${(props) => props.theme.colors.font.alt1};
-		}
-		&:hover {
-			background: ${(props) => props.theme.colors.container.primary.active};
 		}
 	}
 `;

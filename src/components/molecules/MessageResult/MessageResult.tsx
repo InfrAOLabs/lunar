@@ -1,7 +1,8 @@
 import React from 'react';
 
-import { JSONTree } from 'components/atoms/JSONTree';
 import { Loader } from 'components/atoms/Loader';
+import { JSONReader } from 'components/molecules/JSONReader';
+import { checkValidAddress } from 'helpers/utils';
 import { useLanguageProvider } from 'providers/LanguageProvider';
 import { usePermawebProvider } from 'providers/PermawebProvider';
 
@@ -17,7 +18,7 @@ export default function MessageResult(props: { processId: string; messageId: str
 
 	React.useEffect(() => {
 		(async function () {
-			if (!result) {
+			if (!result && checkValidAddress(props.processId) && checkValidAddress(props.messageId)) {
 				try {
 					const messageResult = await permawebProvider.ao.result({
 						process: props.processId,
@@ -34,7 +35,7 @@ export default function MessageResult(props: { processId: string; messageId: str
 	return (
 		<S.Wrapper>
 			{result ? (
-				<JSONTree data={result} header={language.result} />
+				<JSONReader data={result} header={language.result} maxHeight={600} />
 			) : (
 				<Loader sm relative />
 			)}

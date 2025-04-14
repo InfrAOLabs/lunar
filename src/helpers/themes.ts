@@ -506,12 +506,12 @@ export const theme = (currentTheme: any): DefaultTheme => ({
 				},
 			},
 			alt1: {
-				background: currentTheme.neutral1,
+				background: currentTheme.primary1,
 				border: currentTheme.primary1,
-				color: currentTheme.neutralA1,
+				color: currentTheme.light1,
 				active: {
-					background: currentTheme.primary1,
-					border: currentTheme.primary1,
+					background: currentTheme.primary2,
+					border: currentTheme.primary2,
 					color: currentTheme.light1,
 				},
 				disabled: {
@@ -663,6 +663,11 @@ export const theme = (currentTheme: any): DefaultTheme => ({
 			alt3: currentTheme.editor.alt3,
 			alt4: currentTheme.editor.alt4,
 			alt5: currentTheme.editor.alt5,
+			alt6: currentTheme.editor.alt6,
+			alt7: currentTheme.editor.alt7,
+			alt8: currentTheme.editor.alt8,
+			alt9: currentTheme.editor.alt9,
+			alt10: currentTheme.editor.alt10,
 		},
 		row: {
 			active: {

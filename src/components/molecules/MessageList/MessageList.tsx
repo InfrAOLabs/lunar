@@ -4,9 +4,9 @@ import { DefaultGQLResponseType, GQLNodeResponseType } from '@permaweb/libs';
 import { useTheme } from 'styled-components';
 
 import { Button } from 'components/atoms/Button';
-import { JSONTree } from 'components/atoms/JSONTree';
 import { Panel } from 'components/atoms/Panel';
 import { TxAddress } from 'components/atoms/TxAddress';
+import { JSONReader } from 'components/molecules/JSONReader';
 import { ASSETS, DEFAULT_MESSAGE_TAGS } from 'helpers/config';
 import { MessageFilterType, TransactionType } from 'helpers/types';
 import { formatCount, getRelativeDate, getTagValue } from 'helpers/utils';
@@ -138,7 +138,7 @@ function Message(props: {
 						</S.ResultInfoLine>
 					</S.ResultInfo>
 					<S.ResultOutput>
-						{result ? <JSONTree data={result} header={language.output} /> : <p>{`${language.loading}...`}</p>}
+						{result ? <JSONReader data={result} header={language.output} noWrapper /> : <p>{`${language.loading}...`}</p>}
 					</S.ResultOutput>
 					<S.ResultActions>
 						<Button type={'primary'} label={language.close} handlePress={() => setShowViewResult(false)} />
@@ -149,6 +149,7 @@ function Message(props: {
 	);
 }
 
+// TODO: Pagination
 export default function MessageList(props: {
 	txId: string;
 	type: TransactionType;
