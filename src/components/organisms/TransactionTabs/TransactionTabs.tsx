@@ -34,16 +34,10 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 		return stored && JSON.parse(stored).length > 0 ? JSON.parse(stored) : [{ id: '', label: '', type: 'message' }];
 	});
 	const [activeTabIndex, setActiveTabIndex] = React.useState<number>(getInitialIndex());
-	const [ignorePathChange, setIgnorePathChange] = React.useState<boolean>(false);
 	const [isClearing, setIsClearing] = React.useState<boolean>(false);
 
 	React.useEffect(() => {
-		if (ignorePathChange) {
-			setIgnorePathChange(false);
-			return;
-		}
-
-		const txId = extractTxIdFromPath(location.pathname);
+		const { txId, subPath } = extractTxDetailsFromPath(location.pathname);
 
 		if (txId && !transactions.some((tab) => tab.id === txId)) {
 			if (transactions.length === 1 && transactions[0].id === '') {
@@ -57,9 +51,9 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 				const newIndex = transactions.length;
 				setTransactions((prev) => [...prev, { id: txId, label: txId, type: 'message' }]);
 				setActiveTabIndex(newIndex);
-				navigate(`${URLS[props.type]}${txId}`);
 			}
-			navigate(`${URLS[props.type]}${txId}`);
+
+			navigate(`${URLS[props.type]}${txId}${subPath}`);
 		}
 	}, [location.pathname]);
 
@@ -85,17 +79,13 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 		localStorage.setItem(storageKey, JSON.stringify(transactions));
 	}, [transactions]);
 
-	const extractTxIdFromPath = (path: string): string => {
-		let txId = null;
-		const parts = path.split('/');
-		for (const part of parts) {
-			if (checkValidAddress(part)) {
-				txId = part;
-				break;
-			}
-		}
-		return txId;
-	};
+	function extractTxDetailsFromPath(pathname: string) {
+		const parts = pathname.replace(/#.*/, '').split('/').filter(Boolean);
+		const txId = parts[1] || '';
+		const subPath = parts.slice(2).join('/') || '';
+
+		return { txId, subPath: subPath ? `/${subPath}` : '' };
+	}
 
 	function getInitialIndex() {
 		if (transactions.length <= 0) return 0;
@@ -176,26 +166,53 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 		navigate(`${URLS[props.type]}${transactions[index].id}`);
 	};
 
-	const handleAddTab = () => {
-		setTransactions((prev) => [...prev, { id: '', label: '', type: 'message' }]);
-		setActiveTabIndex(transactions.length);
-		navigate(URLS[props.type]);
+	const handleAddTab = (id?: string) => {
+		setTransactions((prev) => {
+			const updated = [...prev, { id: id ?? '', label: id ?? '', type: 'message' } as TransactionTabType];
+			setActiveTabIndex(updated.length - 1);
+			return updated;
+		});
+
+		if (id) {
+			navigate(`${URLS[props.type]}${id}`);
+		} else {
+			navigate(URLS[props.type]);
+		}
 	};
 
 	const handleDeleteTab = (deletedIndex: number) => {
 		const updatedTransactions = transactions.filter((_, i) => i !== deletedIndex);
 
-		let newActiveIndex = activeTabIndex;
+		let newActiveIndex: number;
 
-		if (deletedIndex === activeTabIndex) {
-			newActiveIndex = deletedIndex === 0 ? 0 : deletedIndex - 1;
-		} else if (deletedIndex < activeTabIndex) {
+		if (deletedIndex < activeTabIndex) {
 			newActiveIndex = activeTabIndex - 1;
+		} else if (deletedIndex === activeTabIndex) {
+			newActiveIndex = updatedTransactions.length > deletedIndex ? deletedIndex : updatedTransactions.length - 1;
+		} else {
+			newActiveIndex = activeTabIndex;
 		}
-		newActiveIndex = Math.max(0, Math.min(newActiveIndex, updatedTransactions.length - 1));
 
-		setTransactions(updatedTransactions.length > 0 ? updatedTransactions : [{ id: '', label: '', type: 'message' }]);
-		setActiveTabIndex(newActiveIndex);
+		newActiveIndex = Math.max(0, newActiveIndex);
+
+		flushSync(() => {
+			setIsClearing(true);
+			setTransactions(
+				updatedTransactions.length > 0
+					? updatedTransactions
+					: [{ id: '', label: '', type: 'message' }]
+			);
+			setActiveTabIndex(newActiveIndex);
+		});
+
+		setTimeout(() => setIsClearing(false), 50);
+
+		if (updatedTransactions.length > 0) {
+			const newId = updatedTransactions[newActiveIndex]?.id ?? '';
+			navigate(`${URLS[props.type]}${newId}`);
+		} else {
+			handleClearTabs();
+		}
 	};
 
 	const handleClearTabs = () => {
@@ -251,7 +268,6 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 					</div>
 					{language.new}
 				</S.TabAction>
-				<S.TabDivider />
 			</S.TabsContent>
 		);
 	}, [transactions, activeTabIndex, language]);
@@ -265,6 +281,7 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 						type={tx.type}
 						active={index === activeTabIndex}
 						onTxChange={(newTx: GQLNodeResponseType) => handleTxChange(index, newTx)}
+						handleMessageOpen={(id: string) => handleAddTab(id)}
 					/>
 				);
 			case 'aos':

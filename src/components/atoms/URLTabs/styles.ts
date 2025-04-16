@@ -9,6 +9,9 @@ export const Wrapper = styled.div`
 
 export const TabsHeader = styled.div<{ useFixed: boolean }>`
 	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
 	@media (max-width: ${STYLING.cutoffs.secondary}) {
 		position: relative;
 		top: auto;
@@ -18,7 +21,7 @@ export const TabsHeader = styled.div<{ useFixed: boolean }>`
 export const Tabs = styled.div`
 	display: flex;
 	align-items: center;
-	gap: 30px;
+	gap: 20px;
 	overflow-x: auto;
 `;
 
@@ -26,17 +29,12 @@ export const Content = styled.div``;
 
 export const Tab = styled.div<{ active: boolean }>`
 	display: flex;
-	flex: 1;
 	justify-content: center;
 	align-items: center;
 	position: relative;
-	button {
-		border-radius: ${STYLING.dimensions.radius.primary} !important;
-		flex: 1;
-		span {
-			font-size: ${(props) => props.theme.typography.size.xSmall} !important;
-		}
-	}
+	/* button {
+		border-radius: ${STYLING.dimensions.radius.alt2} !important;
+	} */
 `;
 
 export const View = styled.div`

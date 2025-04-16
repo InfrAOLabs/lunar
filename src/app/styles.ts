@@ -200,6 +200,7 @@ export const GlobalStyle = createGlobalStyle`
   .info {
     padding: 0 5px 0.5px 5px;
     background: ${(props) => props.theme.colors.contrast.background};
+    border: 1px solid ${(props) => props.theme.colors.border.alt2};
     border-radius: ${STYLING.dimensions.radius.alt2};
     animation: ${open} ${transition2};
     span {
@@ -344,9 +345,6 @@ export const MessageWrapper = styled.div`
 
 export const Footer = styled.footer<{ navigationOpen: boolean }>`
 	width: 100%;
-	max-width: ${STYLING.cutoffs.max};
-	padding: 0 20px 15px ${(props) => (props.navigationOpen ? `calc(${STYLING.dimensions.nav.width} + 30px)` : '30px')};
-	transition: padding-left ${transition2};
 	margin: ${STYLING.dimensions.nav.height} 0 0 0;
 	display: flex;
 	align-items: center;

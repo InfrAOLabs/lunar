@@ -42,11 +42,13 @@ export default function App() {
 					<S.View navigationOpen={settings.sidebarOpen}>
 						{element}
 					</S.View>
+					<S.ViewWrapper>
 					<S.Footer navigationOpen={settings.sidebarOpen}>
 						<p>
 							{language.app} {new Date().getFullYear()}
 						</p>
 					</S.Footer>
+					</S.ViewWrapper>
 				</>
 			);
 		})();

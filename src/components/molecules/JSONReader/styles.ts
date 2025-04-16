@@ -5,7 +5,8 @@ export const Wrapper = styled.div<{ maxHeight?: number, noWrapper?: boolean }>`
 	padding: ${(props) => props.noWrapper ? '0' : '10px 15px 15px 15px'};
 	font-family: ${(props) => props.theme.typography.family.alt2};
 	font-weight: ${(props) => props.theme.typography.weight.bold};
-	font-size: ${(props) => props.theme.typography.size.xxSmall};
+	font-size: ${(props) => props.theme.typography.size.xSmall};
+	letter-spacing: 0;
 
 	ul {
 		margin: 0 0 0 1.5px !important;

@@ -4,27 +4,40 @@ import { useTheme } from 'styled-components';
 
 import * as S from './styles';
 
-export default function _JSONTree(props: { data: any, header?: string, placeholder?: string; maxHeight?: number, noWrapper?: boolean }) {
+export default function _JSONTree(props: {
+	data: any;
+	header?: string;
+	placeholder?: string;
+	maxHeight?: number;
+	noWrapper?: boolean;
+}) {
 	const currentTheme: any = useTheme();
 
 	const [data, setData] = React.useState<object | null>(null);
 
 	React.useEffect(() => {
-		if (props.data) setData(safelyParseNestedJSON(props.data));
-	}, [props.data])
+		if (props.data) setData(parseJSON(props.data));
+	}, [props.data]);
 
-	const safelyParseNestedJSON = (input) => {
+	const parseJSON = (input) => {
+		// Regular expression to match ANSI escape codes
+		const ansiRegex = /\x1B\[[0-9;]*m/g;
+
 		if (typeof input === 'string') {
+			// First, remove ANSI escape codes from the string
+			const strippedInput = input.replace(ansiRegex, '');
 			try {
-				const parsed = JSON.parse(input);
-				return safelyParseNestedJSON(parsed);
+				// Attempt to parse further if the stripped string is still JSON
+				const parsed = JSON.parse(strippedInput);
+				return parseJSON(parsed);
 			} catch (e) {
-				return input;
+				// Return the cleaned string if parsing fails
+				return strippedInput;
 			}
 		} else if (Array.isArray(input)) {
-			return input.map(safelyParseNestedJSON);
+			return input.map(parseJSON);
 		} else if (input !== null && typeof input === 'object') {
-			return Object.fromEntries(Object.entries(input).map(([key, value]) => [key, safelyParseNestedJSON(value)]));
+			return Object.fromEntries(Object.entries(input).map(([key, value]) => [key, parseJSON(value)]));
 		}
 		return input;
 	};
@@ -49,7 +62,11 @@ export default function _JSONTree(props: { data: any, header?: string, placehold
 	};
 
 	return (
-		<S.Wrapper className={`${props.noWrapper ? '' : 'border-wrapper-alt3 '}scroll-wrapper`} maxHeight={props.maxHeight} noWrapper={props.noWrapper}>
+		<S.Wrapper
+			className={`${props.noWrapper ? '' : 'border-wrapper-alt3 '}scroll-wrapper`}
+			maxHeight={props.maxHeight}
+			noWrapper={props.noWrapper}
+		>
 			{props.header && (
 				<S.Header>
 					<p>{props.header}</p>
@@ -59,9 +76,9 @@ export default function _JSONTree(props: { data: any, header?: string, placehold
 				<JSONTree data={data} hideRoot={true} theme={theme} shouldExpandNodeInitially={() => true} />
 			) : (
 				<S.Placeholder>
-				<p>{props.placeholder ?? 'No data to display'}</p>
+					<p>{props.placeholder ?? 'No data to display'}</p>
 				</S.Placeholder>
 			)}
 		</S.Wrapper>
-	)
+	);
 }

@@ -10,7 +10,7 @@ export default function ViewHeader(props: IProps) {
 		<S.HeaderWrapper>
 			<ViewWrapper>
 				<S.HeaderContent>
-				<p>{props.header}</p>
+				<h4>{props.header}</h4>
 				{props.actions && (
 					<S.HeaderActions>
 						{props.actions.map((action: React.ReactNode, index: number) => (

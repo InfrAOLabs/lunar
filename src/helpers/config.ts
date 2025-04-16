@@ -45,7 +45,7 @@ export const ASSETS = {
 	linkedin: getTxEndpoint('8S2jArSLL2aZYZy9_sUkFlqbZUpGhYUNmFFVI4gMbPo'),
 	listOrdered: getTxEndpoint('LCGDNvNEerXlE8vE65J6XRuAMm54u2zNAyvwQbyoBEs'),
 	listUnordered: getTxEndpoint('lSpJ-R6JoI9J814Iy2JJZWnrkvKU8iFqVIWtVsmI4Os'),
-	logo: getTxEndpoint('4txDbfbymP1RNMQCsFzyZOZR9qeUZXt_IacmL4IXYD8'),
+	logo: getTxEndpoint('xcXeKzfFh-jf6snD6C73V2BoYhdmrNF9X9B44JbsjGU'),
 	menu: getTxEndpoint('0La3-o2_gGMDbkfV4zVVUMjTYQ7Cn9YWQ2JO-FbjAIk'),
 	message: getTxEndpoint('GDlYmHD-I2AeYRx6VpZGxbRa0UaI1OcC_iBcl6FBOGw'),
 	navigation: getTxEndpoint('uFsSvBhbWZak9j5QWXIdeZ97ky_s0JsaIZ45KVXmD_8'),

@@ -47,20 +47,6 @@ export const ToggleWrapper = styled.div`
 	gap: 7.5px;
 `;
 
-export const Logo = styled.div`
-	color: ${(props) => props.theme.colors.font.primary};
-	font-family: ${(props) => props.theme.typography.family.alt1};
-	font-size: ${(props) => props.theme.typography.size.lg};
-	font-weight: ${(props) => props.theme.typography.weight.xBold};
-	margin: 0 0 1.5px 0;
-	transition: all 100ms;
-
-	&:hover {
-		cursor: pointer;
-		color: ${(props) => props.theme.colors.font.alt1};
-	}
-`;
-
 export const PanelContent = styled.div<{ open: boolean }>`
 	height: calc(100vh - (${STYLING.dimensions.nav.height} + 70px));
 	padding: 0 15px 15px 15px;
@@ -138,8 +124,7 @@ export const PanelFooter = styled.div<{ open: boolean }>`
 export const Header = styled.header<{ navigationOpen: boolean }>`
 	height: ${STYLING.dimensions.nav.height};
 	width: 100%;
-	padding: 0 20px 0 ${(props) => (props.navigationOpen ? `calc(${STYLING.dimensions.nav.width} + 10px)` : '20px')};
-	transition: padding-left ${transition2};
+
 	position: fixed;
 	top: 0;
 	z-index: 4;
@@ -237,6 +222,11 @@ export const SearchResult = styled.div`
 export const Content = styled.div`
 	height: 100%;
 	width: 100%;
+
+	max-width: ${STYLING.cutoffs.max};
+	padding: 0 25px;
+    margin: 0 auto;
+
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -254,14 +244,16 @@ export const C1Wrapper = styled.div`
 `;
 
 export const LogoWrapper = styled.div`
-	height: 29.5px;
 	svg {
-		height: 30px;
-		width: 30px;
+		height: 25px;
+		width: 25px;
+		padding: 2.5px 0 0 0;
+		margin: 5.5px 0 0 0;
+		color: ${(props) => props.theme.colors.icon.alt2.fill};
 		fill: ${(props) => props.theme.colors.icon.alt2.fill};
 		&:hover {
+			color: ${(props) => props.theme.colors.icon.alt2.active};
 			fill: ${(props) => props.theme.colors.icon.alt2.active};
-			opacity: 0.85;
 		}
 	}
 `;
@@ -270,21 +262,19 @@ export const DNavWrapper = styled.div`
 	height: 35px;
 	display: flex;
 	align-items: center;
-	margin: 0 0 0 15px;
 	padding: 0 0 0 15px;
-	> * {
-		&:not(:last-child) {
-			margin: 0 20px 0 0;
-		}
-		&:last-child {
-			margin: 0;
-		}
-	}
+	gap: 25px;
 	a {
-		color: ${(props) => props.theme.colors.font.primary};
-		font-family: ${(props) => props.theme.typography.family.primary};
+		color: ${(props) => props.theme.colors.font.alt1};
+		font-family: ${(props) => props.theme.typography.family.alt1};
 		font-size: ${(props) => props.theme.typography.size.small};
 		font-weight: ${(props) => props.theme.typography.weight.bold};
+		text-transform: uppercase;
+		letter-spacing: 0.35px;
+
+		&:hover {
+			color: ${(props) => props.theme.colors.font.alt5};
+		}
 	}
 	@media (max-width: ${STYLING.cutoffs.secondary}) {
 		display: none;
@@ -294,7 +284,7 @@ export const DNavWrapper = styled.div`
 export const ActionsWrapper = styled.div`
 	display: flex;
 	align-items: center;
-	gap: 12.5px;
+	gap: 25px;
 `;
 
 export const MWrapper = styled.div`

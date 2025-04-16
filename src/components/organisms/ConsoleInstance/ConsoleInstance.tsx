@@ -88,55 +88,116 @@ export default function ConsoleInstance(props: {
 	}, [inputProcessId, arProvider.walletAddress, props.active]);
 
 	React.useEffect(() => {
-		if (props.active && terminalRef.current && arProvider.wallet && checkValidAddress(inputProcessId)) {
-			fitAddon.current = new FitAddon();
+		(async function () {
+			if (props.active && terminalRef.current && arProvider.wallet && checkValidAddress(inputProcessId)) {
+				fitAddon.current = new FitAddon();
+				await document.fonts.ready;
 
-			setTimeout(async () => {
-				document.fonts.ready.then(async () => {
-					termInstance.current = new Terminal({
-						cursorBlink: false,
-						fontFamily: theme.typography.family.alt2,
-						fontSize: 13,
-						fontWeight: 600,
-						theme: getTheme(theme),
-					});
-
-					termInstance.current.loadAddon(fitAddon.current);
-
-					termInstance.current.open(terminalRef.current);
-
-					fitAddon.current.fit();
-
-					const handleResize = () => {
-						fitAddon.current?.fit();
-					};
-					window.addEventListener('resize', handleResize);
-
-					termInstance.current.write(`\x1b[32mWelcome to AOS\x1b[0m\r\n\r\n`);
-					termInstance.current.write(`\x1b[90mProcess ID:\x1b[0m \x1b[32m${inputProcessId}\x1b[0m\r\n`);
-
-					await sendMessage(null, 'prompt');
-
-					let commandBuffer = '';
-
-					termInstance.current.onData(async (data: string) => {
-						if (data === '\r') {
-							console.log(commandBuffer);
-							await sendMessage(commandBuffer);
-							commandBuffer = '';
-						} else if (data === '\u007F') {
-							if (commandBuffer.length > 0) {
-								commandBuffer = commandBuffer.slice(0, -1);
-								termInstance.current.write('\b \b');
-							}
-						} else {
-							commandBuffer += data;
-							termInstance.current.write(data);
-						}
-					});
+				termInstance.current = new Terminal({
+					cursorBlink: false,
+					fontFamily: theme.typography.family.alt2,
+					fontSize: 13,
+					fontWeight: 600,
+					theme: getTheme(theme),
 				});
-			}, 150);
-		}
+
+				termInstance.current.loadAddon(fitAddon.current);
+
+				termInstance.current.open(terminalRef.current);
+
+				fitAddon.current.fit();
+
+				// setTimeout(() => {
+				// 	fitAddon.current?.fit();
+				// }, 500);
+
+				const handleResize = () => {
+					fitAddon.current?.fit();
+				};
+				window.addEventListener('resize', handleResize);
+
+				termInstance.current.write(`\x1b[32mWelcome to AOS\x1b[0m\r\n\r\n`);
+				termInstance.current.write(`\x1b[90mProcess ID:\x1b[0m \x1b[32m${inputProcessId}\x1b[0m\r\n`);
+
+				await sendMessage(null, 'prompt');
+
+				// Command state variables
+				let commandBuffer = '';
+				let cursorPosition = 0;
+				// const commandHistory: string[] = [];
+				// let historyIndex = commandHistory.length;
+
+				// Helper to refresh the command line
+				const refreshLine = () => {
+					// Clear the current line and reset the cursor to the beginning.
+					// \x1b[2K clears the entire line, \r returns the cursor to the beginning.
+					termInstance.current.write('\x1b[2K\r' + commandBuffer);
+					// If the cursor is not at the end, move the terminal cursor left accordingly.
+					const moveLeftCount = commandBuffer.length - cursorPosition;
+					if (moveLeftCount > 0) {
+						termInstance.current.write(`\x1b[${moveLeftCount}D`);
+					}
+				};
+
+				const commandHistory: string[] = [];
+				let historyIndex: number = commandHistory.length;
+
+				termInstance.current.onData(async (data: string) => {
+					if (data.startsWith('\x1b')) {
+						if (data === '\x1b[A') {
+							// Up arrow: navigate to previous command in history
+							historyIndex = Math.max(0, historyIndex - 1);
+							const previousCommand = commandHistory[historyIndex] || '';
+							commandBuffer = previousCommand;
+							cursorPosition = commandBuffer.length;
+							// refreshLine();
+							return;
+						} else if (data === '\x1b[B') {
+							// Down arrow: navigate to next command in history
+							historyIndex = Math.min(commandHistory.length, historyIndex + 1);
+							const nextCommand = commandHistory[historyIndex] || '';
+							commandBuffer = nextCommand;
+							cursorPosition = commandBuffer.length;
+							// refreshLine();
+							return;
+						} else if (data === '\x1b[D') {
+							// Left arrow: move the cursor left if possible
+							if (cursorPosition > 0) {
+								cursorPosition--;
+								termInstance.current.write('\x1b[D');
+							}
+							return;
+						} else if (data === '\x1b[C') {
+							// Right arrow: move the cursor right if possible
+							if (cursorPosition < commandBuffer.length) {
+								cursorPosition++;
+								termInstance.current.write('\x1b[C');
+							}
+							return;
+						}
+						return;
+					}
+
+					if (data === '\r') {
+						console.log(commandBuffer);
+						if (commandBuffer.trim() !== '') {
+							commandHistory.push(commandBuffer.trim());
+							historyIndex = commandHistory.length; // Reset history index
+						}
+						await sendMessage(commandBuffer);
+						commandBuffer = '';
+					} else if (data === '\u007F') {
+						if (commandBuffer.length > 0) {
+							commandBuffer = commandBuffer.slice(0, -1);
+							termInstance.current.write('\b \b');
+						}
+					} else {
+						commandBuffer += data;
+						termInstance.current.write(data);
+					}
+				});
+			}
+		})();
 
 		return () => {
 			if (termInstance.current) {
@@ -206,8 +267,17 @@ export default function ConsoleInstance(props: {
 			clearLoader();
 
 			if (!outputType || outputType === 'data') {
-				// const rawOutput = typeof (response?.Output?.data) === 'object' ? response?.Output?.data?.output ?? '';
-				const rawOutput = response?.Output?.data?.output ?? '';
+				let rawOutput = '';
+				if (response?.Output?.data) {
+					if (typeof response?.Output?.data === 'object') {
+						if (response?.Output?.data?.output) {
+							rawOutput = response.Output.data.output;
+						}
+					} else {
+						rawOutput = response.Output.data;
+					}
+				}
+
 				const sanitizedOutput = rawOutput.toString().replace(/\t/g, '  ');
 				termInstance.current.write('\r\x1b[2K');
 				sanitizedOutput.split('\n').forEach((line: string) => {
@@ -253,26 +323,38 @@ export default function ConsoleInstance(props: {
 		}
 
 		if (!inputProcessId) {
-			if (loadingOptions) return <Loader sm relative />;
-			if (txOptions) {
-				return (
-					<S.OptionsWrapper className={'scroll-wrapper'}>
-						{txOptions.map((tx: GQLNodeResponseType, index: number) => {
-							const name = getTagValue(tx.node.tags, 'Name');
-							return (
-								<Button
-									key={index}
-									type={'primary'}
-									label={name ?? formatAddress(tx.node.id, false)}
-									handlePress={() => setInputProcessId(tx.node.id)}
-									height={40}
-									fullWidth
-								/>
-							);
-						})}
-					</S.OptionsWrapper>
-				);
-			}
+			return (
+				<S.OptionsWrapper>
+					<S.OptionsHeader>
+						<p>Select a process to connect with AOS</p>
+					</S.OptionsHeader>
+					{loadingOptions ? (
+						<S.OptionsLoader>
+							<Loader sm relative />
+						</S.OptionsLoader>
+					) : (
+						<>
+							{txOptions && (
+								<S.Options className={'scroll-wrapper-hidden'}>
+									{txOptions.map((tx: GQLNodeResponseType, index: number) => {
+										const name = getTagValue(tx.node.tags, 'Name');
+										return (
+											<Button
+												key={index}
+												type={'primary'}
+												label={name ?? formatAddress(tx.node.id, false)}
+												handlePress={() => setInputProcessId(tx.node.id)}
+												height={42.5}
+												fullWidth
+											/>
+										);
+									})}
+								</S.Options>
+							)}
+						</>
+					)}
+				</S.OptionsWrapper>
+			);
 		}
 
 		return (

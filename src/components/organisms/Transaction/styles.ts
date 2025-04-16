@@ -20,16 +20,7 @@ export const HeaderWrapper = styled.form`
 export const HeaderActionsWrapper = styled.div`
 	display: flex;
 	align-items: center;
-	/* justify-content: space-between; */
 	gap: 20px;
-
-	/* button {
-		margin: 7.5px 0 0 0;
-
-		span {
-			
-		}
-	} */
 `
 
 export const BodyWrapper = styled.div`
@@ -138,6 +129,31 @@ export const InputActions = styled.div`
 	gap: 15px;
 	justify-content: flex-end;
 	margin: 15px 0 0 0;
+`;
+
+export const TxInfoWrapper = styled.div`
+	display: flex;
+	align-items: center;
+	gap: 15px;
+`;
+
+export const UpdateWrapper = styled.div`
+	width: fit-content;
+	padding: 4.5px 15px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: ${(props) => props.theme.colors.container.alt8.background};
+	border: 1px solid ${(props) => props.theme.colors.border.alt2};
+	border-radius: ${STYLING.dimensions.radius.alt2};
+	span {
+		font-size: ${(props) => props.theme.typography.size.xxSmall};
+		font-family: ${(props) => props.theme.typography.family.alt1};
+		font-weight: ${(props) => props.theme.typography.weight.bold};
+		color: ${(props) => props.theme.colors.font.light1};
+		text-align: center;
+		text-transform: uppercase;
+	}
 `;
 
 export const OverviewWrapper = styled.div`

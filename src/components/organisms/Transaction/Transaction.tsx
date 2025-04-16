@@ -28,6 +28,7 @@ export default function Transaction(props: {
 	type: TransactionType;
 	active: boolean;
 	onTxChange?: (newTx: GQLNodeResponseType) => void;
+	handleMessageOpen: (id: string) => void;
 }) {
 	const arProvider = useArweaveProvider();
 	const permawebProvider = usePermawebProvider();
@@ -127,12 +128,6 @@ export default function Transaction(props: {
 				url: URLS.explorerInfo(inputTxId),
 				view: () => (
 					<S.InfoWrapper>
-						<S.ReadWrapper>
-							{props.type === 'process' && <ProcessRead processId={inputTxId} autoRun={true} />}
-							{props.type === 'message' && (
-								<MessageResult processId={txResponse?.node?.recipient} messageId={inputTxId} />
-							)}
-						</S.ReadWrapper>
 						<S.TagsWrapper>
 							<S.TagsSection className={'border-wrapper-primary'}>
 								<S.SectionHeader>
@@ -182,6 +177,12 @@ export default function Transaction(props: {
 								</S.OverviewWrapper>
 							</S.TagsSection>
 						</S.TagsWrapper>
+						<S.ReadWrapper>
+							{props.type === 'process' && <ProcessRead processId={inputTxId} autoRun={true} />}
+							{props.type === 'message' && (
+								<MessageResult processId={txResponse?.node?.recipient} messageId={inputTxId} />
+							)}
+						</S.ReadWrapper>
 					</S.InfoWrapper>
 				),
 			},
@@ -199,6 +200,7 @@ export default function Transaction(props: {
 									type={props.type}
 									recipient={props.type === 'message' ? txResponse?.node?.recipient : null}
 									parentId={inputTxId}
+									handleMessageOpen={(id: string) => props.handleMessageOpen(id)}
 								/>
 							)}
 						</S.MessagesSection>
@@ -225,18 +227,14 @@ export default function Transaction(props: {
 				}
 			);
 
-			console.log(txResponse?.node?.owner?.address)
-
 			if (arProvider.walletAddress && txResponse?.node?.owner?.address === arProvider.walletAddress) {
 				tabs.push({
 					label: language.aos,
 					icon: ASSETS.console,
 					disabled: false,
 					url: URLS.explorerAOS(inputTxId),
-					view: () => (
-						<ConsoleInstance processId={inputTxId} active={true} />
-					)
-				})
+					view: () => <ConsoleInstance processId={inputTxId} active={true} />,
+				});
 			}
 		}
 
@@ -246,7 +244,29 @@ export default function Transaction(props: {
 	const transactionTabs = React.useMemo(() => {
 		const matchingTab = TABS.find((tab) => tab.url === currentHash);
 		const activeUrl = matchingTab ? matchingTab.url : TABS[0].url;
-		return <URLTabs tabs={TABS} activeUrl={activeUrl} />;
+		return (
+			<URLTabs
+				tabs={TABS}
+				activeUrl={activeUrl}
+				endComponent={
+					<S.TxInfoWrapper>
+						<S.UpdateWrapper>
+							<span>{props.type}</span>
+						</S.UpdateWrapper>
+						{txResponse?.node?.tags && (
+							<S.UpdateWrapper>
+								<span>{getTagValue(txResponse.node.tags, 'Variant')}</span>
+							</S.UpdateWrapper>
+						)}
+						{txResponse?.node?.block?.timestamp && (
+							<S.UpdateWrapper>
+								<span>{formatDate(txResponse?.node?.block?.timestamp * 1000, 'timestamp')}</span>
+							</S.UpdateWrapper>
+						)}
+					</S.TxInfoWrapper>
+				}
+			/>
+		);
 	}, [TABS]);
 
 	function getTransaction() {

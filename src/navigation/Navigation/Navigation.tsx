@@ -4,6 +4,7 @@ import { ReactSVG } from 'react-svg';
 import { GQLNodeResponseType } from '@permaweb/libs';
 import { debounce } from 'lodash';
 
+import { ViewWrapper } from 'app/styles';
 import { FormField } from 'components/atoms/FormField';
 import { IconButton } from 'components/atoms/IconButton';
 import { ASSETS, STYLING, URLS } from 'helpers/config';
@@ -198,9 +199,25 @@ export default function Navigation(props: { open: boolean; toggle: () => void })
 	return (
 		<>
 			{panel}
-			<S.Header navigationOpen={props.open} className={'fade-in'}>
-				<S.Content>
-					<S.C1Wrapper>
+				<S.Header navigationOpen={props.open} className={'fade-in'}>
+					<S.Content>
+						<S.C1Wrapper>
+							<S.LogoWrapper>
+								<Link to={URLS.base}>
+									<ReactSVG src={ASSETS.logo} />
+								</Link>
+							</S.LogoWrapper>
+							<S.DNavWrapper>
+								{paths.map((element: { path: string; label: string; target?: '_blank' }, index: number) => {
+									return (
+										<Link key={index} to={element.path} target={element.target || ''}>
+											{element.label}
+										</Link>
+									);
+								})}
+							</S.DNavWrapper>
+						</S.C1Wrapper>
+						{/* <S.C1Wrapper>
 						{!props.open && navigationToggle}
 						<CloseHandler
 							callback={() => {
@@ -228,12 +245,39 @@ export default function Navigation(props: { open: boolean; toggle: () => void })
 								)}
 							</S.SearchWrapper>
 						</CloseHandler>
-					</S.C1Wrapper>
-					<S.ActionsWrapper>
-						<WalletConnect />
-					</S.ActionsWrapper>
-				</S.Content>
-			</S.Header>
+					</S.C1Wrapper> */}
+
+						<S.ActionsWrapper>
+							<CloseHandler
+								callback={() => {
+									setTxOutputOpen(false);
+								}}
+								active={txOutputOpen}
+								disabled={!txOutputOpen}
+							>
+								<S.SearchWrapper>
+									<S.SearchInputWrapper>
+										<ReactSVG src={ASSETS.search} />
+										<FormField
+											value={inputTxId}
+											onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputTxId(e.target.value)}
+											onFocus={() => setTxOutputOpen(true)}
+											placeholder={language.processOrMessageId}
+											invalid={{ status: inputTxId ? !checkValidAddress(inputTxId) : false, message: null }}
+											disabled={loadingTx}
+											hideErrorMessage
+											sm
+										/>
+									</S.SearchInputWrapper>
+									{txOutputOpen && checkValidAddress(inputTxId) && (
+										<S.SearchOutputWrapper>{searchOutput}</S.SearchOutputWrapper>
+									)}
+								</S.SearchWrapper>
+							</CloseHandler>
+							<WalletConnect />
+						</S.ActionsWrapper>
+					</S.Content>
+				</S.Header>
 		</>
 	);
 }

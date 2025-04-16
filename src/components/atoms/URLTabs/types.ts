@@ -23,4 +23,5 @@ export interface IUProps {
 	tabs: URLViewType[];
 	activeUrl: string;
 	useFixed?: boolean;
+	endComponent?: React.ReactNode;
 }

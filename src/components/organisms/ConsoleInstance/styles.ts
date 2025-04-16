@@ -11,21 +11,14 @@ export const Wrapper = styled.div<{ noWrapper?: boolean }>`
 export const Console = styled.div<{ noWrapper?: boolean }>`
 	height: 100%;
 	width: 100%;
-	
-	/* .xterm .xterm-viewport {
-		background-color: transparent !important;
-		overflow: auto;
-		::-webkit-scrollbar {
-			display: none;
-		}
-		
-		-ms-overflow-style: none;
-		scrollbar-width: none;
-	} */
 
 	.terminal {
 		padding: ${(props) => props.noWrapper ? '0' : '15px'};
 		height: 100% !important;
+		
+		span {
+			letter-spacing: 0 !important;
+		}
 	}
 
 	.xterm-rows {
@@ -48,10 +41,31 @@ export const OptionsWrapper = styled.div`
 	flex-direction: column;
 	gap: 15px;
 	margin: 0 auto;
-	 
-	 button {
+`;
+
+export const OptionsHeader = styled.div`
+	p {
+		font-size: ${(props) => props.theme.typography.size.xxSmall};
+		font-family: ${(props) => props.theme.typography.family.primary};
+		font-weight: ${(props) => props.theme.typography.weight.medium};
+		color: ${(props) => props.theme.colors.font.alt1};
+		text-transform: uppercase;
+		text-align: center;
+	}
+`;
+
+export const Options = styled.div`
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+
+	button {
 		border-radius: ${STYLING.dimensions.radius.primary} !important;
 	 }
+`;
+
+export const OptionsLoader = styled.div`
+	position: relative;
 `;
 
 export const LoadingWrapper = styled.div`

@@ -2,6 +2,10 @@ import styled, { css } from 'styled-components';
 
 import { STYLING } from 'helpers/config';
 
+export const Container = styled.div`
+	scroll-margin-top: 140px;
+`;
+
 export const Header = styled.div`
 	padding: 15px;
 	margin: 0;
@@ -29,7 +33,7 @@ export const HeaderActions = styled.div`
 	gap: 12.5px;
 `;
 
-export const HeaderActionsDivider = styled.div`
+export const Divider = styled.div`
 	height: 20px;
 	width: 1px;
 	border-right: 1px solid ${(props) => props.theme.colors.border.primary}
@@ -62,8 +66,7 @@ export const HeaderWrapper = styled.div`
 
 	> {
 		&:last-child,
-		&:nth-child(3),
-		&:nth-child(4) {
+		&:nth-child(3) {
 			display: flex;
 			justify-content: flex-end;
 			text-align: right;
@@ -172,6 +175,9 @@ export const ElementItem = styled.div`
 export const ID = styled(ElementItem)`
 	min-width: 165px;
 	width: 165px;
+	display: flex;
+	align-items: center;
+	gap: 12.5px;
 `;
 
 export const Action = styled(ElementItem)`
@@ -179,23 +185,52 @@ export const Action = styled(ElementItem)`
 	width: 270px;
 `;
 
+export const ActionTooltip = styled.div`
+	position: absolute;
+	z-index: 2;
+	top: 2.5px;
+    left: calc(100% + 10px);
+	display: none;
+	white-space: nowrap;
+
+	span {
+		display: block;
+		line-height: 1.65;
+	}
+`;
+
 export const ActionValue = styled(Action) <{ background?: string }>`
 	min-width: 270px;
 	width: 270px;
+	position: relative;
 
-	/* p {
-		width: 100px;
+	.action-indicator {
+		position: relative;
+		width: 105px;
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		padding: 2.5px 10px;
-		border: 1px solid ${(props) => props.theme.colors.border.primary};
+		padding: 2.15px 7.5px;
 		background: ${(props) => props.background ? props.background : props.theme.colors.container.alt8.background};
-		color: ${(props) => props.theme.colors.font.light1};
 		border-radius: ${STYLING.dimensions.radius.alt2};
+
+		&:hover {
+			${ActionTooltip} {
+				display: block;
+			}
+		}
+	}
+	
+	p {
+		max-width: 100%;
+		color: ${(props) => props.theme.colors.font.light1};
 		font-size: ${(props) => props.theme.typography.size.xxSmall};
 		text-align: center;
-	} */
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
 `;
 
 export const To = styled(ElementItem)`
@@ -208,9 +243,9 @@ export const To = styled(ElementItem)`
 `;
 
 export const Output = styled(ElementItem)`
-	min-width: 150px;
-	width: 150px;
-	justify-content: flex-end;
+	min-width: 100px;
+	width: 100px;
+	justify-content: center;
 	p {
 		text-align: right;
 	}
@@ -296,6 +331,19 @@ export const FooterWrapper = styled.div`
 	border-bottom: 1px solid ${(props) => props.theme.colors.border.primary} !important;	
 	border-bottom-left-radius: ${STYLING.dimensions.radius.alt1};
 	border-bottom-right-radius: ${STYLING.dimensions.radius.alt1};
+`;
+
+export const PageCounter = styled.div`
+	display: flex;
+	align-items: center;
+	gap: 7.5px;
+
+	p, label, input {
+		font-size: ${(props) => props.theme.typography.size.xxSmall};
+		font-family: ${(props) => props.theme.typography.family.primary};
+		font-weight: ${(props) => props.theme.typography.weight.medium};
+		color: ${(props) => props.theme.colors.font.alt1};
+	}
 `;
 
 export const UpdateWrapper = styled.div<{ childList?: boolean }>`

@@ -34,7 +34,7 @@ export const TabsContent = styled.div`
 
 	border: 1px solid ${(props) => props.theme.colors.border.primary};
 	background: ${(props) => props.theme.colors.container.alt1.background};
-	border-radius: ${STYLING.dimensions.radius.primary};
+	border-radius: ${STYLING.dimensions.radius.alt2};
 `;
 
 export const TabHeader = styled.div`
