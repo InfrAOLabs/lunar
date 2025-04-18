@@ -3,11 +3,11 @@ import { DefaultTheme, useTheme } from 'styled-components';
 import { Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 
-import { ViewWrapper } from 'app/styles';
 import { Button } from 'components/atoms/Button';
+import { IconButton } from 'components/atoms/IconButton';
 import { Loader } from 'components/atoms/Loader';
 import { Notification } from 'components/atoms/Notification';
-import { ViewHeader } from 'components/atoms/ViewHeader';
+import { ASSETS } from 'helpers/config';
 import { GQLNodeResponseType } from 'helpers/types';
 import { checkValidAddress, formatAddress, getTagValue } from 'helpers/utils';
 import { useArweaveProvider } from 'providers/ArweaveProvider';
@@ -32,6 +32,7 @@ export default function ConsoleInstance(props: {
 	const languageProvider = useLanguageProvider();
 	const language = languageProvider.object[languageProvider.current];
 
+	const consoleRef = React.useRef(null);
 	const terminalRef = React.useRef(null);
 	const termInstance = React.useRef(null);
 	const fitAddon = React.useRef<FitAddon | null>(null);
@@ -42,10 +43,50 @@ export default function ConsoleInstance(props: {
 	const [loadingOptions, setLoadingOptions] = React.useState<boolean>(false);
 	const [txOptions, setTxOptions] = React.useState<GQLNodeResponseType[] | null>(null);
 
+	const [fullScreenMode, setFullScreenMode] = React.useState<boolean>(false);
 	const [hasFetched, setHasFetched] = React.useState<boolean>(false);
 	const [error, setError] = React.useState<string | null>(null);
 
 	const [loadingMessage, setLoadingMessage] = React.useState<boolean>(false);
+
+	const toggleFullscreen = React.useCallback(async () => {
+		const el = terminalRef.current!;
+		if (!document.fullscreenElement) {
+			await el.requestFullscreen?.();
+		} else {
+			await document.exitFullscreen?.();
+		}
+	}, []);
+
+	React.useEffect(() => {
+		const onFullScreenChange = () => {
+			setFullScreenMode(!!document.fullscreenElement);
+		};
+		document.addEventListener('fullscreenchange', onFullScreenChange);
+		return () => {
+			document.removeEventListener('fullscreenchange', onFullScreenChange);
+		};
+	}, []);
+
+	React.useEffect(() => {
+		const onKeyDown = (e: KeyboardEvent) => {
+			if (e.key === 'Escape' && fullScreenMode) {
+				toggleFullscreen();
+			}
+		};
+		document.addEventListener('keydown', onKeyDown);
+		return () => {
+			document.removeEventListener('keydown', onKeyDown);
+		};
+	}, [fullScreenMode, toggleFullscreen]);
+
+	React.useEffect(() => {
+		if (consoleRef.current && props.active) {
+			setTimeout(() => {
+				consoleRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			}, 10);
+		}
+	}, [props.active]);
 
 	React.useEffect(() => {
 		(async function () {
@@ -359,8 +400,8 @@ export default function ConsoleInstance(props: {
 
 		return (
 			<S.Console
-				className={`${props.noWrapper ? '' : 'border-wrapper-alt3 '}scroll-wrapper`}
-				noWrapper={props.noWrapper}
+				className={`${props.noWrapper && !fullScreenMode ? '' : 'border-wrapper-alt3 '}scroll-wrapper`}
+				noWrapper={props.noWrapper && !fullScreenMode}
 				ref={terminalRef}
 			/>
 		);
@@ -368,13 +409,24 @@ export default function ConsoleInstance(props: {
 
 	return props.active ? (
 		<>
-			<S.Wrapper noWrapper={props.noWrapper}>
+			<S.Wrapper noWrapper={props.noWrapper} ref={consoleRef}>
 				{getConsole()}
 				{/* {loadingMessage && (
 					<S.LoadingWrapper>
 						<Loader sm relative />
 					</S.LoadingWrapper>
 				)} */}
+				<S.ActionsWrapper>
+					<IconButton
+						type={'alt1'}
+						src={ASSETS.fullscreen}
+						handlePress={toggleFullscreen}
+						dimensions={{
+							wrapper: 25,
+							icon: 12.5,
+						}}
+					/>
+				</S.ActionsWrapper>
 			</S.Wrapper>
 			{error && (
 				<Notification

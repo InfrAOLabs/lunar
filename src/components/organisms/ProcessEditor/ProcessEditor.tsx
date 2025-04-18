@@ -24,7 +24,7 @@ export default function ProcessEditor(props: { processId: string; type: 'read' |
 				editorRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
 			}, 10);
 		}
-	}, [])
+	}, []);
 
 	async function handleSubmit(query: object) {
 		setLoading(true);

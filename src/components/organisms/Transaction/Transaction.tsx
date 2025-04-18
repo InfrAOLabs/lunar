@@ -13,7 +13,7 @@ import { MessageResult } from 'components/molecules/MessageResult';
 import { ProcessRead } from 'components/molecules/ProcessRead';
 import { ASSETS, URLS } from 'helpers/config';
 import { TransactionType } from 'helpers/types';
-import { checkValidAddress, formatDate, getTagValue } from 'helpers/utils';
+import { checkValidAddress, formatCount, formatDate, getTagValue } from 'helpers/utils';
 import { useArweaveProvider } from 'providers/ArweaveProvider';
 import { useLanguageProvider } from 'providers/LanguageProvider';
 import { usePermawebProvider } from 'providers/PermawebProvider';
@@ -126,6 +126,7 @@ export default function Transaction(props: {
 	};
 
 	const TABS = React.useMemo(() => {
+		console.log(txResponse);
 		const tabs = [
 			{
 				label: language.overview,
@@ -151,10 +152,10 @@ export default function Transaction(props: {
 											formatDate(txResponse.node.block.timestamp * 1000, 'timestamp')
 										}
 									/>
-									<OverviewLine label={language.owner} value={txResponse?.node?.owner?.address} />
 									<S.OverviewDivider />
 									{props.type === 'process' && (
 										<>
+											<OverviewLine label={language.owner} value={txResponse?.node?.owner?.address} />
 											<OverviewLine
 												label={'Authority'}
 												value={txResponse?.node?.tags && getTagValue(txResponse.node.tags, 'Authority')}
@@ -186,7 +187,42 @@ export default function Transaction(props: {
 						<S.ReadWrapper>
 							{props.type === 'process' && <ProcessRead processId={inputTxId} autoRun={true} />}
 							{props.type === 'message' && (
-								<MessageResult processId={txResponse?.node?.recipient} messageId={inputTxId} />
+								<>
+									<S.MessageInfo className={'border-wrapper-primary'}>
+										<S.MessageInfoHeader>
+											<p>{language.messageInfo}</p>
+										</S.MessageInfoHeader>
+										<S.MessageInfoBody>
+											<S.MessageInfoLine>
+												<span>{`${language.id}: `}</span>
+												<TxAddress address={txResponse?.node?.id} />
+											</S.MessageInfoLine>
+											<S.MessageInfoLine>
+												<span>{`${language.blockHeight}: `}</span>
+												<p>{formatCount(txResponse?.node?.block?.height.toString())}</p>
+											</S.MessageInfoLine>
+											<S.MessageInfoLine>
+												<span>{`${language.timestamp}: `}</span>
+												<p>{txResponse?.node?.block?.timestamp}</p>
+											</S.MessageInfoLine>
+											<S.MessageInfoLine>
+												<span>{`${language.from}: `}</span>
+												<TxAddress
+													address={getTagValue(txResponse.node.tags, 'From-Process') ?? txResponse.node.owner.address}
+												/>
+											</S.MessageInfoLine>
+											<S.MessageInfoLine>
+												<span>{`${language.to}: `}</span>
+												<TxAddress address={txResponse?.node?.recipient} />
+											</S.MessageInfoLine>
+											<S.MessageInfoLine>
+												<span>{`${language.owner}: `}</span>
+												<TxAddress address={txResponse?.node?.owner?.address} />
+											</S.MessageInfoLine>
+										</S.MessageInfoBody>
+									</S.MessageInfo>
+									<MessageResult processId={txResponse?.node?.recipient} messageId={inputTxId} />
+								</>
 							)}
 						</S.ReadWrapper>
 					</S.InfoWrapper>

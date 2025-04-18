@@ -372,6 +372,14 @@ export default function MessageList(props: {
 		}
 	}
 
+	function handleFilterChange(filter: MessageFilterType) {
+		setCurrentFilter(filter);
+		setPageNumber(1);
+		setPageCursor(null);
+		setNextCursor(null);
+		setCursorHistory([]);
+	}
+
 	function getMessage() {
 		let message: string = language.associatedMessagesInfo;
 		if (loadingMessages) message = `${language.associatedMessagesLoading}...`;
@@ -399,24 +407,6 @@ export default function MessageList(props: {
 						<p>{`Page (${formatCount(pageNumber.toString())} of ${formatCount(totalPages.toString())})`}</p>
 						<S.Divider />
 						<p>{`${perPage} per page`}</p>
-						{/* <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-							<input
-								type={'number'}
-								value={perPage}
-								min={'1'}
-								onChange={(e) => {
-									const newPerPage = parseInt(e.target.value, 10);
-									if (!isNaN(newPerPage) && newPerPage > 0) {
-										setPerPage(newPerPage);
-										// Optionally reset pagination here if needed:
-										// setPageCursor(null);
-										// setCursorHistory([]);
-										// setPageCount(1);
-									}
-								}}
-							/>
-							per page
-						</label> */}
 					</S.PageCounter>
 				)}
 				<Button
@@ -440,13 +430,13 @@ export default function MessageList(props: {
 								<Button
 									type={'alt3'}
 									label={`${language.incoming}${incomingCount ? ` (${formatCount(incomingCount.toString())})` : ''}`}
-									handlePress={() => setCurrentFilter('incoming')}
+									handlePress={() => handleFilterChange('incoming')}
 									active={currentFilter === 'incoming'}
 								/>
 								<Button
 									type={'alt3'}
 									label={`${language.outgoing}${outgoingCount ? ` (${formatCount(outgoingCount.toString())})` : ''}`}
-									handlePress={() => setCurrentFilter('outgoing')}
+									handlePress={() => handleFilterChange('outgoing')}
 									active={currentFilter === 'outgoing'}
 								/>
 								<S.Divider />

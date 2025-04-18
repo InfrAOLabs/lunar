@@ -3,9 +3,20 @@ import styled from 'styled-components';
 import { STYLING } from 'helpers/config';
 
 export const Wrapper = styled.div<{ noWrapper?: boolean }>`
-	height: ${(props) => props.noWrapper ? `calc(100vh - 270px)` : `calc(100vh - 395px)`};
+	/* height: ${(props) => props.noWrapper ? `calc(100vh - 270px)` : `calc(100vh - 395px)`}; */
+	height: 500px;
 	width: 100%;
 	position: relative;
+`;
+
+export const ActionsWrapper = styled.div`
+	position: absolute;
+	bottom: 20px;
+	right: 20px;
+
+	button {
+		padding: 3.5px 0 0 0 !important;
+	}
 `;
 
 export const Console = styled.div<{ noWrapper?: boolean }>`

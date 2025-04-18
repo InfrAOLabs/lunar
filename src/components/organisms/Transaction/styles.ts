@@ -44,6 +44,69 @@ export const InfoWrapper = styled.div`
 
 export const ReadWrapper = styled.div`
 	width: calc(100% - 475px);
+	display: flex;
+	flex-direction: column;
+	gap: 25px;
+`;
+
+export const MessageInfo = styled.div`
+	width: 100%;
+	padding: 15px 15px 7.5px 15px;
+`;
+
+export const MessageInfoHeader = styled.div`
+	p {
+		font-size: ${(props) => props.theme.typography.size.lg};
+		font-family: ${(props) => props.theme.typography.family.primary};
+		font-weight: ${(props) => props.theme.typography.weight.bold};
+		color: ${(props) => props.theme.colors.font.primary};
+	}
+`;
+
+export const MessageInfoBody = styled.div`
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	margin: 7.5px 0 0 0;
+
+	> {
+		&:last-child,
+		&:nth-child(3) {
+			justify-content: flex-end;
+			text-align: right;
+			border-right: none;
+		}
+		
+		&:first-child,
+		&:nth-child(2),
+		&:nth-child(3) {
+			border-bottom: 1px solid ${(props) => props.theme.colors.border.primary};
+		}
+		
+		&:nth-child(2),
+		&:nth-child(5) {
+			padding: 7.5px 15px;
+		}
+	}
+`;
+
+export const MessageInfoLine = styled.div`
+	display: flex;
+	align-items: center;
+	gap: 7.5px;
+	padding: 7.5px 0;
+	border-right: 1px solid ${(props) => props.theme.colors.border.primary};
+	span {
+		font-size: ${(props) => props.theme.typography.size.xSmall};
+		font-family: ${(props) => props.theme.typography.family.primary};
+		font-weight: ${(props) => props.theme.typography.weight.bold};
+		color: ${(props) => props.theme.colors.font.alt1};
+	}
+	p {
+		font-size: ${(props) => props.theme.typography.size.xSmall};
+		font-family: ${(props) => props.theme.typography.family.primary};
+		font-weight: ${(props) => props.theme.typography.weight.bold};
+		color: ${(props) => props.theme.colors.font.primary};
+	}
 `;
 
 export const TagsWrapper = styled.div`

@@ -296,12 +296,14 @@ export const GlobalStyle = createGlobalStyle`
 export const App = styled.div`
 	min-height: 100vh;
 	position: relative;
+	display: flex;
+	flex-direction: column;
 `;
 
 export const View = styled.main<{ navigationOpen: boolean }>`
-	min-height: calc(100vh - ${STYLING.dimensions.nav.height} - 35px);
+	min-height: calc(100vh - ${STYLING.dimensions.nav.height});
+	width: 100%;
 	position: relative;
-	top: ${STYLING.dimensions.nav.height};
 	padding: 0 0 20px 0;
 	margin: 0 auto;
 	display: flex;
@@ -320,6 +322,10 @@ export const ViewWrapper = styled.div`
     max-width: ${STYLING.cutoffs.max};
 		padding: 0 25px;
     margin: 0 auto;
+
+		@media (max-width: ${STYLING.cutoffs.initial}) {
+			padding: 0 15px;
+		}
 `;
 
 export const MessageWrapper = styled.div`
@@ -340,13 +346,12 @@ export const MessageWrapper = styled.div`
 
 export const Footer = styled.footer<{ navigationOpen: boolean }>`
 	width: 100%;
-	margin: ${STYLING.dimensions.nav.height} 0 0 0;
 	display: flex;
 	align-items: center;
 	padding: 0 0 20px 0;
 
 	p {
-		font-size: ${(props) => props.theme.typography.size.xxSmall};
+		font-size: ${(props) => props.theme.typography.size.xSmall};
 		font-family: ${(props) => props.theme.typography.family.primary};
 		font-weight: ${(props) => props.theme.typography.weight.bold};
 		color: ${(props) => props.theme.colors.font.alt1};

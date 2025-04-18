@@ -6,10 +6,27 @@ import { STYLING } from 'helpers/config';
 export const Header = styled.header<{ navigationOpen: boolean }>`
 	height: ${STYLING.dimensions.nav.height};
 	width: 100%;
-	position: fixed;
+	position: sticky;
 	top: 0;
 	z-index: 4;
 	background: ${(props) => props.theme.colors.view.background};
+`;
+
+export const Content = styled.div`
+	height: 100%;
+	width: 100%;
+
+	max-width: ${STYLING.cutoffs.max};
+	padding: 0 25px;
+    margin: 0 auto;
+
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+
+	@media (max-width: ${STYLING.cutoffs.initial}) {
+		padding: 0 15px;
+	}
 `;
 
 export const PanelOverlay = styled.div<{ open: boolean }>`
@@ -214,24 +231,11 @@ export const SearchResult = styled.div`
 	}
 `;
 
-export const Content = styled.div`
-	height: 100%;
-	width: 100%;
-
-	max-width: ${STYLING.cutoffs.max};
-	padding: 0 25px;
-    margin: 0 auto;
-
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-`;
-
 export const C1Wrapper = styled.div`
 	width: fit-content;
 	display: flex;
 	align-items: center;
-	gap: 35px;
+	gap: 25px;
 
 	@media (max-width: ${STYLING.cutoffs.desktop}) {
 		max-width: calc(100% - 60px);
@@ -240,8 +244,8 @@ export const C1Wrapper = styled.div`
 
 export const LogoWrapper = styled.div`
 	svg {
-		height: 27.5px;
-		width: 27.5px;
+		height: 30px;
+		width: 30px;
 		padding: 2.5px 0 0 0;
 		margin: 5.5px 0 0 0;
 		color: ${(props) => props.theme.colors.icon.alt2.fill};
@@ -297,6 +301,11 @@ export const DSearchWrapper = styled.div`
 export const MSearchWrapper = styled.div`
 	display: none;
 	position: relative;
+
+	button {
+		padding: 3.5px 0 0 0 !important;
+	}
+
 	@media (max-width: ${STYLING.cutoffs.initial}) {
 		display: block;
 	}
