@@ -242,6 +242,15 @@ export const To = styled(ElementItem)`
 	}
 `;
 
+export const From = styled(ElementItem)`
+	min-width: 150px;
+	width: 150px;
+	justify-content: flex-end;
+	p {
+		text-align: right;
+	}
+`;
+
 export const Output = styled(ElementItem)`
 	min-width: 100px;
 	width: 100px;
@@ -249,6 +258,10 @@ export const Output = styled(ElementItem)`
 	p {
 		text-align: right;
 	}
+
+	button {
+		padding: 4.5px 12.5px !important
+;	}
 `;
 
 export const Time = styled(ElementItem)`
@@ -341,7 +354,7 @@ export const PageCounter = styled.div`
 	p, label, input {
 		font-size: ${(props) => props.theme.typography.size.xxSmall};
 		font-family: ${(props) => props.theme.typography.family.primary};
-		font-weight: ${(props) => props.theme.typography.weight.medium};
+		font-weight: ${(props) => props.theme.typography.weight.bold};
 		color: ${(props) => props.theme.colors.font.alt1};
 	}
 `;

@@ -146,13 +146,13 @@ export const Alt1 = styled(Primary)`
 				? props.theme.colors.font.light1
 				: props.disabled
 				? props.theme.colors.button.primary.disabled.color
-				: props.theme.colors.icon.primary.fill};
+				: props.theme.colors.button.primary.color};
 		fill: ${(props) =>
 			props.active
 				? props.theme.colors.font.light1
 				: props.disabled
 				? props.theme.colors.button.primary.disabled.color
-				: props.theme.colors.icon.primary.fill};
+				: props.theme.colors.button.primary.color};
 	}
 
 	&:hover {

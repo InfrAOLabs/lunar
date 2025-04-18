@@ -34,32 +34,38 @@ export default function Metrics() {
 		})();
 	}, [permawebProvider.libs]);
 
-	if (!metrics) return <Loader />;
-
 	return (
-		<S.Wrapper className={'max-view-wrapper'}>
-			<MetricChart dataList={metrics} metric={'tx_count'} totalField={'tx_count_rolling'} chartLabel={'Total Messages'} />
-			<MetricChart dataList={metrics} metric={'transfer_count'} totalField={'transfer_count'} chartLabel={'Transfers'} />
-			<MetricChart dataList={metrics} metric={'active_users'} totalField={'active_users'} chartLabel={'Users'} />
-			<MetricChart dataList={metrics} metric={'active_processes'} totalField={'active_processes'} chartLabel={'Processes'} />
-			{/* <S.Section className={'border-wrapper-primary'}>
-				<S.SectionHeader>
-					<p>Transfers</p>
-				</S.SectionHeader>
-				<MetricChart dataList={metrics} metric={'transfer_count'} chartLabel={'Messages'} />
-			</S.Section>
-			<S.Section className={'border-wrapper-primary'}>
-				<S.SectionHeader>
-					<p>Users</p>
-				</S.SectionHeader>
-				<MetricChart dataList={metrics} metric={'active_users'} chartLabel={'Messages'} />
-			</S.Section>
-			<S.Section className={'border-wrapper-primary'}>
-				<S.SectionHeader>
-					<p>Processes</p>
-				</S.SectionHeader>
-				<MetricChart dataList={metrics} metric={'active_processes'} chartLabel={'Messages'} />
-			</S.Section> */}
+		<S.Wrapper>
+			{metrics ? (
+				<>
+					<MetricChart
+						dataList={metrics}
+						metric={'tx_count'}
+						totalField={'tx_count_rolling'}
+						chartLabel={'Total Messages'}
+					/>
+					<MetricChart
+						dataList={metrics}
+						metric={'transfer_count'}
+						totalField={'transfer_count'}
+						chartLabel={'Transfers'}
+					/>
+					<MetricChart dataList={metrics} metric={'active_users'} totalField={'active_users'} chartLabel={'Users'} />
+					<MetricChart
+						dataList={metrics}
+						metric={'active_processes'}
+						totalField={'active_processes'}
+						chartLabel={'Processes'}
+					/>
+				</>
+			) : (
+				<>
+					<S.Placeholder className={'border-wrapper-alt3'} />
+					<S.Placeholder className={'border-wrapper-alt3'}/>
+					<S.Placeholder className={'border-wrapper-alt3'}/>
+					<S.Placeholder className={'border-wrapper-alt3'}/>
+				</>
+			)}
 		</S.Wrapper>
 	);
 }

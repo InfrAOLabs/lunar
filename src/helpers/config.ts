@@ -78,14 +78,10 @@ export const ASSETS = {
 	youtube: getTxEndpoint('vEToNqLt0U4CXLW-u7DykeGNqFLfuzKWebnu_1d5FRs'),
 };
 
-export const TAGS = {
-
-}
-
 export const DEFAULT_MESSAGE_TAGS = [
 	{ name: 'Data-Protocol', values: ['ao'] },
 	{ name: 'Type', values: ['Message'] },
-	{ name: 'Variant', values: ['ao.TN.1'] }
+	{ name: 'Variant', values: ['ao.TN.1'] },
 ]
 
 export const DOM = {

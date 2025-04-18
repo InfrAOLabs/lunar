@@ -30,9 +30,11 @@ export default function Landing() {
 			<S.HeaderWrapper>
 				<ViewHeader header={language.network} />
 			</S.HeaderWrapper>
-			<S.BodyWrapper>
-				<Metrics />
-				{/* <ViewWrapper>
+			<ViewWrapper>
+				<S.BodyWrapper>
+					<Metrics />
+					<MessageList />
+					{/* <ViewWrapper>
 					<S.SectionMain>
 						<S.SectionHeader>
 							<p>Active Nodes</p>
@@ -47,7 +49,7 @@ export default function Landing() {
 						</S.ProcessReadWrapper>
 					</S.SectionMain>
 				</ViewWrapper> */}
-				{/* <ViewWrapper>
+					{/* <ViewWrapper>
 					<S.SectionMain>
 						<S.SectionHeader>
 							<p>Recent Messages</p>
@@ -59,7 +61,8 @@ export default function Landing() {
 						/>
 					</S.SectionMain>
 				</ViewWrapper> */}
-			</S.BodyWrapper>
+				</S.BodyWrapper>
+			</ViewWrapper>
 		</S.Wrapper>
 	);
 }

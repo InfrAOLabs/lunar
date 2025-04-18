@@ -1,8 +1,7 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { Modal } from 'components/atoms/Modal';
-import { ASSETS, STORAGE, URLS } from 'helpers/config';
+import { ASSETS, STORAGE } from 'helpers/config';
 import { getARBalanceEndpoint } from 'helpers/endpoints';
 import { WalletEnum } from 'helpers/types';
 import Othent from 'helpers/wallet';
@@ -73,8 +72,6 @@ function WalletList(props: { handleConnect: any }) {
 }
 
 export function ArweaveProvider(props: { children: React.ReactNode }) {
-	const navigate = useNavigate();
-
 	const languageProvider = useLanguageProvider();
 	const language = languageProvider.object[languageProvider.current];
 
@@ -171,7 +168,6 @@ export function ArweaveProvider(props: { children: React.ReactNode }) {
 		await global.window?.arweaveWallet?.disconnect();
 		setWallet(null);
 		setWalletAddress(null);
-		navigate(URLS.base);
 	}
 
 	async function getARBalance(walletAddress: string) {

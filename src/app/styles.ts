@@ -302,15 +302,10 @@ export const View = styled.main<{ navigationOpen: boolean }>`
 	min-height: calc(100vh - ${STYLING.dimensions.nav.height} - 35px);
 	position: relative;
 	top: ${STYLING.dimensions.nav.height};
-	padding: 0 0 20px ${(props) => (props.navigationOpen ? `calc(${STYLING.dimensions.nav.width})` : '0')};
+	padding: 0 0 20px 0;
 	margin: 0 auto;
-	transition: padding-left ${transition2};
 	display: flex;
 	flex-direction: column;
-
-	@media (max-width: ${STYLING.cutoffs.desktop}) {
-		padding: 0 20px 20px 20px;
-	}
 `;
 
 export const CenteredWrapper = styled.div`
@@ -348,6 +343,7 @@ export const Footer = styled.footer<{ navigationOpen: boolean }>`
 	margin: ${STYLING.dimensions.nav.height} 0 0 0;
 	display: flex;
 	align-items: center;
+	padding: 0 0 20px 0;
 
 	p {
 		font-size: ${(props) => props.theme.typography.size.xxSmall};
@@ -357,6 +353,6 @@ export const Footer = styled.footer<{ navigationOpen: boolean }>`
 	}
 
 	@media (max-width: ${STYLING.cutoffs.desktop}) {
-		padding: 20px;
+		padding: 20px 0;
 	}
 `;

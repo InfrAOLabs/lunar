@@ -15,7 +15,7 @@ export const Wrapper = styled.div`
 
 export const Label = styled.label`
 	color: ${(props) => props.theme.colors.font.alt1};
-	font-size: ${(props) => props.theme.typography.size.xSmall};
+	font-size: ${(props) => props.theme.typography.size.xxSmall};
 	font-weight: ${(props) => props.theme.typography.weight.bold};
 `;
 
@@ -33,7 +33,7 @@ export const TextArea = styled.textarea<{
 	background: ${(props) => props.theme.colors.form.background};
 	border: 1px solid
 		${(props) => (props.invalid ? props.theme.colors.form.invalid.outline : props.theme.colors.form.border)};
-	border-radius: ${STYLING.dimensions.radius.alt3};
+	border-radius: ${STYLING.dimensions.radius.alt2};
 	&:focus {
 		outline: 0;
 		border: 1px solid

@@ -21,7 +21,7 @@
 		"@hello-pangea/dnd": "^17.0.0",
 		"@othent/kms": "^1.0.7",
 		"@permaweb/aoconnect": "^0.0.79",
-		"@permaweb/libs": "../permaweb-libs/sdk",
+		"@permaweb/libs": "file:../permaweb-libs/sdk",
 		"arweave": "^1.15.5",
 		"html-react-parser": "^5.1.18",
 		"jwt-decode": "^4.0.0",

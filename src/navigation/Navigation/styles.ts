@@ -3,6 +3,15 @@ import styled from 'styled-components';
 import { open, openRight, transition2 } from 'helpers/animations';
 import { STYLING } from 'helpers/config';
 
+export const Header = styled.header<{ navigationOpen: boolean }>`
+	height: ${STYLING.dimensions.nav.height};
+	width: 100%;
+	position: fixed;
+	top: 0;
+	z-index: 4;
+	background: ${(props) => props.theme.colors.view.background};
+`;
+
 export const PanelOverlay = styled.div<{ open: boolean }>`
 	height: 100vh;
 	width: 100%;
@@ -121,24 +130,10 @@ export const PanelFooter = styled.div<{ open: boolean }>`
 	}
 `;
 
-export const Header = styled.header<{ navigationOpen: boolean }>`
-	height: ${STYLING.dimensions.nav.height};
-	width: 100%;
-
-	position: fixed;
-	top: 0;
-	z-index: 4;
-	background: ${(props) => props.theme.colors.view.background};
-
-	@media (max-width: ${STYLING.cutoffs.desktop}) {
-		padding: 0 20px 0 10px;
-	}
-`;
-
 export const SearchWrapper = styled.div`
 	width: 510px;
+	max-width: 100%;
 	position: relative;
-	margin: 0 0 0 10px;
 `;
 
 export const SearchInputWrapper = styled.div`
@@ -236,7 +231,7 @@ export const C1Wrapper = styled.div`
 	width: fit-content;
 	display: flex;
 	align-items: center;
-	gap: 10px;
+	gap: 35px;
 
 	@media (max-width: ${STYLING.cutoffs.desktop}) {
 		max-width: calc(100% - 60px);
@@ -245,8 +240,8 @@ export const C1Wrapper = styled.div`
 
 export const LogoWrapper = styled.div`
 	svg {
-		height: 25px;
-		width: 25px;
+		height: 27.5px;
+		width: 27.5px;
 		padding: 2.5px 0 0 0;
 		margin: 5.5px 0 0 0;
 		color: ${(props) => props.theme.colors.icon.alt2.fill};
@@ -259,32 +254,73 @@ export const LogoWrapper = styled.div`
 `;
 
 export const DNavWrapper = styled.div`
-	height: 35px;
 	display: flex;
 	align-items: center;
-	padding: 0 0 0 15px;
-	gap: 25px;
+	gap: 30px;
+
+	@media (max-width: ${STYLING.cutoffs.secondary}) {
+		display: none;
+	}
+`;
+
+export const DNavLink = styled.div<{ active: boolean }>`
 	a {
-		color: ${(props) => props.theme.colors.font.alt1};
+		color: ${(props) => props.active ? props.theme.colors.font.primary : props.theme.colors.font.alt1};
 		font-family: ${(props) => props.theme.typography.family.alt1};
 		font-size: ${(props) => props.theme.typography.size.small};
 		font-weight: ${(props) => props.theme.typography.weight.bold};
 		text-transform: uppercase;
 		letter-spacing: 0.35px;
 
+		padding: 0 0 2.5px 0;
+		border-bottom: 2.5px solid ${(props) => props.active ? props.theme.colors.border.alt5 : 'transparent'};
+
 		&:hover {
-			color: ${(props) => props.theme.colors.font.alt5};
+			color: ${(props) => props.theme.colors.font.primary};
+			border-bottom: 2.5px solid ${(props) => props.theme.colors.border.alt5};
 		}
-	}
-	@media (max-width: ${STYLING.cutoffs.secondary}) {
-		display: none;
 	}
 `;
 
 export const ActionsWrapper = styled.div`
 	display: flex;
 	align-items: center;
-	gap: 25px;
+	gap: 15px;
+`;
+
+export const DSearchWrapper = styled.div`
+	@media (max-width: ${STYLING.cutoffs.initial}) {
+		display: none;
+	}
+`;
+
+export const MSearchWrapper = styled.div`
+	display: none;
+	position: relative;
+	@media (max-width: ${STYLING.cutoffs.initial}) {
+		display: block;
+	}
+`;
+
+export const MSearchContainer = styled.div`
+	height: 170px;
+	max-width: calc(100vw - 50px);
+	position: absolute;
+	top: 45px;
+	right: 0;
+	padding: 15px;
+	border-radius: ${STYLING.dimensions.radius.alt2} !important;
+`;
+
+export const MSearchHeader = styled.div`
+	margin: 0 0 10px 0;
+	p {
+		color: ${(props) => props.theme.colors.font.alt1};
+		font-family: ${(props) => props.theme.typography.family.alt1};
+		font-size: ${(props) => props.theme.typography.size.small};
+		font-weight: ${(props) => props.theme.typography.weight.bold};
+		text-transform: uppercase;
+	}
 `;
 
 export const MWrapper = styled.div`

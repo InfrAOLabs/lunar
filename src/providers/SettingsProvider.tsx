@@ -47,7 +47,7 @@ interface SettingsProviderProps {
 
 const defaultSettings: Settings = {
 	theme: window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark-primary' : 'light-primary',
-	sidebarOpen: true,
+	sidebarOpen: false,
 	isDesktop: true,
 	windowSize: { width: window.innerWidth, height: window.innerHeight },
 	showCategoryAction: false,

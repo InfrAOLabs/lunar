@@ -13,8 +13,18 @@ export default function ProcessEditor(props: { processId: string; type: 'read' |
 	const languageProvider = useLanguageProvider();
 	const language = languageProvider.object[languageProvider.current];
 
+	const editorRef = React.useRef(null);
+
 	const [loading, setLoading] = React.useState<boolean>(false);
 	const [output, setOutput] = React.useState<any>(null);
+
+	React.useEffect(() => {
+		if (editorRef.current) {
+			setTimeout(() => {
+				editorRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			}, 10);
+		}
+	}, [])
 
 	async function handleSubmit(query: object) {
 		setLoading(true);
@@ -28,7 +38,7 @@ export default function ProcessEditor(props: { processId: string; type: 'read' |
 	}
 
 	return (
-		<S.Wrapper>
+		<S.Wrapper ref={editorRef}>
 			<S.EditorWrapper>
 				<JSONWriter
 					initialData={{
@@ -46,7 +56,7 @@ export default function ProcessEditor(props: { processId: string; type: 'read' |
 				/>
 			</S.EditorWrapper>
 			<S.ResultWrapper>
-				<JSONReader data={output} header={language.response} maxHeight={600} />
+				<JSONReader data={output} header={language.response} placeholder={'Run to get a response'} />
 			</S.ResultWrapper>
 		</S.Wrapper>
 	);

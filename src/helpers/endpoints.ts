@@ -1,6 +1,6 @@
 import { checkValidAddress } from './utils';
 
-const arweaveEndpoint = 'https://arweave.net';
+export const arweaveEndpoint = 'https://arweave.net';
 
 export function getARBalanceEndpoint(walletAddress: string) {
 	return `${arweaveEndpoint}/wallet/${walletAddress}/balance`;

@@ -57,70 +57,70 @@ export function PermawebProvider(props: { children: React.ReactNode }) {
 		setLibs(PermawebLibs.init({ ao, arweave, signer }));
 	}, [arProvider.wallet]);
 
-	// React.useEffect(() => {
-	// 	(async function () {
-	// 		if (arProvider.wallet && arProvider.walletAddress) {
-	// 			const cachedProfile = getCachedProfile(arProvider.walletAddress);
-	// 			if (cachedProfile) {
-	// 				setProfile(cachedProfile);
-	// 			}
+	React.useEffect(() => {
+		(async function () {
+			if (arProvider.wallet && arProvider.walletAddress) {
+				const cachedProfile = getCachedProfile(arProvider.walletAddress);
+				if (cachedProfile) {
+					setProfile(cachedProfile);
+				}
 
-	// 			try {
-	// 				const fetchedProfile = await libs.getProfileByWalletAddress(arProvider.walletAddress);
-	// 				setProfile(fetchedProfile);
-	// 				cacheProfile(arProvider.walletAddress, fetchedProfile);
-	// 			} catch (e: any) {
-	// 				console.error(e);
-	// 			}
-	// 		}
-	// 	})();
-	// }, [arProvider.wallet, arProvider.walletAddress, libs]);
+				try {
+					const fetchedProfile = await libs.getProfileByWalletAddress(arProvider.walletAddress);
+					setProfile(fetchedProfile);
+					cacheProfile(arProvider.walletAddress, fetchedProfile);
+				} catch (e: any) {
+					console.error(e);
+				}
+			}
+		})();
+	}, [arProvider.wallet, arProvider.walletAddress, libs]);
 
-	// React.useEffect(() => {
-	// 	(async function () {
-	// 		if (arProvider.wallet && arProvider.walletAddress) {
-	// 			const fetchProfileUntilChange = async () => {
-	// 				let changeDetected = false;
-	// 				let tries = 0;
-	// 				const maxTries = 10;
+	React.useEffect(() => {
+		(async function () {
+			if (arProvider.wallet && arProvider.walletAddress) {
+				const fetchProfileUntilChange = async () => {
+					let changeDetected = false;
+					let tries = 0;
+					const maxTries = 10;
 
-	// 				while (!changeDetected && tries < maxTries) {
-	// 					try {
-	// 						const existingProfile = profile;
-	// 						const newProfile = await libs.getProfileByWalletAddress(arProvider.walletAddress);
+					while (!changeDetected && tries < maxTries) {
+						try {
+							const existingProfile = profile;
+							const newProfile = await libs.getProfileByWalletAddress(arProvider.walletAddress);
 
-	// 						if (JSON.stringify(existingProfile) !== JSON.stringify(newProfile)) {
-	// 							setProfile(newProfile);
-	// 							cacheProfile(arProvider.walletAddress, newProfile);
-	// 							changeDetected = true;
-	// 						} else {
-	// 							await new Promise((resolve) => setTimeout(resolve, 1000));
-	// 							tries++;
-	// 						}
-	// 					} catch (error) {
-	// 						console.error(error);
-	// 						break;
-	// 					}
-	// 				}
+							if (JSON.stringify(existingProfile) !== JSON.stringify(newProfile)) {
+								setProfile(newProfile);
+								cacheProfile(arProvider.walletAddress, newProfile);
+								changeDetected = true;
+							} else {
+								await new Promise((resolve) => setTimeout(resolve, 1000));
+								tries++;
+							}
+						} catch (error) {
+							console.error(error);
+							break;
+						}
+					}
 
-	// 				if (!changeDetected) {
-	// 					console.warn(`No changes detected after ${maxTries} attempts`);
-	// 				}
-	// 			};
+					if (!changeDetected) {
+						console.warn(`No changes detected after ${maxTries} attempts`);
+					}
+				};
 
-	// 			await fetchProfileUntilChange();
-	// 		}
-	// 	})();
-	// }, [refreshProfileTrigger, libs]);
+				await fetchProfileUntilChange();
+			}
+		})();
+	}, [refreshProfileTrigger, libs]);
 
-	// function getCachedProfile(address: string) {
-	// 	const cached = localStorage.getItem(STORAGE.profile(address));
-	// 	return cached ? JSON.parse(cached) : null;
-	// }
+	function getCachedProfile(address: string) {
+		const cached = localStorage.getItem(STORAGE.profile(address));
+		return cached ? JSON.parse(cached) : null;
+	}
 
-	// function cacheProfile(address: string, profileData: any) {
-	// 	localStorage.setItem(STORAGE.profile(address), JSON.stringify(profileData));
-	// }
+	function cacheProfile(address: string, profileData: any) {
+		localStorage.setItem(STORAGE.profile(address), JSON.stringify(profileData));
+	}
 
 	return (
 		<PermawebContext.Provider

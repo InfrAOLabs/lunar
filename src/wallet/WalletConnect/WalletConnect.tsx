@@ -162,14 +162,10 @@ export default function WalletConnect(_props: { callback?: () => void }) {
 								</S.DHeaderFlex>
 							</S.DHeaderWrapper>
 							<S.DBodyWrapper>
-								{/* <li onClick={() => permawebProvider.setShowProfileManager(true)}>
+								<li onClick={() => permawebProvider.setShowProfileManager(true)}>
 									<ReactSVG src={ASSETS.write} />
 									{language.profile}
-								</li> */}
-								{/* <li onClick={() => setShowThemeSelector(true)}>
-									<ReactSVG src={ASSETS.language} />
-									{language.language}
-								</li> */}
+								</li>
 								<li onClick={() => setShowThemeSelector(true)}>
 									<ReactSVG src={ASSETS.design} />
 									{language.appearance}

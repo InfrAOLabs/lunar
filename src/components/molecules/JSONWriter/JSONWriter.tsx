@@ -13,9 +13,7 @@ export default function JSONWriter(props: {
 	const languageProvider = useLanguageProvider();
 	const language = languageProvider.object[languageProvider.current];
 
-	const [jsonString, setJsonString] = React.useState(
-		JSON.stringify(props.initialData, null, 4)
-	);
+	const [jsonString, setJsonString] = React.useState(JSON.stringify(props.initialData, null, 4));
 	const [error, setError] = React.useState(null);
 
 	const textAreaRef = React.useRef<HTMLTextAreaElement>(null);
@@ -39,7 +37,7 @@ export default function JSONWriter(props: {
 			JSON.parse(updatedString);
 			setError(null);
 		} catch (err) {
-			setError('Invalid JSON: please check your syntax.');
+			setError('Invalid JSON');
 		}
 
 		// Auto-resize the textarea whenever the content changes.
@@ -68,10 +66,7 @@ export default function JSONWriter(props: {
 
 			// Insert "{}" and set the caret between the braces.
 			const insertText = event.key === '{' ? '{}' : '[]';
-			const newValue =
-				jsonString.substring(0, selectionStart) +
-				insertText +
-				jsonString.substring(selectionEnd);
+			const newValue = jsonString.substring(0, selectionStart) + insertText + jsonString.substring(selectionEnd);
 			setJsonString(newValue);
 
 			// Update the caret position.
@@ -98,16 +93,12 @@ export default function JSONWriter(props: {
 
 				// Insert a new line with the same indentation.
 				const insertText = '\n' + indent;
-				const newValue =
-					jsonString.substring(0, selectionStart) +
-					insertText +
-					jsonString.substring(selectionEnd);
+				const newValue = jsonString.substring(0, selectionStart) + insertText + jsonString.substring(selectionEnd);
 				setJsonString(newValue);
 
 				// Adjust the caret position and auto-resize.
 				setTimeout(() => {
-					textarea.selectionStart = textarea.selectionEnd =
-						selectionStart + insertText.length;
+					textarea.selectionStart = textarea.selectionEnd = selectionStart + insertText.length;
 					autoResize();
 				}, 0);
 			}
@@ -116,16 +107,12 @@ export default function JSONWriter(props: {
 		if (event.key === 'Tab') {
 			event.preventDefault();
 			const insertText = '    '; // 4 spaces
-			const newValue =
-				jsonString.substring(0, selectionStart) +
-				insertText +
-				jsonString.substring(selectionEnd);
+			const newValue = jsonString.substring(0, selectionStart) + insertText + jsonString.substring(selectionEnd);
 			setJsonString(newValue);
 
 			// Update the caret position and auto-resize.
 			setTimeout(() => {
-				textarea.selectionStart = textarea.selectionEnd =
-					selectionStart + insertText.length;
+				textarea.selectionStart = textarea.selectionEnd = selectionStart + insertText.length;
 				autoResize();
 			}, 0);
 			return;
@@ -148,7 +135,7 @@ export default function JSONWriter(props: {
 
 	return (
 		<S.Wrapper>
-			<S.EditorWrapper className={'border-wrapper-alt3'}>
+			<S.EditorWrapper className={'border-wrapper-alt2 scroll-wrapper'}>
 				<S.LinesWrapper ref={numbersRef}>
 					{lines.map((_, index) => (
 						<span key={index}>{index + 1}</span>
@@ -164,18 +151,21 @@ export default function JSONWriter(props: {
 						onScroll={handleScroll}
 					/>
 				</S.Editor>
+				<S.ActionsWrapper>
+						{error && (
+							<S.ErrorWrapper>
+								<span>{error}</span>
+							</S.ErrorWrapper>
+						)}
+						<Button
+							type={'alt1'}
+							label={`${language.run} (⌘ + ⏎)`}
+							handlePress={submitHandler}
+							disabled={props.loading || error !== null}
+							loading={props.loading}
+						/>
+					</S.ActionsWrapper>
 			</S.EditorWrapper>
-
-			<S.ActionsWrapper>
-				<Button
-					type={'alt1'}
-					label={`${language.run} (⌘ + ⏎)`}
-					handlePress={submitHandler}
-					disabled={props.loading || error !== null}
-					loading={props.loading}
-				/>
-			</S.ActionsWrapper>
-			{error && <div style={{ color: 'red', marginTop: '8px' }}>{error}</div>}
 		</S.Wrapper>
 	);
 }

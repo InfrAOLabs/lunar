@@ -27,8 +27,9 @@ export const TWrapper = styled.div`
 
 export const Label = styled.label`
 	color: ${(props) => props.theme.colors.font.alt1};
-	font-size: ${(props) => props.theme.typography.size.xxxSmall};
+	font-size: ${(props) => props.theme.typography.size.xxSmall};
 	font-weight: ${(props) => props.theme.typography.weight.bold};
+	margin: 0 0 7.5px 0;
 `;
 
 export const Tooltip = styled.div`
@@ -55,7 +56,7 @@ export const Input = styled.input<{
 	background: ${(props) => props.theme.colors.form.background};
 	border: 1px solid
 		${(props) => (props.invalid ? props.theme.colors.form.invalid.outline : props.theme.colors.form.border)};
-	border-radius: ${STYLING.dimensions.radius.primary};
+		border-radius: ${STYLING.dimensions.radius.alt2};
 	&:focus {
 		outline: 0;
 		border: 1px solid

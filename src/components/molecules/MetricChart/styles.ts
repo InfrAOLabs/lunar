@@ -15,7 +15,6 @@ export const HeaderWrapper = styled.div`
 	gap: 15px;
 
 	> * {
-		
 		&:last-child {
 			align-items: flex-end;
 			justify-content: flex-end;
@@ -62,8 +61,8 @@ export const HeaderLabel = styled.div`
 
 export const HeaderValue = styled.div`
 	p {
-		font-size: ${(props) => props.theme.typography.size.lg};
-		font-family: ${(props) => props.theme.typography.family.primary};
+		font-size: clamp(18px, 1.5vw, 22px);
+		font-family: ${(props) => props.theme.typography.family.alt1};
 		font-weight: ${(props) => props.theme.typography.weight.xBold};
 		color: ${(props) => props.theme.colors.font.primary};
 	}

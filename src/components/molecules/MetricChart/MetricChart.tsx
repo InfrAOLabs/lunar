@@ -18,7 +18,6 @@ import { formatCount, formatDate } from 'helpers/utils';
 
 import * as S from './styles';
 
-// Register necessary components and plugins
 ChartJS.register(
 	CategoryScale,
 	LinearScale,
@@ -30,13 +29,11 @@ ChartJS.register(
 	Filler
 );
 
-// Custom plugin to draw crosshair lines and a static vertical line at the current date index.
 const crosshairPlugin = {
 	id: 'crosshairPlugin',
 	afterDatasetsDraw(chart: any, _args: any, pluginOptions: any) {
 		const { ctx, scales } = chart;
 
-		// Draw static current supply vertical line if currentDate is provided
 		if (pluginOptions.currentDate !== undefined && pluginOptions.currentDate >= 0) {
 			const currentDateIndex = pluginOptions.currentDate;
 			const xCoord = scales.x.getPixelForValue(currentDateIndex);
@@ -53,7 +50,6 @@ const crosshairPlugin = {
 			ctx.restore();
 		}
 
-		// Draw hover crosshair if an active element exists
 		const activeElement = chart.$activeElement;
 		if (activeElement) {
 			const x = activeElement.x;
@@ -65,7 +61,6 @@ const crosshairPlugin = {
 
 			ctx.save();
 
-			// Vertical line for hover
 			ctx.beginPath();
 			ctx.moveTo(x, topY);
 			ctx.lineTo(x, bottomY);
@@ -76,7 +71,6 @@ const crosshairPlugin = {
 			}
 			ctx.stroke();
 
-			// Horizontal line for hover
 			ctx.beginPath();
 			ctx.moveTo(leftX, y);
 			ctx.lineTo(rightX, y);
@@ -87,7 +81,6 @@ const crosshairPlugin = {
 			}
 			ctx.stroke();
 
-			// Intersection dot for hover
 			const dotRadius = pluginOptions?.crosshairDot?.radius ?? 5;
 			const dotColor = pluginOptions?.crosshairDot?.color || 'black';
 			ctx.beginPath();
@@ -106,7 +99,7 @@ const crosshairPlugin = {
 
 ChartJS.register(crosshairPlugin);
 
-export default function DynamicLineChart(props: {
+export default function MetricChart(props: {
 	dataList: MetricDataPoint[];
 	metric: keyof MetricDataPoint;
 	totalField: keyof MetricDataPoint;

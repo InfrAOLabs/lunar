@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ReactSVG } from 'react-svg';
 import { GQLNodeResponseType } from '@permaweb/libs';
 import { debounce } from 'lodash';
@@ -19,13 +19,16 @@ import { CloseHandler } from 'wrappers/CloseHandler';
 import * as S from './styles';
 
 export default function Navigation(props: { open: boolean; toggle: () => void }) {
-	const { confirmNavigation } = useNavigationConfirm();
+	const location = useLocation();
+	// const { confirmNavigation } = useNavigationConfirm();
 
 	const permawebProvider = usePermawebProvider();
 	const languageProvider = useLanguageProvider();
 	const language = languageProvider.object[languageProvider.current];
 
-	const [desktop, setDesktop] = React.useState(checkWindowCutoff(parseInt(STYLING.cutoffs.desktop)));
+	const [_desktop, setDesktop] = React.useState(checkWindowCutoff(parseInt(STYLING.cutoffs.desktop)));
+
+	const [searchOpen, setSearchOpen] = React.useState<boolean>(false);
 	const [inputTxId, setInputTxId] = React.useState<string>('');
 	const [txOutputOpen, setTxOutputOpen] = React.useState<boolean>(false);
 	const [loadingTx, setLoadingTx] = React.useState<boolean>(false);
@@ -75,7 +78,13 @@ export default function Navigation(props: { open: boolean; toggle: () => void })
 				setTxOutputOpen(true);
 				setLoadingTx(true);
 				try {
-					const response = await permawebProvider.libs.getGQLData({ ids: [inputTxId] });
+					const response = await permawebProvider.libs.getGQLData({
+						ids: [inputTxId],
+						tags: [
+							{ name: 'Data-Protocol', values: ['ao'] },
+							{ name: 'Variant', values: ['ao.TN.1'] },
+						],
+					});
 					const responseData = response?.data?.[0];
 					setTxResponse(responseData ?? null);
 				} catch (e: any) {
@@ -89,73 +98,73 @@ export default function Navigation(props: { open: boolean; toggle: () => void })
 		})();
 	}, [inputTxId]);
 
-	const handleNavigate = (e: React.MouseEvent<HTMLAnchorElement>, to: string) => {
-		e.preventDefault();
-		confirmNavigation(to);
-		if (!desktop) props.toggle();
-	};
+	// const handleNavigate = (e: React.MouseEvent<HTMLAnchorElement>, to: string) => {
+	// 	e.preventDefault();
+	// 	confirmNavigation(to);
+	// 	if (!desktop) props.toggle();
+	// };
 
-	const navigationToggle = React.useMemo(() => {
-		return (
-			<S.ToggleWrapper>
-				<IconButton
-					type={props.open ? 'primary' : 'alt1'}
-					src={ASSETS.navigation}
-					handlePress={props.toggle}
-					dimensions={{
-						wrapper: 36.5,
-						icon: 20,
-					}}
-					tooltip={props.open ? language.sidebarClose : language.sidebarOpen}
-					tooltipPosition={props.open ? 'right' : 'bottom-left'}
-				/>
-			</S.ToggleWrapper>
-		);
-	}, [props.open, desktop]);
+	// const navigationToggle = React.useMemo(() => {
+	// 	return (
+	// 		<S.ToggleWrapper>
+	// 			<IconButton
+	// 				type={props.open ? 'primary' : 'alt1'}
+	// 				src={ASSETS.navigation}
+	// 				handlePress={props.toggle}
+	// 				dimensions={{
+	// 					wrapper: 36.5,
+	// 					icon: 20,
+	// 				}}
+	// 				tooltip={props.open ? language.sidebarClose : language.sidebarOpen}
+	// 				tooltipPosition={props.open ? 'right' : 'bottom-left'}
+	// 			/>
+	// 		</S.ToggleWrapper>
+	// 	);
+	// }, [props.open, desktop]);
 
-	const panel = React.useMemo(() => {
-		const content = (
-			<>
-				<S.PanelHeader>{navigationToggle}</S.PanelHeader>
-				<>
-					<S.PanelContent open={props.open} className={'fade-in scroll-wrapper'}>
-						{paths.map((element: { path: string; label: string; icon: string; target?: '_blank' }, index: number) => {
-							return (
-								<Link
-									key={index}
-									to={element.path}
-									target={element.target || ''}
-									onClick={(e) => handleNavigate(e, element.path)}
-								>
-									<ReactSVG src={element.icon} />
-									{element.label}
-								</Link>
-							);
-						})}
-					</S.PanelContent>
-				</>
-			</>
-		);
+	// const panel = React.useMemo(() => {
+	// 	const content = (
+	// 		<>
+	// 			<S.PanelHeader>{navigationToggle}</S.PanelHeader>
+	// 			<>
+	// 				<S.PanelContent open={props.open} className={'fade-in scroll-wrapper'}>
+	// 					{paths.map((element: { path: string; label: string; icon: string; target?: '_blank' }, index: number) => {
+	// 						return (
+	// 							<Link
+	// 								key={index}
+	// 								to={element.path}
+	// 								target={element.target || ''}
+	// 								onClick={(e) => handleNavigate(e, element.path)}
+	// 							>
+	// 								<ReactSVG src={element.icon} />
+	// 								{element.label}
+	// 							</Link>
+	// 						);
+	// 					})}
+	// 				</S.PanelContent>
+	// 			</>
+	// 		</>
+	// 	);
 
-		if (desktop) {
-			return (
-				<S.Panel open={props.open} className={'fade-in'}>
-					{content}
-				</S.Panel>
-			);
-		} else {
-			return (
-				<>
-					<S.Panel open={props.open} className={'fade-in'}>
-						<CloseHandler active={props.open} disabled={!props.open} callback={() => props.toggle()}>
-							{content}
-						</CloseHandler>
-					</S.Panel>
-					<S.PanelOverlay open={props.open} />
-				</>
-			);
-		}
-	}, [props.open, desktop]);
+	// 	if (desktop) {
+	// 		return (
+	// 			<S.Panel open={props.open} className={'fade-in'}>
+	// 				{content}
+	// 			</S.Panel>
+	// 		);
+	// 	} else {
+	// 		return (
+	// 			<>
+	// 				<S.Panel open={props.open} className={'fade-in'}>
+	// 					<CloseHandler active={props.open} disabled={!props.open} callback={() => props.toggle()}>
+	// 						{content}
+	// 					</CloseHandler>
+	// 				</S.Panel>
+	// 				<S.PanelOverlay open={props.open} />
+	// 			</>
+	// 		);
+	// 	}
+	// }, [props.open, desktop]);
 
 	const searchOutput = React.useMemo(() => {
 		if (loadingTx) {
@@ -176,6 +185,7 @@ export default function Navigation(props: { open: boolean; toggle: () => void })
 							setTxResponse(null);
 							setInputTxId('');
 							setTxOutputOpen(false);
+							setSearchOpen(false);
 						}}
 					>
 						{name ?? formatAddress(txResponse.node.id, false)}
@@ -196,28 +206,55 @@ export default function Navigation(props: { open: boolean; toggle: () => void })
 		return null;
 	}, [loadingTx, txResponse]);
 
+	function getSearch() {
+		return (
+			<S.SearchWrapper>
+				<S.SearchInputWrapper>
+					<ReactSVG src={ASSETS.search} />
+					<FormField
+						value={inputTxId}
+						onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputTxId(e.target.value)}
+						onFocus={() => setTxOutputOpen(true)}
+						placeholder={language.processOrMessageId}
+						invalid={{ status: inputTxId ? !checkValidAddress(inputTxId) : false, message: null }}
+						disabled={loadingTx}
+						hideErrorMessage
+						sm
+					/>
+				</S.SearchInputWrapper>
+				{txOutputOpen && checkValidAddress(inputTxId) && <S.SearchOutputWrapper>{searchOutput}</S.SearchOutputWrapper>}
+			</S.SearchWrapper>
+		);
+	}
+
 	return (
 		<>
-			{panel}
-				<S.Header navigationOpen={props.open} className={'fade-in'}>
-					<S.Content>
-						<S.C1Wrapper>
-							<S.LogoWrapper>
-								<Link to={URLS.base}>
-									<ReactSVG src={ASSETS.logo} />
-								</Link>
-							</S.LogoWrapper>
-							<S.DNavWrapper>
-								{paths.map((element: { path: string; label: string; target?: '_blank' }, index: number) => {
-									return (
-										<Link key={index} to={element.path} target={element.target || ''}>
+			{/* {panel} */}
+			<S.Header navigationOpen={props.open} className={'fade-in'}>
+				<S.Content>
+					<S.C1Wrapper>
+						<S.LogoWrapper>
+							<Link to={URLS.base}>
+								<ReactSVG src={ASSETS.logo} />
+							</Link>
+						</S.LogoWrapper>
+						<S.DNavWrapper>
+							{paths.map((element: { path: string; label: string; target?: '_blank' }, index: number) => {
+								const active =
+									element.path === URLS.base
+										? location.pathname === URLS.base
+										: location.pathname.startsWith(element.path);
+								return (
+									<S.DNavLink key={index} active={active}>
+										<Link to={element.path} target={element.target || ''}>
 											{element.label}
 										</Link>
-									);
-								})}
-							</S.DNavWrapper>
-						</S.C1Wrapper>
-						{/* <S.C1Wrapper>
+									</S.DNavLink>
+								);
+							})}
+						</S.DNavWrapper>
+					</S.C1Wrapper>
+					{/* <S.C1Wrapper>
 						{!props.open && navigationToggle}
 						<CloseHandler
 							callback={() => {
@@ -247,7 +284,8 @@ export default function Navigation(props: { open: boolean; toggle: () => void })
 						</CloseHandler>
 					</S.C1Wrapper> */}
 
-						<S.ActionsWrapper>
+					<S.ActionsWrapper>
+						<S.DSearchWrapper>
 							<CloseHandler
 								callback={() => {
 									setTxOutputOpen(false);
@@ -255,29 +293,32 @@ export default function Navigation(props: { open: boolean; toggle: () => void })
 								active={txOutputOpen}
 								disabled={!txOutputOpen}
 							>
-								<S.SearchWrapper>
-									<S.SearchInputWrapper>
-										<ReactSVG src={ASSETS.search} />
-										<FormField
-											value={inputTxId}
-											onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputTxId(e.target.value)}
-											onFocus={() => setTxOutputOpen(true)}
-											placeholder={language.processOrMessageId}
-											invalid={{ status: inputTxId ? !checkValidAddress(inputTxId) : false, message: null }}
-											disabled={loadingTx}
-											hideErrorMessage
-											sm
-										/>
-									</S.SearchInputWrapper>
-									{txOutputOpen && checkValidAddress(inputTxId) && (
-										<S.SearchOutputWrapper>{searchOutput}</S.SearchOutputWrapper>
-									)}
-								</S.SearchWrapper>
+								{getSearch()}
 							</CloseHandler>
-							<WalletConnect />
-						</S.ActionsWrapper>
-					</S.Content>
-				</S.Header>
+						</S.DSearchWrapper>
+						<WalletConnect />
+						<S.MSearchWrapper>
+							<IconButton
+								type={'alt1'}
+								src={ASSETS.search}
+								handlePress={() => setSearchOpen((prev) => !prev)}
+								dimensions={{
+									wrapper: 36.5,
+									icon: 17.5,
+								}}
+							/>
+							{searchOpen && (
+								<S.MSearchContainer className={'border-wrapper-alt2'}>
+								<S.MSearchHeader>
+									<p>Search</p>
+								</S.MSearchHeader>
+								{getSearch()}
+							</S.MSearchContainer>
+							)}
+						</S.MSearchWrapper>
+					</S.ActionsWrapper>
+				</S.Content>
+			</S.Header>
 		</>
 	);
 }

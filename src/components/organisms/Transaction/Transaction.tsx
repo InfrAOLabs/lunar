@@ -72,7 +72,13 @@ export default function Transaction(props: {
 		if (inputTxId && checkValidAddress(inputTxId)) {
 			setLoadingTx(true);
 			try {
-				const response = await permawebProvider.libs.getGQLData({ ids: [inputTxId] });
+				const response = await permawebProvider.libs.getGQLData({
+					ids: [inputTxId],
+					tags: [
+						{ name: 'Data-Protocol', values: ['ao'] },
+						{ name: 'Variant', values: ['ao.TN.1'] },
+					],
+				});
 				const responseData = response?.data?.[0];
 				setTxResponse(responseData ?? null);
 				if (responseData) {
@@ -345,7 +351,6 @@ export default function Transaction(props: {
 					message={error}
 					callback={() => {
 						setError(null);
-						setInputTxId('');
 					}}
 				/>
 			)}

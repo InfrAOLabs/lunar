@@ -21,7 +21,7 @@ export const Container = styled.div<{
 	width: 650px;
 	max-width: ${(props) => (props.noHeader ? '100%' : '90vw')};
 	background: ${(props) => (props.noHeader ? 'transparent' : props.theme.colors.container.primary.background)};
-	border: 1.25px solid ${(props) => props.theme.colors.border.alt4};
+	border: 1.25px solid ${(props) => props.theme.colors.border.primary};
 	border-radius: ${STYLING.dimensions.radius.primary};
 	margin: 20px auto;
 `;

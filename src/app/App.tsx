@@ -39,15 +39,13 @@ export default function App() {
 			return (
 				<>
 					<Navigation open={settings.sidebarOpen} toggle={() => updateSettings('sidebarOpen', !settings.sidebarOpen)} />
-					<S.View navigationOpen={settings.sidebarOpen}>
-						{element}
-					</S.View>
+					<S.View navigationOpen={settings.sidebarOpen}>{element}</S.View>
 					<S.ViewWrapper>
-					<S.Footer navigationOpen={settings.sidebarOpen}>
-						<p>
-							{language.app} {new Date().getFullYear()}
-						</p>
-					</S.Footer>
+						<S.Footer navigationOpen={settings.sidebarOpen}>
+							<p>
+								{language.app} {new Date().getFullYear()}
+							</p>
+						</S.Footer>
 					</S.ViewWrapper>
 				</>
 			);
