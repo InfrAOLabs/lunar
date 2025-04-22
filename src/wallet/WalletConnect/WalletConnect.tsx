@@ -149,7 +149,7 @@ export default function WalletConnect(_props: { callback?: () => void }) {
 						<Avatar owner={permawebProvider.profile} dimensions={{ wrapper: 35, icon: 21.5 }} callback={handlePress} />
 					</S.PWrapper>
 					{showWalletDropdown && (
-						<S.Dropdown className={'border-wrapper-alt3 fade-in scroll-wrapper'}>
+						<S.Dropdown className={'border-wrapper-alt1 fade-in scroll-wrapper'}>
 							<S.DHeaderWrapper>
 								{/* <S.PDropdownHeader>
 									<p>{language.profileMenu}</p>

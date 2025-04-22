@@ -411,12 +411,7 @@ export default function ConsoleInstance(props: {
 		<>
 			<S.Wrapper noWrapper={props.noWrapper} ref={consoleRef}>
 				{getConsole()}
-				{/* {loadingMessage && (
-					<S.LoadingWrapper>
-						<Loader sm relative />
-					</S.LoadingWrapper>
-				)} */}
-				<S.ActionsWrapper>
+				<S.ActionsWrapper noWrapper={props.noWrapper}>
 					<IconButton
 						type={'alt1'}
 						src={ASSETS.fullscreen}

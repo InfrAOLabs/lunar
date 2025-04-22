@@ -64,9 +64,8 @@ export const Dropdown = styled.div`
 	max-width: 75vw;
 	padding: 11.5px 10px;
 	position: absolute;
-	top: 40px;
+	top: 42.5px;
 	right: -1.5px;
-	border-radius: ${STYLING.dimensions.radius.primary};
 `;
 
 export const DHeaderWrapper = styled.div`

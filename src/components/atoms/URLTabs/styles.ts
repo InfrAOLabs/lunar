@@ -25,6 +25,13 @@ export const Tabs = styled.div`
 	overflow-x: auto;
 `;
 
+export const EndWrapper = styled.div`
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 15px;
+`;
+
 export const Content = styled.div``;
 
 export const Tab = styled.div<{ active: boolean }>`

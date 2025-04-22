@@ -165,7 +165,8 @@ export const GlobalStyle = createGlobalStyle`
 
   .border-wrapper-alt1 {
     background: ${(props) => props.theme.colors.container.primary.background};
-    border: 1px solid ${(props) => props.theme.colors.border.alt4};
+    box-shadow: 0 3.5px 7.5px 0 ${(props) => props.theme.colors.shadow.primary};
+    border: 1px solid ${(props) => props.theme.colors.border.alt1};
     border-radius: ${STYLING.dimensions.radius.alt1};
   }
 

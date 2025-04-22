@@ -245,6 +245,11 @@ export const OverviewLine = styled.div`
 	p {
 		color: ${(props) => props.theme.colors.font.primary};
 		text-align: right;
+		text-align: right;
+		max-width: 65%;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	span {

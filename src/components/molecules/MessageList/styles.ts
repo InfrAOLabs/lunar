@@ -18,19 +18,71 @@ export const Header = styled.div`
 	border-left: 1px solid ${(props) => props.theme.colors.border.primary};
 	border-top-right-radius: ${STYLING.dimensions.radius.alt1};
 	border-top-left-radius: ${STYLING.dimensions.radius.alt1};
-	
+`;
+
+export const HeaderMain = styled.div`
+	display: flex;
+	align-items: center;
+	gap: 15px;
+
 	p {
 		font-size: ${(props) => props.theme.typography.size.lg};
 		font-family: ${(props) => props.theme.typography.family.primary};
 		font-weight: ${(props) => props.theme.typography.weight.bold};
 		color: ${(props) => props.theme.colors.font.primary};
 	}
-`;
+	
+	.update-wrapper {
+		padding: 2.5px 25px;
+	}
+`
 
 export const HeaderActions = styled.div`
 	display: flex;
 	align-items: center;
 	gap: 12.5px;
+`;
+
+export const FilterWrapper = styled.div`
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 12.5px;
+`;
+
+export const FilterDropdown = styled.div`
+	max-height: 85vh;
+	width: 325px;
+	max-width: 75vw;
+	padding: 15px;
+	position: absolute;
+	z-index: 1;
+	top: 32.5px;
+	right: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 12.5px;
+`;
+
+export const FilterDropdownHeader = styled.div`
+	p {
+		color: ${(props) => props.theme.colors.font.alt1};
+		font-size: ${(props) => props.theme.typography.size.xxSmall} !important;
+		font-weight: ${(props) => props.theme.typography.weight.medium} !important;
+		font-family: ${(props) => props.theme.typography.family.primary} !important;
+		text-transform: uppercase;
+	}
+`;
+
+export const FilterDropdownActionSelect = styled.div`
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+
+	button {
+		border-radius: ${STYLING.dimensions.radius.primary} !important;
+	}
 `;
 
 export const Divider = styled.div`

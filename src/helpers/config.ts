@@ -79,11 +79,21 @@ export const ASSETS = {
 	youtube: getTxEndpoint('vEToNqLt0U4CXLW-u7DykeGNqFLfuzKWebnu_1d5FRs'),
 };
 
-export const DEFAULT_MESSAGE_TAGS = [
+export const DEFAULT_ACTIONS = {
+	eval: { name: 'Eval' },
+	info: { name: 'Info' },
+	balance: { name: 'Balance' },
+	transfer: { name: 'Transfer' },
+	debitNotice: { name: 'Debit-Notice' },
+	creditNotice: { name: 'Credit-Notice' },
+}
+
+export const DEFAULT_AO_TAGS = [
 	{ name: 'Data-Protocol', values: ['ao'] },
-	{ name: 'Type', values: ['Message'] },
 	{ name: 'Variant', values: ['ao.TN.1'] },
 ]
+
+export const DEFAULT_MESSAGE_TAGS = [{ name: 'Type', values: ['Message'] }, ...DEFAULT_AO_TAGS];
 
 export const DOM = {
 	loader: 'loader',

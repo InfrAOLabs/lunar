@@ -55,6 +55,7 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 
 			navigate(`${URLS[props.type]}${txId}${subPath}`);
 		}
+
 	}, [location.pathname]);
 
 	React.useEffect(() => {
@@ -111,6 +112,7 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 
 		const name = getTagValue(newTx.node.tags, 'Name');
 		const type = getTagValue(newTx.node.tags, 'Type');
+
 		setTransactions((prev) => {
 			const updated = [...prev];
 			if (updated[tabIndex]) {
@@ -129,8 +131,7 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 			}
 			return updated;
 		});
-		setActiveTabIndex(tabIndex);
-
+		
 		const currentParts = window.location.hash.replace('#', '').split('/');
 		const currentRoute = currentParts[currentParts.length - 1];
 
@@ -167,17 +168,21 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 	};
 
 	const handleAddTab = (id?: string) => {
-		setTransactions((prev) => {
-			const updated = [...prev, { id: id ?? '', label: id ?? '', type: 'message' } as TransactionTabType];
-			setActiveTabIndex(updated.length - 1);
-			return updated;
+		const newTab = { id: id ?? '', label: id ?? '', type: 'message' } as TransactionTabType;
+
+		flushSync(() => {
+			setIsClearing(true);
+
+			setTransactions((prev) => {
+				const updated = [...prev, newTab];
+				setActiveTabIndex(updated.length - 1);
+				return updated;
+			});
 		});
 
-		if (id) {
-			navigate(`${URLS[props.type]}${id}`);
-		} else {
-			navigate(URLS[props.type]);
-		}
+		setTimeout(() => setIsClearing(false), 50);
+
+		navigate(id ? `${URLS[props.type]}${id}` : URLS[props.type]);
 	};
 
 	const handleDeleteTab = (deletedIndex: number) => {
@@ -197,11 +202,7 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 
 		flushSync(() => {
 			setIsClearing(true);
-			setTransactions(
-				updatedTransactions.length > 0
-					? updatedTransactions
-					: [{ id: '', label: '', type: 'message' }]
-			);
+			setTransactions(updatedTransactions.length > 0 ? updatedTransactions : [{ id: '', label: '', type: 'message' }]);
 			setActiveTabIndex(newActiveIndex);
 		});
 
@@ -325,11 +326,13 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 			<ViewWrapper>
 				{!isClearing ? (
 					<>
-						{transactions.map((tx: TransactionTabType, index) => (
-							<S.TransactionWrapper key={index} active={index === activeTabIndex}>
-								{getTab(tx, index)}
-							</S.TransactionWrapper>
-						))}
+						{transactions.map((tx: TransactionTabType, index) => {
+							return (
+								<S.TransactionWrapper key={index} active={index === activeTabIndex}>
+									{getTab(tx, index)}
+								</S.TransactionWrapper>
+							)
+						})}
 					</>
 				) : null}
 			</ViewWrapper>

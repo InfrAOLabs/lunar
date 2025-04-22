@@ -2,7 +2,6 @@ import React from 'react';
 import { ReactSVG } from 'react-svg';
 import { GQLNodeResponseType } from '@permaweb/libs';
 
-import { Button } from 'components/atoms/Button';
 import { FormField } from 'components/atoms/FormField';
 import { IconButton } from 'components/atoms/IconButton';
 import { Notification } from 'components/atoms/Notification';
@@ -11,7 +10,7 @@ import { URLTabs } from 'components/atoms/URLTabs';
 import { MessageList } from 'components/molecules/MessageList';
 import { MessageResult } from 'components/molecules/MessageResult';
 import { ProcessRead } from 'components/molecules/ProcessRead';
-import { ASSETS, URLS } from 'helpers/config';
+import { ASSETS, DEFAULT_AO_TAGS, URLS } from 'helpers/config';
 import { TransactionType } from 'helpers/types';
 import { checkValidAddress, formatCount, formatDate, getTagValue } from 'helpers/utils';
 import { useArweaveProvider } from 'providers/ArweaveProvider';
@@ -23,6 +22,7 @@ import { ProcessEditor } from '../ProcessEditor';
 
 import * as S from './styles';
 
+// TODO: Rerendering on wallet change
 export default function Transaction(props: {
 	txId: string;
 	type: TransactionType;
@@ -44,7 +44,6 @@ export default function Transaction(props: {
 	const [error, setError] = React.useState<string | null>(null);
 
 	const [idCopied, setIdCopied] = React.useState<boolean>(false);
-	const [urlCopied, setUrlCopied] = React.useState<boolean>(false);
 
 	const excludedTagNames = ['Type', 'Authority', 'Module', 'Scheduler'];
 	const filteredTags =
@@ -74,16 +73,14 @@ export default function Transaction(props: {
 			try {
 				const response = await permawebProvider.libs.getGQLData({
 					ids: [inputTxId],
-					tags: [
-						{ name: 'Data-Protocol', values: ['ao'] },
-						{ name: 'Variant', values: ['ao.TN.1'] },
-					],
+					tags: [...DEFAULT_AO_TAGS],
 				});
 				const responseData = response?.data?.[0];
 				setTxResponse(responseData ?? null);
 				if (responseData) {
 					if (props.onTxChange) props.onTxChange(responseData);
-				} else {
+				}
+				else {
 					setError(language.txNotFound);
 				}
 			} catch (e: any) {
@@ -99,12 +96,6 @@ export default function Transaction(props: {
 			setIdCopied(true);
 			setTimeout(() => setIdCopied(false), 2000);
 		}
-	}, []);
-
-	const copyUrl = React.useCallback(async () => {
-		await navigator.clipboard.writeText(window.location.href);
-		setUrlCopied(true);
-		setTimeout(() => setUrlCopied(false), 2000);
 	}, []);
 
 	const OverviewLine = ({ label, value, render }: { label: string; value: any; render?: (v: any) => JSX.Element }) => {
@@ -125,8 +116,8 @@ export default function Transaction(props: {
 		);
 	};
 
+	// TODO: Process write
 	const TABS = React.useMemo(() => {
-		console.log(txResponse);
 		const tabs = [
 			{
 				label: language.overview,
@@ -290,23 +281,6 @@ export default function Transaction(props: {
 			<URLTabs
 				tabs={TABS}
 				activeUrl={activeUrl}
-				endComponent={
-					<S.TxInfoWrapper>
-						<S.UpdateWrapper>
-							<span>{props.type}</span>
-						</S.UpdateWrapper>
-						{txResponse?.node?.tags && (
-							<S.UpdateWrapper>
-								<span>{getTagValue(txResponse.node.tags, 'Variant')}</span>
-							</S.UpdateWrapper>
-						)}
-						{txResponse?.node?.block?.timestamp && (
-							<S.UpdateWrapper>
-								<span>{formatDate(txResponse?.node?.block?.timestamp * 1000, 'timestamp')}</span>
-							</S.UpdateWrapper>
-						)}
-					</S.TxInfoWrapper>
-				}
 			/>
 		);
 	}, [TABS]);
@@ -370,13 +344,21 @@ export default function Transaction(props: {
 						/>
 					</S.SearchWrapper>
 					<S.HeaderActionsWrapper>
-						<Button
-							type={'primary'}
-							label={urlCopied ? `${language.copied}!` : language.copyFullUrl}
-							handlePress={() => copyUrl()}
-							icon={ASSETS.copy}
-							iconLeftAlign
-						/>
+						<S.TxInfoWrapper>
+							<S.UpdateWrapper>
+								<span>{props.type}</span>
+							</S.UpdateWrapper>
+							{txResponse?.node?.tags && (
+								<S.UpdateWrapper>
+									<span>{getTagValue(txResponse.node.tags, 'Variant')}</span>
+								</S.UpdateWrapper>
+							)}
+							{txResponse?.node?.block?.timestamp && (
+								<S.UpdateWrapper>
+									<span>{formatDate(txResponse?.node?.block?.timestamp * 1000, 'timestamp')}</span>
+								</S.UpdateWrapper>
+							)}
+						</S.TxInfoWrapper>
 					</S.HeaderActionsWrapper>
 				</S.HeaderWrapper>
 				<S.BodyWrapper>{getTransaction()}</S.BodyWrapper>

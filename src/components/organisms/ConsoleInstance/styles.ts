@@ -3,16 +3,16 @@ import styled from 'styled-components';
 import { STYLING } from 'helpers/config';
 
 export const Wrapper = styled.div<{ noWrapper?: boolean }>`
-	/* height: ${(props) => props.noWrapper ? `calc(100vh - 270px)` : `calc(100vh - 395px)`}; */
-	height: 500px;
+	min-height: 500px;
+	height: ${(props) => props.noWrapper ? `calc(100vh - 145px)` : `calc(100vh - 195px)`};
 	width: 100%;
 	position: relative;
 `;
 
-export const ActionsWrapper = styled.div`
+export const ActionsWrapper = styled.div<{ noWrapper?: boolean }>`
 	position: absolute;
-	bottom: 20px;
-	right: 20px;
+	bottom: ${(props) => props.noWrapper ? '0' : '20px'};
+	right: ${(props) => props.noWrapper ? '0' : '20px'};
 
 	button {
 		padding: 3.5px 0 0 0 !important;

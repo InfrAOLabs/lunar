@@ -1,4 +1,6 @@
 import React from 'react';
+import Editor, { BeforeMount, OnMount } from '@monaco-editor/react';
+import { DefaultTheme, useTheme } from 'styled-components';
 
 import { Button } from 'components/atoms/Button';
 import { useLanguageProvider } from 'providers/LanguageProvider';
@@ -10,161 +12,163 @@ export default function JSONWriter(props: {
 	handleSubmit: (data: object) => void;
 	loading: boolean;
 }) {
+	const currentTheme: any = useTheme();
+
 	const languageProvider = useLanguageProvider();
 	const language = languageProvider.object[languageProvider.current];
 
+	const monacoRef = React.useRef<typeof import('monaco-editor') | null>(null);
+	const themeName = currentTheme.scheme === 'dark' ? 'editorDark' : 'editorLight';
+
 	const [jsonString, setJsonString] = React.useState(JSON.stringify(props.initialData, null, 4));
-	const [error, setError] = React.useState(null);
+	const [error, setError] = React.useState<string | null>(null);
 
-	const textAreaRef = React.useRef<HTMLTextAreaElement>(null);
-	const numbersRef = React.useRef<HTMLDivElement>(null);
+	const strip = (hex: string) => hex.replace(/^#/, '');
 
-	// Auto-resize the textarea height based on its content.
-	const autoResize = () => {
-		const ta = textAreaRef.current;
-		if (ta) {
-			ta.style.height = 'auto';
-			ta.style.height = ta.scrollHeight + 'px';
-		}
+	function getRules(theme: DefaultTheme) {
+		return [
+			{ token: 'string.quoted.double.json', foreground: strip(theme.colors.editor.primary) },
+			{ token: 'string.key.json', foreground: strip(theme.colors.editor.primary) },
+			{ token: 'string.value.json', foreground: strip(theme.colors.editor.alt1) },
+		];
+	}
+
+	function getColors(theme: DefaultTheme) {
+		return {
+			'editor.background': theme.colors.container.alt1.background,
+			'editorLineNumber.foreground': theme.colors.font.alt1,
+			'editorCursor.foreground': theme.colors.font.alt1,
+			'editorBracketHighlight.foreground1': theme.colors.editor.alt5,
+			'editorBracketHighlight.foreground2': theme.colors.editor.alt8,
+			'editorBracketHighlight.foreground3': theme.colors.editor.alt5,
+		};
+	}
+
+	const themes = {
+		light: 'editorLight',
+		dark: 'editorDark',
+	}
+
+	const handleBeforeMount: BeforeMount = (monaco) => {
+		monacoRef.current = monaco;
+
+		monaco.editor.defineTheme(themes.light, {
+			base: 'vs',
+			inherit: true,
+			rules: getRules(currentTheme),
+			colors: getColors(currentTheme),
+		});
+
+		monaco.editor.defineTheme(themes.dark, {
+			base: 'vs-dark',
+			inherit: true,
+			rules: getRules(currentTheme),
+			colors: getColors(currentTheme),
+		});
+
+		const themeName = currentTheme.scheme === 'dark' ? themes.dark : themes.light;
+		monaco.editor.setTheme(themeName);
 	};
 
-	// Called whenever the content of the textarea changes.
-	const handleChange = (event) => {
-		const updatedString = event.target.value;
-		setJsonString(updatedString);
+	React.useEffect(() => {
+		const monaco = monacoRef.current;
+		if (!monaco) return;
 
+		monaco.editor.defineTheme(themes.light, {
+			base: 'vs',
+			inherit: true,
+			rules: getRules(currentTheme),
+			colors: getColors(currentTheme),
+		});
+
+		monaco.editor.defineTheme(themes.dark, {
+			base: 'vs-dark',
+			inherit: true,
+			rules: getRules(currentTheme),
+			colors: getColors(currentTheme),
+		});
+
+		monaco.editor.setTheme(themeName);
+	}, [currentTheme, themeName]);
+
+	const handleEditorDidMount: OnMount = (editor, monaco) => {
+		editor.onKeyDown((e) => {
+			if ((e.metaKey || e.ctrlKey) && e.keyCode === monaco.KeyCode.Enter) {
+				e.preventDefault();
+				props.handleSubmit(JSON.parse(jsonString));
+			}
+		});
+	};
+
+	function handleChange(value: string) {
+		const v = value ?? '';
+		setJsonString(v);
 		try {
-			JSON.parse(updatedString);
+			JSON.parse(v);
 			setError(null);
-		} catch (err) {
+		} catch {
 			setError('Invalid JSON');
-		}
-
-		// Auto-resize the textarea whenever the content changes.
-		autoResize();
-	};
-
-	// Submit the JSON if there is no error.
-	function submitHandler() {
-		if (!error) {
-			const parsedData = JSON.parse(jsonString);
-			props.handleSubmit(parsedData);
 		}
 	}
 
-	// Keyboard handling:
-	// - When "{" is typed, insert a matching "}" and place the caret inside.
-	// - Cmd/Ctrl+Enter submits the JSON.
-	// - Plain Enter inserts a new line with proper indentation.
-	const handleKeyDown = (event) => {
-		const textarea = event.target;
-		const { selectionStart, selectionEnd } = textarea;
-
-		// Auto-close braces.
-		if (event.key === '{' || event.key === '[') {
-			event.preventDefault();
-
-			// Insert "{}" and set the caret between the braces.
-			const insertText = event.key === '{' ? '{}' : '[]';
-			const newValue = jsonString.substring(0, selectionStart) + insertText + jsonString.substring(selectionEnd);
-			setJsonString(newValue);
-
-			// Update the caret position.
-			setTimeout(() => {
-				textarea.selectionStart = textarea.selectionEnd = selectionStart + 1;
-			}, 0);
-			autoResize();
-			return;
+	function submitHandler() {
+		try {
+			const parsed = JSON.parse(jsonString);
+			setError(null);
+			props.handleSubmit(parsed);
+		} catch {
+			setError('Invalid JSON');
 		}
-
-		if (event.key === 'Enter') {
-			// Check for submission shortcut (Cmd/Ctrl + Enter).
-			if (event.metaKey || event.ctrlKey) {
-				event.preventDefault();
-				submitHandler();
-			} else {
-				event.preventDefault();
-				// Determine the current line and its indentation.
-				const textBeforeCaret = jsonString.substring(0, selectionStart);
-				const lastNewLine = textBeforeCaret.lastIndexOf('\n');
-				const currentLine = textBeforeCaret.slice(lastNewLine + 1);
-				const indentMatch = currentLine.match(/^\s*/);
-				const indent = indentMatch ? indentMatch[0] : '';
-
-				// Insert a new line with the same indentation.
-				const insertText = '\n' + indent;
-				const newValue = jsonString.substring(0, selectionStart) + insertText + jsonString.substring(selectionEnd);
-				setJsonString(newValue);
-
-				// Adjust the caret position and auto-resize.
-				setTimeout(() => {
-					textarea.selectionStart = textarea.selectionEnd = selectionStart + insertText.length;
-					autoResize();
-				}, 0);
-			}
-		}
-
-		if (event.key === 'Tab') {
-			event.preventDefault();
-			const insertText = '    '; // 4 spaces
-			const newValue = jsonString.substring(0, selectionStart) + insertText + jsonString.substring(selectionEnd);
-			setJsonString(newValue);
-
-			// Update the caret position and auto-resize.
-			setTimeout(() => {
-				textarea.selectionStart = textarea.selectionEnd = selectionStart + insertText.length;
-				autoResize();
-			}, 0);
-			return;
-		}
-	};
-
-	// Sync scrolling between the textarea and the line numbers.
-	const handleScroll = () => {
-		if (textAreaRef.current && numbersRef.current) {
-			numbersRef.current.scrollTop = textAreaRef.current.scrollTop;
-		}
-	};
-
-	const lines = jsonString.split('\n');
-
-	// Auto-resize on mount and whenever jsonString updates.
-	React.useEffect(() => {
-		autoResize();
-	}, [jsonString]);
+	}
 
 	return (
 		<S.Wrapper>
 			<S.EditorWrapper className={'border-wrapper-alt2 scroll-wrapper'}>
-				<S.LinesWrapper ref={numbersRef}>
-					{lines.map((_, index) => (
-						<span key={index}>{index + 1}</span>
-					))}
-				</S.LinesWrapper>
 				<S.Editor>
-					<textarea
-						ref={textAreaRef}
-						className={'scroll-wrapper'}
+					<Editor
+						height={'100%'}
+						defaultLanguage={'json'}
 						value={jsonString}
-						onChange={handleChange}
-						onKeyDown={handleKeyDown}
-						onScroll={handleScroll}
+						onChange={(value) => handleChange(value)}
+						beforeMount={handleBeforeMount}
+						onMount={handleEditorDidMount}
+						theme={themeName}
+						options={{
+							readOnly: props.loading,
+							automaticLayout: true,
+							tabSize: 4,
+							formatOnPaste: true,
+							formatOnType: true,
+							minimap: { enabled: false },
+							wordWrap: 'on',
+							fontFamily: currentTheme.typography.family.alt2,
+							fontSize: currentTheme.typography.size.xxSmall,
+							fontWeight: '600',
+							scrollbar: {
+								verticalSliderSize: 8,
+								horizontalSliderSize: 8,
+								verticalScrollbarSize: 12,
+								horizontalScrollbarSize: 12,
+								arrowSize: 10,
+								useShadows: false,
+							  }
+						}}
 					/>
 				</S.Editor>
 				<S.ActionsWrapper>
-						{error && (
-							<S.ErrorWrapper>
-								<span>{error}</span>
-							</S.ErrorWrapper>
-						)}
-						<Button
-							type={'alt1'}
-							label={`${language.run} (⌘ + ⏎)`}
-							handlePress={submitHandler}
-							disabled={props.loading || error !== null}
-							loading={props.loading}
-						/>
-					</S.ActionsWrapper>
+					{error && (
+						<S.ErrorWrapper>
+							<span>{error}</span>
+						</S.ErrorWrapper>
+					)}
+					<Button
+						type={'alt1'}
+						label={`${language.run} (⌘ + ⏎)`}
+						handlePress={submitHandler}
+						disabled={props.loading || Boolean(error)}
+						loading={props.loading}
+					/>
+				</S.ActionsWrapper>
 			</S.EditorWrapper>
 		</S.Wrapper>
 	);

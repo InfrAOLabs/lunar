@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import { ASSETS } from 'helpers/config';
+import { useLanguageProvider } from 'providers/LanguageProvider';
 import NotFound from 'views/NotFound';
 
 import { Button } from '../Button';
@@ -52,6 +54,11 @@ export default function URLTabs(props: IUProps) {
 	const navigate = useNavigate();
 	const { id, active } = useParams() as { id: string; active: string };
 
+	const languageProvider = useLanguageProvider();
+	const language = languageProvider.object[languageProvider.current];
+
+	const [urlCopied, setUrlCopied] = React.useState<boolean>(false);
+
 	React.useEffect(() => {
 		if (!active) {
 			navigate(props.activeUrl);
@@ -63,6 +70,12 @@ export default function URLTabs(props: IUProps) {
 			navigate(url);
 		}
 	};
+
+	const copyUrl = React.useCallback(async () => {
+		await navigator.clipboard.writeText(window.location.href);
+		setUrlCopied(true);
+		setTimeout(() => setUrlCopied(false), 2000);
+	}, []);
 
 	return (
 		<S.Wrapper>
@@ -83,7 +96,18 @@ export default function URLTabs(props: IUProps) {
 						);
 					})}
 				</S.Tabs>
+				<S.EndWrapper>
+				{!props.noUrlCopy && (
+					<Button
+					type={'primary'}
+					label={urlCopied ? `${language.copied}!` : language.copyFullUrl}
+					handlePress={() => copyUrl()}
+					icon={ASSETS.copy}
+					iconLeftAlign
+				/>
+				)}
 				{props.endComponent && props.endComponent}
+				</S.EndWrapper>
 			</S.TabsHeader>
 			<S.Content>
 				<TabContent tabs={props.tabs} />
