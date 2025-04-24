@@ -110,7 +110,7 @@ export const STYLING = {
 	cutoffs: {
 		desktop: '1200px',
 		initial: '1024px',
-		max: '1600px',
+		max: '2000px',
 		tablet: '840px',
 		tabletSecondary: '768px',
 		secondary: '540px',
@@ -151,6 +151,7 @@ function createURLs() {
 		explorerMessages: (id: string) => `${explorer}${id}/messages`,
 		explorerRead: (id: string) => `${explorer}${id}/read`,
 		explorerWrite: (id: string) => `${explorer}${id}/write`,
+		explorerSource: (id: string) => `${explorer}${id}/source`,
 		explorerAOS: (id: string) => `${explorer}${id}/aos`,
 		aos: aos,
 		docs: docs,

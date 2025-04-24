@@ -23,7 +23,7 @@ export const Header = styled.div`
 export const HeaderMain = styled.div`
 	display: flex;
 	align-items: center;
-	gap: 15px;
+	gap: 25px;
 
 	p {
 		font-size: ${(props) => props.theme.typography.size.lg};
@@ -34,6 +34,13 @@ export const HeaderMain = styled.div`
 	
 	.update-wrapper {
 		padding: 2.5px 25px;
+	}
+	
+	.loader {
+		> div {
+			height: fit-content;
+			width: fit-content;
+		}
 	}
 `
 

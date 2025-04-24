@@ -28,6 +28,24 @@ export default function App() {
 
 	const { settings, updateSettings } = useSettingsProvider();
 
+	if (process.env.NODE_ENV === 'development') {
+		const suppressed = 'ResizeObserver loop completed with undelivered notifications.';
+		const origWarn = console.warn.bind(console);
+		console.warn = (msg?: any, ...args: any[]) => {
+			if (typeof msg === 'string' && msg.includes(suppressed)) {
+				return;
+			}
+			origWarn(msg, ...args);
+		};
+		const origError = console.error.bind(console);
+		console.error = (msg?: any, ...args: any[]) => {
+			if (typeof msg === 'string' && msg.includes(suppressed)) {
+				return;
+			}
+			origError(msg, ...args);
+		};
+	}
+
 	function getRoute(path: string, element: React.ReactNode) {
 		const baseRoutes = [URLS.docs, `URLS.docs/*`, `${URLS.docs}:active/*`, URLS.notFound, '*'];
 

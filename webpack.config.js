@@ -23,7 +23,10 @@ module.exports = {
 		open: false,
 		compress: true,
 		client: {
-			overlay: true,
+			overlay: {
+				errors: true,
+				warnings: false,
+			}
 		},
 	},
 	optimization:

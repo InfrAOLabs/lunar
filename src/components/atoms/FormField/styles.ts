@@ -7,9 +7,6 @@ export const Wrapper = styled.div<{ sm: boolean | undefined }>`
 	display: flex;
 	flex-direction: column;
 	position: relative;
-	@media (max-width: ${STYLING.cutoffs.initial}) {
-		max-width: none;
-	}
 `;
 
 export const TWrapper = styled.div`

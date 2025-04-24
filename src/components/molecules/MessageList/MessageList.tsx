@@ -8,6 +8,7 @@ import { useTheme } from 'styled-components';
 import { Button } from 'components/atoms/Button';
 import { FormField } from 'components/atoms/FormField';
 import { IconButton } from 'components/atoms/IconButton';
+import { Loader } from 'components/atoms/Loader';
 import { Panel } from 'components/atoms/Panel';
 import { TxAddress } from 'components/atoms/TxAddress';
 import { JSONReader } from 'components/molecules/JSONReader';
@@ -457,8 +458,8 @@ export default function MessageList(props: {
 					<S.HeaderMain>
 						<p>{language.messages}</p>
 						{loadingMessages && (
-							<div className={'update-wrapper'}>
-								<span>{`${language.loading}...`}</span>
+							<div className={'loader'}>
+								<Loader xSm relative />
 							</div>
 						)}
 					</S.HeaderMain>

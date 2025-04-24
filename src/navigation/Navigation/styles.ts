@@ -185,6 +185,12 @@ export const SearchOutputWrapper = styled.div`
 		font-weight: ${(props) => props.theme.typography.weight.bold} !important;
 		font-family: ${(props) => props.theme.typography.family.primary} !important;
 	}
+
+	@media (max-width: ${STYLING.cutoffs.initial}) {
+		position: relative;
+		top: auto;
+		margin: 15px 0 0 0;
+	}
 `;
 
 export const SearchOutputPlaceholder = styled.div`
@@ -312,12 +318,11 @@ export const MSearchWrapper = styled.div`
 `;
 
 export const MSearchContainer = styled.div`
-	height: 170px;
 	max-width: calc(100vw - 50px);
 	position: absolute;
 	top: 45px;
 	right: 0;
-	padding: 15px;
+	padding: 15px 15px 15px 15px;
 	border-radius: ${STYLING.dimensions.radius.alt2} !important;
 `;
 

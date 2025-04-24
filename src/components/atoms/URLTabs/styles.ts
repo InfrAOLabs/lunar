@@ -10,8 +10,10 @@ export const Wrapper = styled.div`
 export const TabsHeader = styled.div<{ useFixed: boolean }>`
 	width: 100%;
 	display: flex;
+	gap: 20px;
 	align-items: center;
 	justify-content: space-between;
+	overflow-x: auto;
 	@media (max-width: ${STYLING.cutoffs.secondary}) {
 		position: relative;
 		top: auto;
@@ -22,7 +24,6 @@ export const Tabs = styled.div`
 	display: flex;
 	align-items: center;
 	gap: 20px;
-	overflow-x: auto;
 `;
 
 export const EndWrapper = styled.div`
@@ -30,6 +31,10 @@ export const EndWrapper = styled.div`
 	justify-content: center;
 	align-items: center;
 	gap: 15px;
+
+	button {
+		min-width: 160px;
+	}
 `;
 
 export const Content = styled.div``;
@@ -39,9 +44,6 @@ export const Tab = styled.div<{ active: boolean }>`
 	justify-content: center;
 	align-items: center;
 	position: relative;
-	/* button {
-		border-radius: ${STYLING.dimensions.radius.alt2} !important;
-	} */
 `;
 
 export const View = styled.div`

@@ -19,7 +19,6 @@ export const TabsWrapper = styled.div`
 
 export const BodyWrapper = styled.div`
 	width: 100%;
-	padding: 0 25px;
 `;
 
 export const TabsContent = styled.div`
@@ -31,7 +30,6 @@ export const TabsContent = styled.div`
 	white-space: nowrap;
 	overflow-x: auto;
 	overflow-y: hidden;
-
 	border: 1px solid ${(props) => props.theme.colors.border.primary};
 	background: ${(props) => props.theme.colors.container.alt1.background};
 	border-radius: ${STYLING.dimensions.radius.alt2};
@@ -174,4 +172,45 @@ export const TabAction = styled.div<{ active: boolean }>`
 
 export const TransactionWrapper = styled.div<{ active: boolean }>`
 	display: ${(props) => props.active ? 'block' : 'none'}
+`;
+
+export const ModalWrapper = styled.div`
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	padding: 0 20px 20px 20px !important;
+`;
+
+export const ModalBodyWrapper = styled.div`
+	p {
+		color: ${(props) => props.theme.colors.font.alt1};
+		font-size: ${(props) => props.theme.typography.size.xSmall} !important;
+		font-weight: ${(props) => props.theme.typography.weight.bold} !important;
+		font-family: ${(props) => props.theme.typography.family.primary} !important;
+	}
+`;
+
+export const ModalBodyElements = styled.div`
+	display: flex;
+	flex-direction: column;
+	gap: 1.5px;
+	margin: 15px 0 0 0;
+`;
+
+export const ModalBodyElement = styled.div`
+	span {
+		color: ${(props) => props.theme.colors.font.primary};
+		font-size: ${(props) => props.theme.typography.size.xSmall} !important;
+		font-weight: ${(props) => props.theme.typography.weight.bold} !important;
+		font-family: ${(props) => props.theme.typography.family.primary} !important;
+		text-transform: uppercase;
+	}
+`;
+
+export const ModalActionsWrapper = styled.div`
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	flex-wrap: wrap;
+	gap: 15px;
 `;

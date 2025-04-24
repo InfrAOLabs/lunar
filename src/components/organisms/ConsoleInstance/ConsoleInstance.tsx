@@ -7,6 +7,7 @@ import { Button } from 'components/atoms/Button';
 import { IconButton } from 'components/atoms/IconButton';
 import { Loader } from 'components/atoms/Loader';
 import { Notification } from 'components/atoms/Notification';
+import { Editor } from 'components/molecules/Editor';
 import { ASSETS } from 'helpers/config';
 import { GQLNodeResponseType } from 'helpers/types';
 import { checkValidAddress, formatAddress, getTagValue } from 'helpers/utils';
@@ -32,6 +33,8 @@ export default function ConsoleInstance(props: {
 	const languageProvider = useLanguageProvider();
 	const language = languageProvider.object[languageProvider.current];
 
+	const promptRef = React.useRef(null);
+	const loadingRef = React.useRef(false);
 	const consoleRef = React.useRef(null);
 	const terminalRef = React.useRef(null);
 	const termInstance = React.useRef(null);
@@ -43,20 +46,54 @@ export default function ConsoleInstance(props: {
 	const [loadingOptions, setLoadingOptions] = React.useState<boolean>(false);
 	const [txOptions, setTxOptions] = React.useState<GQLNodeResponseType[] | null>(null);
 
+	const [prompt, setPrompt] = React.useState<string>('> ');
 	const [fullScreenMode, setFullScreenMode] = React.useState<boolean>(false);
-	const [hasFetched, setHasFetched] = React.useState<boolean>(false);
+	const [editorMode, setEditorMode] = React.useState<boolean>(false);
+	const [editorData, setEditorData] = React.useState<string>('');
 	const [error, setError] = React.useState<string | null>(null);
 
 	const [loadingMessage, setLoadingMessage] = React.useState<boolean>(false);
 
 	const toggleFullscreen = React.useCallback(async () => {
-		const el = terminalRef.current!;
+		const el = consoleRef.current!;
 		if (!document.fullscreenElement) {
 			await el.requestFullscreen?.();
 		} else {
 			await document.exitFullscreen?.();
 		}
 	}, []);
+
+	React.useEffect(() => {
+		const onKeyDown = (e: KeyboardEvent) => {
+			if (e.ctrlKey && (e.key === 'e' || e.key === 'E')) {
+				e.preventDefault();
+				setEditorMode((prev) => !prev);
+			}
+		};
+
+		window.addEventListener('keydown', onKeyDown, true);
+		return () => {
+			window.removeEventListener('keydown', onKeyDown, true);
+		};
+	}, []);
+
+	React.useEffect(() => {
+		if (editorMode && termInstance.current) {
+			termInstance.current.write(`\r\n\r\n\x1b[90mEditor Open: Hit the checkmark or (Ctrl + L) to evaluate\x1b[0m`);
+			termInstance.current.write('\x1b[?25l');
+			loadingRef.current = true;
+		} else {
+			loadingRef.current = false;
+		}
+	}, [editorMode]);
+
+	React.useEffect(() => {
+		loadingRef.current = editorMode;
+	}, [editorMode]);
+
+	React.useEffect(() => {
+		promptRef.current = prompt;
+	}, [prompt]);
 
 	React.useEffect(() => {
 		const onFullScreenChange = () => {
@@ -79,6 +116,22 @@ export default function ConsoleInstance(props: {
 			document.removeEventListener('keydown', onKeyDown);
 		};
 	}, [fullScreenMode, toggleFullscreen]);
+
+	React.useEffect(() => {
+		const onKeyDown = (e: KeyboardEvent) => {
+			if (!editorMode || !editorData) return;
+
+			if (e.ctrlKey && (e.key === 'l' || e.key === 'L')) {
+				e.preventDefault();
+				handleEditorSend();
+			}
+		};
+
+		window.addEventListener('keydown', onKeyDown);
+		return () => {
+			window.removeEventListener('keydown', onKeyDown);
+		};
+	}, [editorMode, editorData]);
 
 	React.useEffect(() => {
 		if (consoleRef.current && props.active) {
@@ -143,99 +196,97 @@ export default function ConsoleInstance(props: {
 				});
 
 				termInstance.current.loadAddon(fitAddon.current);
-
 				termInstance.current.open(terminalRef.current);
-
 				fitAddon.current.fit();
-
-				// setTimeout(() => {
-				// 	fitAddon.current?.fit();
-				// }, 500);
 
 				const handleResize = () => {
 					fitAddon.current?.fit();
 				};
+
 				window.addEventListener('resize', handleResize);
 
 				termInstance.current.write(`\x1b[32mWelcome to AOS\x1b[0m\r\n\r\n`);
+				termInstance.current.write(`\x1b[90mOpen the editor with: (Ctrl + E) or '.editor'\x1b[0m\r\n\r\n`);
 				termInstance.current.write(`\x1b[90mProcess ID:\x1b[0m \x1b[32m${inputProcessId}\x1b[0m\r\n`);
 
 				await sendMessage(null, 'prompt');
 
-				// Command state variables
 				let commandBuffer = '';
 				let cursorPosition = 0;
-				// const commandHistory: string[] = [];
-				// let historyIndex = commandHistory.length;
+				const commandHistory: string[] = [];
+				let historyIndex: number = commandHistory.length;
 
-				// Helper to refresh the command line
 				const refreshLine = () => {
-					// Clear the current line and reset the cursor to the beginning.
-					// \x1b[2K clears the entire line, \r returns the cursor to the beginning.
-					termInstance.current.write('\x1b[2K\r' + commandBuffer);
-					// If the cursor is not at the end, move the terminal cursor left accordingly.
-					const moveLeftCount = commandBuffer.length - cursorPosition;
+					const currentPrompt = promptRef.current;
+					termInstance.current.write(`\x1b[2K\r${currentPrompt}${commandBuffer}`);
+					const moveLeftCount = currentPrompt.length + commandBuffer.length - (currentPrompt.length + cursorPosition);
 					if (moveLeftCount > 0) {
 						termInstance.current.write(`\x1b[${moveLeftCount}D`);
 					}
 				};
 
-				const commandHistory: string[] = [];
-				let historyIndex: number = commandHistory.length;
-
 				termInstance.current.onData(async (data: string) => {
+					if (loadingRef.current) return;
+
+					/* Arrow / Control Sequences */
 					if (data.startsWith('\x1b')) {
-						if (data === '\x1b[A') {
-							// Up arrow: navigate to previous command in history
-							historyIndex = Math.max(0, historyIndex - 1);
-							const previousCommand = commandHistory[historyIndex] || '';
-							commandBuffer = previousCommand;
-							cursorPosition = commandBuffer.length;
-							// refreshLine();
-							return;
-						} else if (data === '\x1b[B') {
-							// Down arrow: navigate to next command in history
-							historyIndex = Math.min(commandHistory.length, historyIndex + 1);
-							const nextCommand = commandHistory[historyIndex] || '';
-							commandBuffer = nextCommand;
-							cursorPosition = commandBuffer.length;
-							// refreshLine();
-							return;
-						} else if (data === '\x1b[D') {
-							// Left arrow: move the cursor left if possible
-							if (cursorPosition > 0) {
-								cursorPosition--;
-								termInstance.current.write('\x1b[D');
-							}
-							return;
-						} else if (data === '\x1b[C') {
-							// Right arrow: move the cursor right if possible
-							if (cursorPosition < commandBuffer.length) {
-								cursorPosition++;
-								termInstance.current.write('\x1b[C');
-							}
-							return;
+						switch (data) {
+							case '\x1b[A' /* Up */:
+								historyIndex = Math.max(0, historyIndex - 1);
+								commandBuffer = commandHistory[historyIndex] || '';
+								cursorPosition = commandBuffer.length;
+								refreshLine();
+								return;
+							case '\x1b[B' /* Down */:
+								historyIndex = Math.min(commandHistory.length, historyIndex + 1);
+								commandBuffer = commandHistory[historyIndex] || '';
+								cursorPosition = commandBuffer.length;
+								refreshLine();
+								return;
+							case '\x1b[D' /* Left */:
+								if (cursorPosition > 0) {
+									cursorPosition--;
+									refreshLine();
+								}
+								return;
+							case '\x1b[C' /* Right */:
+								if (cursorPosition < commandBuffer.length) {
+									cursorPosition++;
+									refreshLine();
+								}
+								return;
+							default:
+								return;
+						}
+					}
+
+					/* Enter */
+					if (data === '\r') {
+						if (commandBuffer.trim()) {
+							commandHistory.push(commandBuffer.trim());
+							historyIndex = commandHistory.length;
+							
+							await resolveCommand(commandBuffer);
+						}
+						commandBuffer = '';
+						cursorPosition = 0;
+						return;
+					}
+
+					/* Backspace */
+					if (data === '\u007F') {
+						if (cursorPosition > 0) {
+							commandBuffer = commandBuffer.slice(0, cursorPosition - 1) + commandBuffer.slice(cursorPosition);
+							cursorPosition--;
+							refreshLine();
 						}
 						return;
 					}
 
-					if (data === '\r') {
-						console.log(commandBuffer);
-						if (commandBuffer.trim() !== '') {
-							commandHistory.push(commandBuffer.trim());
-							historyIndex = commandHistory.length; // Reset history index
-						}
-						await sendMessage(commandBuffer);
-						commandBuffer = '';
-					} else if (data === '\u007F') {
-						if (commandBuffer.length > 0) {
-							commandBuffer = commandBuffer.slice(0, -1);
-							termInstance.current.write('\b \b');
-						}
-					} else {
-						commandBuffer += data;
-						termInstance.current.write(data);
-					}
+					/* Insert at cursor position, bump cursor, and redraw */
+					commandBuffer = commandBuffer.slice(0, cursorPosition) + data + commandBuffer.slice(cursorPosition);
+					cursorPosition++;
+					refreshLine();
 				});
 			}
 		})();
@@ -254,83 +305,91 @@ export default function ConsoleInstance(props: {
 		}
 	}, [theme]);
 
-	const spinnerFrames = ['Loading      ', 'Loading.     ', 'Loading..    ', 'Loading...   '];
-
-	let spinnerInterval: ReturnType<typeof setInterval> | null = null;
-	let currentFrame = 0;
-
-	function startLoader() {
-		setLoadingMessage(true);
-		termInstance.current.write('\n');
-		termInstance.current.write('\x1b[?25l');
-		spinnerInterval = setInterval(() => {
-			termInstance.current.write('\r\x1b[2K');
-			termInstance.current.write(`\x1b[32m${spinnerFrames[currentFrame]}\x1b[0m\r`);
-			currentFrame = (currentFrame + 1) % spinnerFrames.length;
-		}, 135);
+	function handleEditorSend() {
+		if (editorData) sendMessage(editorData);
 	}
 
-	function stopSpinner() {
-		if (spinnerInterval) {
-			clearInterval(spinnerInterval);
-			spinnerInterval = null;
+	async function resolveCommand(data: string | null) {
+		if (data.startsWith('.')) {
+			const command = data.substring(1);
+			
+			switch(command) {
+				case 'editor':
+					setEditorMode((prev) => !prev);
+					return;
+				default:
+					termInstance.current.write(`\r\n\x1b[91mCommand Not Supported\x1b[0m\r\n`);
+					termInstance.current.write('\r');
+					termInstance.current.write(promptRef.current);
+					return;
+			}
 		}
-		termInstance.current.write('\r\x1b[2K');
-		termInstance.current.write('\x1b[?25h');
+
+		await sendMessage(data);
 	}
 
-	function clearLoader() {
-		stopSpinner();
-		setLoadingMessage(false);
-		termInstance.current.write('\r\x1b[2K');
-		termInstance.current.write('\x1b[?25h');
-	}
-
-	// TODO: Disable input while loading
 	async function sendMessage(data: string | null, outputType?: 'data' | 'prompt') {
-		startLoader();
+		if (termInstance.current) {
+			startLoader();
 
-		try {
-			const message = await permawebProvider.libs.sendMessage({
-				processId: inputProcessId,
-				action: 'Eval',
-				data: data ?? '',
-				useRawData: true,
-			});
+			try {
+				const message = await permawebProvider.libs.sendMessage({
+					processId: inputProcessId,
+					action: 'Eval',
+					data: data ?? '',
+					useRawData: true,
+				});
 
-			const response = await permawebProvider.ao.result({
-				process: inputProcessId,
-				message: message,
-			});
+				const response = await permawebProvider.ao.result({
+					process: inputProcessId,
+					message: message,
+				});
 
-			console.log(response);
+				console.log(response);
 
-			clearLoader();
+				stopLoader();
 
-			if (!outputType || outputType === 'data') {
-				let rawOutput = '';
-				if (response?.Output?.data) {
-					if (typeof response?.Output?.data === 'object') {
-						if (response?.Output?.data?.output) {
-							rawOutput = response.Output.data.output;
+				if (!outputType || outputType === 'data') {
+					let rawOutput = '';
+					let isError = false;
+
+					if (response?.Output?.data) {
+						if (typeof response?.Output?.data === 'object') {
+							if (response?.Output?.data?.output) {
+								rawOutput = response.Output.data.output;
+							}
+						} else {
+							rawOutput = response.Output.data;
 						}
 					} else {
-						rawOutput = response.Output.data;
+						if (response?.Error) {
+							rawOutput = response.Error;
+							isError = true;
+						}
 					}
+
+					const sanitizedOutput = rawOutput.toString().replace(/\t/g, '  ');
+					termInstance.current.write('\r\x1b[2K');
+
+					sanitizedOutput.split('\n').forEach((line: string) => {
+						if (isError) {
+							termInstance.current.write(`\x1b[91m${line}\x1b[0m\r\n`);
+						} else {
+							termInstance.current.write(line + '\r\n');
+						}
+					});
 				}
 
-				const sanitizedOutput = rawOutput.toString().replace(/\t/g, '  ');
-				termInstance.current.write('\r\x1b[2K');
-				sanitizedOutput.split('\n').forEach((line: string) => {
-					termInstance.current.write(line + '\r\n');
-				});
-			}
+				const newPrompt = response?.Output?.prompt ?? promptRef.current;
 
-			termInstance.current.write('\r');
-			termInstance.current.write(response?.Output?.prompt ?? '> ');
-		} catch (e: any) {
-			clearLoader();
-			termInstance.current.write('> ');
+				setPrompt(newPrompt);
+				setEditorData('');
+				termInstance.current.write('\r');
+				termInstance.current.write(newPrompt);
+			} catch (e: any) {
+				stopLoader();
+				termInstance.current.write(prompt);
+			}
 		}
 	}
 
@@ -348,14 +407,50 @@ export default function ConsoleInstance(props: {
 			cyan: currentTheme.colors.editor.alt7,
 			white: '#EEEEEE',
 			brightBlack: currentTheme.colors.editor.alt10,
-			brightRed: currentTheme.colors.editor.primary,
+			brightRed: currentTheme.colors.warning.primary,
 			brightGreen: currentTheme.colors.editor.alt3,
 			brightYellow: currentTheme.colors.editor.alt6,
 			brightBlue: currentTheme.colors.editor.alt4,
 			brightMagenta: currentTheme.colors.editor.alt8,
 			brightCyan: currentTheme.colors.editor.alt7,
 			brightWhite: '#EEEEEE',
+			selectionBackground: '#4A78DA',
+			selectionForeground: '#FAFAFA',
 		};
+	}
+
+	const spinnerFrames = ['Loading      ', 'Loading.     ', 'Loading..    ', 'Loading...   '];
+
+	let spinnerInterval: ReturnType<typeof setInterval> | null = null;
+	let currentFrame = 0;
+
+	function stopSpinner() {
+		if (spinnerInterval) {
+			clearInterval(spinnerInterval);
+			spinnerInterval = null;
+		}
+		termInstance.current.write('\r\x1b[2K');
+		termInstance.current.write('\x1b[?25h');
+	}
+
+	function startLoader() {
+		setLoadingMessage(true);
+		loadingRef.current = true;
+		termInstance.current.write('\n');
+		termInstance.current.write('\x1b[?25l');
+		spinnerInterval = setInterval(() => {
+			termInstance.current.write('\r\x1b[2K');
+			termInstance.current.write(`\x1b[32m${spinnerFrames[currentFrame]}\x1b[0m\r`);
+			currentFrame = (currentFrame + 1) % spinnerFrames.length;
+		}, 135);
+	}
+
+	function stopLoader() {
+		stopSpinner();
+		loadingRef.current = false;
+		setLoadingMessage(false);
+		termInstance.current.write('\r\x1b[2K');
+		termInstance.current.write('\x1b[?25h');
 	}
 
 	function getConsole() {
@@ -402,6 +497,7 @@ export default function ConsoleInstance(props: {
 			<S.Console
 				className={`${props.noWrapper && !fullScreenMode ? '' : 'border-wrapper-alt3 '}scroll-wrapper`}
 				noWrapper={props.noWrapper && !fullScreenMode}
+				editorMode={editorMode}
 				ref={terminalRef}
 			/>
 		);
@@ -410,8 +506,46 @@ export default function ConsoleInstance(props: {
 	return props.active ? (
 		<>
 			<S.Wrapper noWrapper={props.noWrapper} ref={consoleRef}>
+				{editorMode && (
+					<S.Editor className={'fade-in'}>
+						<Editor
+							initialData={''}
+							setEditorData={(data: string) => setEditorData(data)}
+							language={'lua'}
+							loading={loadingMessage}
+							noFullScreen
+						/>
+						{editorMode && (
+							<S.LoadWrapper noWrapper={props.noWrapper} fullScreenMode={fullScreenMode}>
+								<IconButton
+									type={'alt1'}
+									src={ASSETS.checkmark}
+									handlePress={() => handleEditorSend()}
+									dimensions={{
+										wrapper: 25,
+										icon: 12.5,
+									}}
+									disabled={!editorData}
+									tooltip={`${language.load} (Ctrl + L)`}
+									tooltipPosition={'top-right'}
+								/>
+							</S.LoadWrapper>
+						)}
+					</S.Editor>
+				)}
 				{getConsole()}
-				<S.ActionsWrapper noWrapper={props.noWrapper}>
+				<S.ActionsWrapper noWrapper={props.noWrapper} fullScreenMode={fullScreenMode}>
+					<IconButton
+						type={'alt1'}
+						src={ASSETS.code}
+						handlePress={() => setEditorMode((prev) => !prev)}
+						dimensions={{
+							wrapper: 25,
+							icon: 12.5,
+						}}
+						tooltip={editorMode ? language.closeEditor : language.openEditor}
+						tooltipPosition={'top-right'}
+					/>
 					<IconButton
 						type={'alt1'}
 						src={ASSETS.fullscreen}
@@ -420,6 +554,8 @@ export default function ConsoleInstance(props: {
 							wrapper: 25,
 							icon: 12.5,
 						}}
+						tooltip={fullScreenMode ? language.exitFullScreen : language.enterFullScreen}
+						tooltipPosition={'top-right'}
 					/>
 				</S.ActionsWrapper>
 			</S.Wrapper>

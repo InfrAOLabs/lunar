@@ -12,9 +12,15 @@ export const Wrapper = styled.div`
 export const HeaderWrapper = styled.form`
 	width: 100%;
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
 	justify-content: space-between;
 	gap: 20px;
+
+	@media (max-width: ${STYLING.cutoffs.initial}) {
+		flex-direction: column;
+		align-items: flex-start;
+	}
 `;
 
 export const HeaderActionsWrapper = styled.div`
@@ -38,7 +44,15 @@ export const InfoWrapper = styled.div`
 	gap: 25px;
 
 	@media (max-width: ${STYLING.cutoffs.initial}) {
-		flex-direction: column;
+		flex-direction: column-reverse;
+	}
+`;
+
+export const TagsWrapper = styled.div`
+	width: 450px;
+
+	@media (max-width: ${STYLING.cutoffs.initial}) {
+		width: 100%;
 	}
 `;
 
@@ -47,26 +61,37 @@ export const ReadWrapper = styled.div`
 	display: flex;
 	flex-direction: column;
 	gap: 25px;
+
+	@media (max-width: ${STYLING.cutoffs.initial}) {
+		width: 100%;
+	}
 `;
 
 export const MessageInfo = styled.div`
 	width: 100%;
-	padding: 15px 15px 7.5px 15px;
+	padding: 7.5px 15px;
 `;
 
 export const MessageInfoHeader = styled.div`
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 15px;
 	p {
 		font-size: ${(props) => props.theme.typography.size.lg};
 		font-family: ${(props) => props.theme.typography.family.primary};
 		font-weight: ${(props) => props.theme.typography.weight.bold};
 		color: ${(props) => props.theme.colors.font.primary};
 	}
+
+	> div {
+		border-right: none !important;
+	}
 `;
 
 export const MessageInfoBody = styled.div`
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
-	margin: 7.5px 0 0 0;
 
 	> {
 		&:last-child,
@@ -109,9 +134,6 @@ export const MessageInfoLine = styled.div`
 	}
 `;
 
-export const TagsWrapper = styled.div`
-	width: 450px;
-`;
 export const MessagesWrapper = styled.div`
 	width: 100%;
 `;
@@ -160,17 +182,21 @@ export const SectionFullUpdateWrapper = styled.div`
 `;
 
 export const SearchWrapper = styled.div`
+	max-width: 100%;
 	display: flex;
 	align-items: center;
+	flex-wrap: wrap;
 	gap: 15px;
 	position: relative;
 `;
 
 export const SearchInputWrapper = styled.div`
 	width: 510px;
+	max-width: 100%;
 	position: relative;
 
 	input {
+		max-width: 100%;
 		padding: 10px 10px 10px 42.5px !important;
 	}
 
@@ -198,6 +224,7 @@ export const TxInfoWrapper = styled.div`
 	display: flex;
 	align-items: center;
 	gap: 15px;
+	flex-wrap: wrap;
 `;
 
 export const UpdateWrapper = styled.div`

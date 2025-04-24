@@ -12,13 +12,14 @@ import { MessageResult } from 'components/molecules/MessageResult';
 import { ProcessRead } from 'components/molecules/ProcessRead';
 import { ASSETS, DEFAULT_AO_TAGS, URLS } from 'helpers/config';
 import { TransactionType } from 'helpers/types';
-import { checkValidAddress, formatCount, formatDate, getTagValue } from 'helpers/utils';
+import { checkValidAddress, formatCount, formatDate, getByteSizeDisplay, getTagValue } from 'helpers/utils';
 import { useArweaveProvider } from 'providers/ArweaveProvider';
 import { useLanguageProvider } from 'providers/LanguageProvider';
 import { usePermawebProvider } from 'providers/PermawebProvider';
 
 import { ConsoleInstance } from '../ConsoleInstance';
 import { ProcessEditor } from '../ProcessEditor';
+import { ProcessSource } from '../ProcessSource';
 
 import * as S from './styles';
 
@@ -182,21 +183,13 @@ export default function Transaction(props: {
 									<S.MessageInfo className={'border-wrapper-primary'}>
 										<S.MessageInfoHeader>
 											<p>{language.messageInfo}</p>
-										</S.MessageInfoHeader>
-										<S.MessageInfoBody>
 											<S.MessageInfoLine>
 												<span>{`${language.id}: `}</span>
 												<TxAddress address={txResponse?.node?.id} />
 											</S.MessageInfoLine>
-											<S.MessageInfoLine>
-												<span>{`${language.blockHeight}: `}</span>
-												<p>{formatCount(txResponse?.node?.block?.height.toString())}</p>
-											</S.MessageInfoLine>
-											<S.MessageInfoLine>
-												<span>{`${language.timestamp}: `}</span>
-												<p>{txResponse?.node?.block?.timestamp}</p>
-											</S.MessageInfoLine>
-											<S.MessageInfoLine>
+										</S.MessageInfoHeader>
+										<S.MessageInfoBody>
+										<S.MessageInfoLine>
 												<span>{`${language.from}: `}</span>
 												<TxAddress
 													address={getTagValue(txResponse.node.tags, 'From-Process') ?? txResponse.node.owner.address}
@@ -209,6 +202,18 @@ export default function Transaction(props: {
 											<S.MessageInfoLine>
 												<span>{`${language.owner}: `}</span>
 												<TxAddress address={txResponse?.node?.owner?.address} />
+											</S.MessageInfoLine>
+											<S.MessageInfoLine>
+												<span>{`${language.blockHeight}: `}</span>
+												<p>{formatCount(txResponse?.node?.block?.height.toString())}</p>
+											</S.MessageInfoLine>
+											<S.MessageInfoLine>
+												<span>{`${language.timestamp}: `}</span>
+												<p>{txResponse?.node?.block?.timestamp}</p>
+											</S.MessageInfoLine>
+											<S.MessageInfoLine>
+												<span>{`${language.size}: `}</span>
+												<p>{getByteSizeDisplay(Number(txResponse?.node?.data?.size) ?? 0)}</p>
 											</S.MessageInfoLine>
 										</S.MessageInfoBody>
 									</S.MessageInfo>
@@ -257,7 +262,14 @@ export default function Transaction(props: {
 					disabled: false,
 					url: URLS.explorerWrite(inputTxId),
 					view: () => <ProcessEditor processId={inputTxId} type={'write'} />,
-				}
+				},
+				{
+					label: language.source,
+					icon: ASSETS.code,
+					disabled: false,
+					url: URLS.explorerSource(inputTxId),
+					view: () => <ProcessSource processId={inputTxId} />,
+				},
 			);
 
 			if (arProvider.walletAddress && txResponse?.node?.owner?.address === arProvider.walletAddress) {
@@ -266,7 +278,7 @@ export default function Transaction(props: {
 					icon: ASSETS.console,
 					disabled: false,
 					url: URLS.explorerAOS(inputTxId),
-					view: () => <ConsoleInstance processId={inputTxId} active={true} />,
+					view: () => <ConsoleInstance processId={inputTxId} active={true} noWrapper />,
 				});
 			}
 		}

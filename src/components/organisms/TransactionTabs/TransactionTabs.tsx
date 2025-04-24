@@ -7,6 +7,7 @@ import { GQLNodeResponseType } from '@permaweb/libs';
 import { ViewWrapper } from 'app/styles';
 import { Button } from 'components/atoms/Button';
 import { IconButton } from 'components/atoms/IconButton';
+import { Modal } from 'components/atoms/Modal';
 import { ViewHeader } from 'components/atoms/ViewHeader';
 import { Transaction } from 'components/organisms/Transaction';
 import { ASSETS, URLS } from 'helpers/config';
@@ -35,6 +36,7 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 	});
 	const [activeTabIndex, setActiveTabIndex] = React.useState<number>(getInitialIndex());
 	const [isClearing, setIsClearing] = React.useState<boolean>(false);
+	const [showClearConfirmation, setShowClearConfirmation] = React.useState<boolean>(false);
 
 	React.useEffect(() => {
 		const { txId, subPath } = extractTxDetailsFromPath(location.pathname);
@@ -55,7 +57,6 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 
 			navigate(`${URLS[props.type]}${txId}${subPath}`);
 		}
-
 	}, [location.pathname]);
 
 	React.useEffect(() => {
@@ -131,7 +132,7 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 			}
 			return updated;
 		});
-		
+
 		const currentParts = window.location.hash.replace('#', '').split('/');
 		const currentRoute = currentParts[currentParts.length - 1];
 
@@ -153,6 +154,9 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 					break;
 				case 'aos':
 					toRoute = URLS.explorerAOS(newTx.node.id);
+					break;
+				case 'source':
+					toRoute = URLS.explorerSource(newTx.node.id);
 					break;
 				default:
 					break;
@@ -226,6 +230,7 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 		navigate(URLS[props.type], { replace: true });
 
 		setTimeout(() => setIsClearing(false), 50);
+		setShowClearConfirmation(false);
 	};
 
 	const tabs = React.useMemo(() => {
@@ -298,44 +303,73 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 	}
 
 	return (
-		<S.Wrapper>
-			<S.HeaderWrapper>
-				<ViewHeader
-					header={language[props.type]}
-					actions={[
-						<Button
-							type={'primary'}
-							label={language.newTab}
-							handlePress={() => handleAddTab()}
-							icon={ASSETS.add}
-							iconLeftAlign
-						/>,
-						<Button
-							type={'warning'}
-							label={language.clearTabs}
-							handlePress={() => handleClearTabs()}
-							icon={ASSETS.delete}
-							iconLeftAlign
-						/>,
-					]}
-				/>
-				<S.TabsWrapper>
-					<ViewWrapper>{tabs}</ViewWrapper>
-				</S.TabsWrapper>
-			</S.HeaderWrapper>
-			<ViewWrapper>
-				{!isClearing ? (
-					<>
-						{transactions.map((tx: TransactionTabType, index) => {
-							return (
-								<S.TransactionWrapper key={index} active={index === activeTabIndex}>
-									{getTab(tx, index)}
-								</S.TransactionWrapper>
-							)
-						})}
-					</>
-				) : null}
-			</ViewWrapper>
-		</S.Wrapper>
+		<>
+			<S.Wrapper>
+				<S.HeaderWrapper>
+					<ViewHeader
+						header={language[props.type]}
+						actions={[
+							<Button
+								type={'primary'}
+								label={language.newTab}
+								handlePress={() => handleAddTab()}
+								icon={ASSETS.add}
+								iconLeftAlign
+							/>,
+							<Button
+								type={'warning'}
+								label={language.clearTabs}
+								handlePress={() => setShowClearConfirmation(true)}
+								icon={ASSETS.delete}
+								iconLeftAlign
+							/>,
+						]}
+					/>
+					<S.TabsWrapper>
+						<ViewWrapper>{tabs}</ViewWrapper>
+					</S.TabsWrapper>
+				</S.HeaderWrapper>
+				<ViewWrapper>
+					{!isClearing ? (
+						<>
+							{transactions.map((tx: TransactionTabType, index) => {
+								return (
+									<S.TransactionWrapper key={index} active={index === activeTabIndex}>
+										{getTab(tx, index)}
+									</S.TransactionWrapper>
+								);
+							})}
+						</>
+					) : null}
+				</ViewWrapper>
+			</S.Wrapper>
+			{showClearConfirmation && (
+				<Modal header={language.clearTabs} handleClose={() => setShowClearConfirmation(false)}>
+					<S.ModalWrapper>
+						<S.ModalBodyWrapper>
+							<p>{language.tabsDeleteConfirmationInfo}</p>
+						</S.ModalBodyWrapper>
+						<S.ModalActionsWrapper>
+							<Button
+								type={'primary'}
+								label={language.cancel}
+								handlePress={() => setShowClearConfirmation(false)}
+								disabled={isClearing}
+							/>
+							<Button
+								type={'primary'}
+								label={language.clearTabs}
+								handlePress={() => handleClearTabs()}
+								disabled={false}
+								loading={isClearing}
+								icon={ASSETS.delete}
+								iconLeftAlign
+								warning
+							/>
+						</S.ModalActionsWrapper>
+					</S.ModalWrapper>
+				</Modal>
+			)}
+		</>
 	);
 }

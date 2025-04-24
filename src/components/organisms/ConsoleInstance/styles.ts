@@ -7,21 +7,33 @@ export const Wrapper = styled.div<{ noWrapper?: boolean }>`
 	height: ${(props) => props.noWrapper ? `calc(100vh - 145px)` : `calc(100vh - 195px)`};
 	width: 100%;
 	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 25px;
 `;
 
-export const ActionsWrapper = styled.div<{ noWrapper?: boolean }>`
+export const ActionsWrapper = styled.div<{ noWrapper?: boolean, fullScreenMode: boolean; }>`
 	position: absolute;
-	bottom: ${(props) => props.noWrapper ? '0' : '20px'};
-	right: ${(props) => props.noWrapper ? '0' : '20px'};
+	bottom: ${(props) => props.noWrapper && !props.fullScreenMode ? '0' : '20px'};
+	right: ${(props) => props.noWrapper && !props.fullScreenMode ? '0' : '20px'};
+
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
 
 	button {
 		padding: 3.5px 0 0 0 !important;
 	}
 `;
 
-export const Console = styled.div<{ noWrapper?: boolean }>`
+export const LoadWrapper = styled(ActionsWrapper)`
+	bottom: 20px;
+	right: 27.5px;
+`;
+
+export const Console = styled.div<{ noWrapper?: boolean, editorMode: boolean }>`
 	height: 100%;
-	width: 100%;
+	width: ${(props) => props.editorMode ? '50%' : '100%'};
 
 	.terminal {
 		padding: ${(props) => props.noWrapper ? '0' : '15px'};
@@ -42,7 +54,13 @@ export const Console = styled.div<{ noWrapper?: boolean }>`
 		height: 100% !important;
 		width: 100% !important;
 	}
-`
+`;
+
+export const Editor = styled.div`
+	height: 100%;
+	width: 50%;
+	position: relative;
+`;
 
 export const OptionsWrapper = styled.div`
 	height: 100%;

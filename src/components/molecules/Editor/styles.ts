@@ -41,7 +41,11 @@ export const ActionsWrapper = styled.div`
   gap: 20px;
   position: absolute;
   bottom: 20px;
-  right: 20px;
+  right: 32.5px;
+
+	button {
+		padding: 3.5px 0 0 0 !important;
+	}
 `
 
 export const ErrorWrapper = styled.div`
