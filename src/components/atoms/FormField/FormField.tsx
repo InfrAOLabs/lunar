@@ -63,7 +63,7 @@ export default function FormField(props: IProps) {
 						{props.endText && <S.EndText sm={props.sm}>{props.endText}</S.EndText>}
 					</S.EndTextContainer>
 				)}
-				{!props.hideErrorMessage && (
+				{!props.hideErrorMessage && props.invalid.message && (
 					<S.ErrorContainer>{props.invalid.message && <S.Error>{props.invalid.message}</S.Error>}</S.ErrorContainer>
 				)}
 			</S.Wrapper>

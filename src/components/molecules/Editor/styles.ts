@@ -21,7 +21,7 @@ export const Editor = styled.div`
   width: 100%;
   flex: 1;
   position: relative;
-	padding: 15px 0 0 0;
+	padding: 25px 0 0 0;
 	background: ${(props) => props.theme.colors.container.alt1.background};
   
   > div {

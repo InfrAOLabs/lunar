@@ -30,6 +30,7 @@ export default function Navigation(props: { open: boolean; toggle: () => void })
 	const [txOutputOpen, setTxOutputOpen] = React.useState<boolean>(false);
 	const [loadingTx, setLoadingTx] = React.useState<boolean>(false);
 	const [txResponse, setTxResponse] = React.useState<GQLNodeResponseType | null>(null);
+	const [panelOpen, setPanelOpen] = React.useState<boolean>(false);
 
 	const paths = React.useMemo(() => {
 		return [
@@ -95,74 +96,6 @@ export default function Navigation(props: { open: boolean; toggle: () => void })
 		})();
 	}, [inputTxId]);
 
-	// const handleNavigate = (e: React.MouseEvent<HTMLAnchorElement>, to: string) => {
-	// 	e.preventDefault();
-	// 	confirmNavigation(to);
-	// 	if (!desktop) props.toggle();
-	// };
-
-	// const navigationToggle = React.useMemo(() => {
-	// 	return (
-	// 		<S.ToggleWrapper>
-	// 			<IconButton
-	// 				type={props.open ? 'primary' : 'alt1'}
-	// 				src={ASSETS.navigation}
-	// 				handlePress={props.toggle}
-	// 				dimensions={{
-	// 					wrapper: 36.5,
-	// 					icon: 20,
-	// 				}}
-	// 				tooltip={props.open ? language.sidebarClose : language.sidebarOpen}
-	// 				tooltipPosition={props.open ? 'right' : 'bottom-left'}
-	// 			/>
-	// 		</S.ToggleWrapper>
-	// 	);
-	// }, [props.open, desktop]);
-
-	// const panel = React.useMemo(() => {
-	// 	const content = (
-	// 		<>
-	// 			<S.PanelHeader>{navigationToggle}</S.PanelHeader>
-	// 			<>
-	// 				<S.PanelContent open={props.open} className={'fade-in scroll-wrapper'}>
-	// 					{paths.map((element: { path: string; label: string; icon: string; target?: '_blank' }, index: number) => {
-	// 						return (
-	// 							<Link
-	// 								key={index}
-	// 								to={element.path}
-	// 								target={element.target || ''}
-	// 								onClick={(e) => handleNavigate(e, element.path)}
-	// 							>
-	// 								<ReactSVG src={element.icon} />
-	// 								{element.label}
-	// 							</Link>
-	// 						);
-	// 					})}
-	// 				</S.PanelContent>
-	// 			</>
-	// 		</>
-	// 	);
-
-	// 	if (desktop) {
-	// 		return (
-	// 			<S.Panel open={props.open} className={'fade-in'}>
-	// 				{content}
-	// 			</S.Panel>
-	// 		);
-	// 	} else {
-	// 		return (
-	// 			<>
-	// 				<S.Panel open={props.open} className={'fade-in'}>
-	// 					<CloseHandler active={props.open} disabled={!props.open} callback={() => props.toggle()}>
-	// 						{content}
-	// 					</CloseHandler>
-	// 				</S.Panel>
-	// 				<S.PanelOverlay open={props.open} />
-	// 			</>
-	// 		);
-	// 	}
-	// }, [props.open, desktop]);
-
 	const searchOutput = React.useMemo(() => {
 		if (loadingTx) {
 			return (
@@ -226,8 +159,7 @@ export default function Navigation(props: { open: boolean; toggle: () => void })
 
 	return (
 		<>
-			{/* {panel} */}
-			<S.Header navigationOpen={props.open} className={'fade-in'}>
+			<S.Header id={'navigation-header'} navigationOpen={props.open} className={'fade-in'}>
 				<S.Content>
 					<S.C1Wrapper>
 						<S.LogoWrapper>
@@ -263,29 +195,79 @@ export default function Navigation(props: { open: boolean; toggle: () => void })
 								{getSearch()}
 							</CloseHandler>
 						</S.DSearchWrapper>
-						<WalletConnect />
 						<S.MSearchWrapper>
+							<CloseHandler active={searchOpen} disabled={!searchOpen} callback={() => setSearchOpen(false)}>
+								<IconButton
+									type={'alt1'}
+									src={ASSETS.search}
+									handlePress={() => setSearchOpen((prev) => !prev)}
+									dimensions={{
+										wrapper: 36.5,
+										icon: 15.5,
+									}}
+								/>
+								{searchOpen && (
+									<S.MSearchContainer className={'border-wrapper-alt1'}>
+										<S.MSearchHeader>
+											<p>{language.search}</p>
+										</S.MSearchHeader>
+										{getSearch()}
+									</S.MSearchContainer>
+								)}
+							</CloseHandler>
+						</S.MSearchWrapper>
+						<S.MMenuWrapper>
 							<IconButton
 								type={'alt1'}
-								src={ASSETS.search}
-								handlePress={() => setSearchOpen((prev) => !prev)}
+								src={ASSETS.menu}
+								handlePress={() => setPanelOpen(true)}
 								dimensions={{
 									wrapper: 36.5,
-									icon: 15.5,
+									icon: 18.5,
 								}}
 							/>
-							{searchOpen && (
-								<S.MSearchContainer className={'border-wrapper-alt1'}>
-								<S.MSearchHeader>
-									<p>{language.search}</p>
-								</S.MSearchHeader>
-								{getSearch()}
-							</S.MSearchContainer>
-							)}
-						</S.MSearchWrapper>
+						</S.MMenuWrapper>
+						<WalletConnect />
 					</S.ActionsWrapper>
 				</S.Content>
 			</S.Header>
+			{panelOpen && (
+				<div className={'overlay'}>
+					<S.PWrapper className={'border-wrapper-primary'}>
+						<CloseHandler active={panelOpen} disabled={!panelOpen} callback={() => setPanelOpen(false)}>
+							<S.PMenu>
+								<S.PHeader>
+									<h4>{language.goTo}</h4>
+									<IconButton
+										type={'primary'}
+										src={ASSETS.close}
+										handlePress={() => setPanelOpen(false)}
+										dimensions={{
+											wrapper: 35,
+											icon: 20,
+										}}
+										tooltip={language.close}
+									/>
+								</S.PHeader>
+								<S.MNavWrapper>
+									{paths.map((element: { path: string; label: string; target?: '_blank' }, index: number) => {
+										return (
+											<Link
+												key={index}
+												to={element.path}
+												target={element.target || ''}
+												onClick={() => setPanelOpen(false)}
+											>
+												{element.label}
+											</Link>
+										);
+									})}
+								</S.MNavWrapper>
+							</S.PMenu>
+						</CloseHandler>
+					</S.PWrapper>
+				</div>
+			)}
 		</>
 	);
 }

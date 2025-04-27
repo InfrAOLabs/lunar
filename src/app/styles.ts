@@ -289,8 +289,8 @@ export const GlobalStyle = createGlobalStyle`
 			display: none;
 		}
 		
-			-ms-overflow-style: none;
-			scrollbar-width: none;
+		-ms-overflow-style: none;
+		scrollbar-width: none;
 		}
 `;
 
@@ -348,14 +348,27 @@ export const MessageWrapper = styled.div`
 export const Footer = styled.footer<{ navigationOpen: boolean }>`
 	width: 100%;
 	display: flex;
+	gap: 15px;
 	align-items: center;
+	justify-content: space-between;
 	padding: 0 0 20px 0;
 
 	p {
 		font-size: ${(props) => props.theme.typography.size.xSmall};
-		font-family: ${(props) => props.theme.typography.family.primary};
+		font-family: ${(props) => props.theme.typography.family.alt1};
 		font-weight: ${(props) => props.theme.typography.weight.bold};
-		color: ${(props) => props.theme.colors.font.alt1};
+		color: ${(props) => props.theme.colors.font.alt2};
+	}
+	
+	a {
+		font-size: ${(props) => props.theme.typography.size.xSmall};
+		font-family: ${(props) => props.theme.typography.family.alt1};
+		font-weight: ${(props) => props.theme.typography.weight.bold};
+		color: ${(props) => props.theme.colors.font.primary};
+
+		&:hover {
+			color: ${(props) => props.theme.colors.link.color} !important;
+		}
 	}
 
 	@media (max-width: ${STYLING.cutoffs.desktop}) {

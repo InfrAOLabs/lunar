@@ -79,7 +79,7 @@ export default function URLTabs(props: IUProps) {
 
 	return (
 		<S.Wrapper>
-			<S.TabsHeader useFixed={props.useFixed ? props.useFixed : false}>
+			<S.TabsHeader useFixed={props.useFixed ? props.useFixed : false} className={'scroll-wrapper'}>
 				<S.Tabs>
 					{props.tabs.map((elem, index) => {
 						const url = typeof elem.url === 'function' ? elem.url(id) : elem.url;

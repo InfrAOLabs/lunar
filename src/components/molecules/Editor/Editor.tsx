@@ -27,13 +27,12 @@ export default function _Editor(props: {
 	const themeName = currentTheme.scheme === 'dark' ? 'editorDark' : 'editorLight';
 
 	const [data, setData] = React.useState(props.initialData);
-	const [error, setError] = React.useState<string | null>(null);
 	const [fullScreenMode, setFullScreenMode] = React.useState<boolean>(false);
 
 	React.useEffect(() => {
 		setData(props.initialData);
 	}, [props.initialData]);
-	
+
 	React.useEffect(() => {
 		if (props.setEditorData) props.setEditorData(data);
 	}, [props.setEditorData, data]);
@@ -97,6 +96,16 @@ export default function _Editor(props: {
 			await document.exitFullscreen?.();
 		}
 	}, []);
+
+	React.useEffect(() => {
+			const onFullScreenChange = () => {
+				setFullScreenMode(!!document.fullscreenElement);
+			};
+			document.addEventListener('fullscreenchange', onFullScreenChange);
+			return () => {
+				document.removeEventListener('fullscreenchange', onFullScreenChange);
+			};
+		}, []);
 
 	React.useEffect(() => {
 		const onKeyDown = (e: KeyboardEvent) => {
@@ -174,6 +183,8 @@ export default function _Editor(props: {
 								wrapper: 25,
 								icon: 12.5,
 							}}
+							tooltip={fullScreenMode ? language.exitFullScreen : language.enterFullScreen}
+							tooltipPosition={'top-right'}
 						/>
 					)}
 				</S.ActionsWrapper>

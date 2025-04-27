@@ -5,11 +5,11 @@
 >
   <style type="text/css"><![CDATA[
     :root {
-      --icon-color: #222; /* light mode color */
+      --icon-color: #222;
     }
     @media (prefers-color-scheme: dark) {
       :root {
-        --icon-color: #eee; /* dark mode color */
+        --icon-color: #eee;
       }
     }
 

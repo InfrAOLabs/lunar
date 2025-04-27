@@ -9,6 +9,8 @@ export const ASSETS = {
 	app: getTxEndpoint('WzomcwfXZ_4hhUvDso1wsyJpNBHGeHezFZQv3V706Hw'),
 	arconnect: getTxEndpoint('-A1IutbyzVDJHi91QwRDQ_mpNa9Jbz-Tapu4YDVsCrc'),
 	arrow: getTxEndpoint('ghFL1fzQ2C1eEAnqSVvfAMP5Jikx7NKSPP5neoNPALw'),
+	arrowLeft: getTxEndpoint('p5Vs5ioDQhzqX2nX38ggTrVPcisJoqoVGfz5fGnPZRA'),
+	arrowRight: getTxEndpoint('_AjPYp5qwvMvNbjtu5AnLulKAsMZr28JujcW8hkNvJw'),
 	arrows: getTxEndpoint('9WYuWYKP1eE6kcmrW6IPCCnwqFvKX4DtWD0hVn2RRPo'),
 	article: getTxEndpoint('upm3OCUmKcVpgCP6QCsMDspuUovC4WamRXql4iaFo9A'),
 	checkmark: getTxEndpoint('mVnNwxm-F6CV043zVtORE-EaMWfd2j8w6HHX70IcVbI'),
@@ -73,19 +75,36 @@ export const ASSETS = {
 	users: getTxEndpoint('LfFkPVJBgBWgJwCtoceyS_EAyYa-r__AjAB5_JAx3aw'),
 	video: getTxEndpoint('T2astk8vaCBLLP8PD2rXgLKbwhNYkdHXllXvGbk-Wps'),
 	wallet: getTxEndpoint('_t97i0BzskALIFERWR6iDs_uX7U6bbd4-3Pqq3HDkfI'),
+	wander: getTxEndpoint('XQOALlQ0rLluskwDip0gcT3suhue1v7CdMFvIVuItoU'),
 	warning: getTxEndpoint('BASlMnOWcLCcLUSrO2wUybQL_06231dLONeVkdTWs3o'),
 	write: getTxEndpoint('SUWTk8Qtcub9EsP5PDF6-vzgKsP5Irg1bB9b8NImDDk'),
 	x: getTxEndpoint('8j0KOYorbeN1EI2_tO-o9tUYi4LJkDwFCDStu0sWMV8'),
 	youtube: getTxEndpoint('vEToNqLt0U4CXLW-u7DykeGNqFLfuzKWebnu_1d5FRs'),
 };
 
+export const TAGS = {
+	keys: {
+		onBoot: 'On-Boot',
+		type: 'Type'
+	},
+	values: {
+		eval: 'Eval',
+		info: 'Info',
+		balance: 'Balance',
+		transfer: 'Transfer',
+		debitNotice: 'Debit-Notice',
+		creditNotice: 'Credit-Notice',
+		process: 'Process'
+	}
+}
+
 export const DEFAULT_ACTIONS = {
-	eval: { name: 'Eval' },
-	info: { name: 'Info' },
-	balance: { name: 'Balance' },
-	transfer: { name: 'Transfer' },
-	debitNotice: { name: 'Debit-Notice' },
-	creditNotice: { name: 'Credit-Notice' },
+	eval: { name: TAGS.values.eval },
+	info: { name: TAGS.values.info },
+	balance: { name: TAGS.values.balance },
+	transfer: { name: TAGS.values.transfer },
+	debitNotice: { name: TAGS.values.debitNotice },
+	creditNotice: { name: TAGS.values.creditNotice },
 }
 
 export const DEFAULT_AO_TAGS = [
@@ -161,3 +180,9 @@ function createURLs() {
 }
 
 export const URLS = createURLs();
+
+export const LINKS = {
+	arweave: `https://arweave.org`,
+	ao: `https://ao.arweave.net`,
+	wander: `https://wander.app`
+}

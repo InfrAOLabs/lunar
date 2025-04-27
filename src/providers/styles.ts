@@ -19,11 +19,6 @@ export const WalletListItem = styled.button`
 	justify-content: center;
 	text-align: center;
 	padding: 15px;
-	img {
-		width: 30px;
-		border-radius: 50%;
-		margin: 0 0 10px 0;
-	}
 	span {
 		color: ${(props) => props.theme.colors.font.primary};
 		font-size: ${(props) => props.theme.typography.size.base};
@@ -32,6 +27,18 @@ export const WalletListItem = styled.button`
 	}
 	&:hover {
 		background: ${(props) => props.theme.colors.container.primary.active};
+	}
+`;
+
+export const WalletLogo = styled.div`
+	height: 35px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	img {
+		width: 30px;
+		border-radius: 50%;
+		margin: 0 0 10px 0;
 	}
 `;
 

@@ -28,7 +28,11 @@ export default function Landing() {
 	return (
 		<S.Wrapper>
 			<S.HeaderWrapper>
-				<ViewHeader header={language.network} />
+				<ViewHeader header={language.network} actions={[
+					<S.Subheader>
+						<span>AO Legacynet</span>
+					</S.Subheader>
+				]} />
 			</S.HeaderWrapper>
 			<ViewWrapper>
 				<S.BodyWrapper>

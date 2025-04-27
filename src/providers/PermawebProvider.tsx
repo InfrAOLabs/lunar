@@ -12,7 +12,7 @@ import { useArweaveProvider } from './ArweaveProvider';
 import { useLanguageProvider } from './LanguageProvider';
 
 interface PermawebContextState {
-	ao: any;
+	deps: { ao: any, arweave: any, signer: any };
 	libs: any;
 	profile: ProfileType;
 	showProfileManager: boolean;
@@ -21,7 +21,7 @@ interface PermawebContextState {
 }
 
 const DEFAULT_CONTEXT = {
-	ao: null,
+	deps: null,
 	libs: null,
 	profile: null,
 	showProfileManager: false,
@@ -35,14 +35,13 @@ export function usePermawebProvider(): PermawebContextState {
 	return React.useContext(PermawebContext);
 }
 
-// TODO: Reset profile on arProvider.wallet change / disconnect
 export function PermawebProvider(props: { children: React.ReactNode }) {
 	const arProvider = useArweaveProvider();
 	const languageProvider = useLanguageProvider();
 	const language = languageProvider.object[languageProvider.current];
 
 	const [libs, setLibs] = React.useState<any>(null);
-	const [ao, setAo] = React.useState<any>(null);
+	const [deps, setDeps] = React.useState<any>(null);
 
 	const [profile, setProfile] = React.useState<ProfileType | null>(null);
 	const [showProfileManager, setShowProfileManager] = React.useState<boolean>(false);
@@ -52,9 +51,11 @@ export function PermawebProvider(props: { children: React.ReactNode }) {
 		const ao = connect({ MODE: 'legacy' });
 		const arweave = Arweave.init({});
 		const signer = arProvider.wallet ? createSigner(arProvider.wallet) : null;
+
+		const depsToUse = { ao, arweave, signer };
 		
-		setAo(ao);
-		setLibs(PermawebLibs.init({ ao, arweave, signer }));
+		setDeps(depsToUse)
+		setLibs(PermawebLibs.init(depsToUse));
 	}, [arProvider.wallet]);
 
 	React.useEffect(() => {
@@ -72,6 +73,9 @@ export function PermawebProvider(props: { children: React.ReactNode }) {
 				} catch (e: any) {
 					console.error(e);
 				}
+			}
+			else {
+				setProfile(null);
 			}
 		})();
 	}, [arProvider.wallet, arProvider.walletAddress]);
@@ -125,7 +129,7 @@ export function PermawebProvider(props: { children: React.ReactNode }) {
 	return (
 		<PermawebContext.Provider
 			value={{
-				ao: ao,
+				deps: deps,
 				libs: libs,
 				profile: profile,
 				showProfileManager,

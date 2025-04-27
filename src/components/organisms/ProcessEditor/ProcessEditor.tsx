@@ -2,14 +2,17 @@ import React from 'react';
 
 import { JSONReader } from 'components/molecules/JSONReader';
 import { JSONWriter } from 'components/molecules/JSONWriter';
+import { useArweaveProvider } from 'providers/ArweaveProvider';
 import { useLanguageProvider } from 'providers/LanguageProvider';
 import { usePermawebProvider } from 'providers/PermawebProvider';
+import { WalletBlock } from 'wallet/WalletBlock';
 
 import * as S from './styles';
 
 export default function ProcessEditor(props: { processId: string; type: 'read' | 'write' }) {
 	const permawebProvider = usePermawebProvider();
-
+	const arProvider = useArweaveProvider();
+	
 	const languageProvider = useLanguageProvider();
 	const language = languageProvider.object[languageProvider.current];
 
@@ -26,15 +29,45 @@ export default function ProcessEditor(props: { processId: string; type: 'read' |
 		}
 	}, []);
 
-	async function handleSubmit(query: object) {
+	async function handleSubmit(message: object) {
 		setLoading(true);
+
+		let messageToSend: any = { ...message };
+		let connectFn: (message: object) => any;
+
+		switch (props.type) {
+			case 'read':
+				connectFn = permawebProvider.deps.ao.dryrun;
+				break;
+			case 'write':
+				connectFn = permawebProvider.deps.ao.message;
+				messageToSend.signer = permawebProvider.deps.signer;
+				break;
+		}
+
 		try {
-			const response = await permawebProvider.ao.dryrun(query);
-			setOutput(response);
+			const response = await connectFn(messageToSend);
+
+			switch (props.type) {
+				case 'read':
+					setOutput(response);
+					break;
+				case 'write':
+					const result = await permawebProvider.deps.ao.result({
+						process: messageToSend.process,
+						message: response
+					});
+					setOutput(result)
+					break;
+			}
 		} catch (e: any) {
 			console.error(e);
 		}
 		setLoading(false);
+	}
+
+	if (props.type === 'write' && !arProvider.wallet) {
+		return <WalletBlock />
 	}
 
 	return (
@@ -51,7 +84,7 @@ export default function ProcessEditor(props: { processId: string; type: 'read' |
 							},
 						],
 					}}
-					handleSubmit={handleSubmit}
+					handleSubmit={(message: object) => handleSubmit(message)}
 					loading={loading}
 				/>
 			</S.EditorWrapper>

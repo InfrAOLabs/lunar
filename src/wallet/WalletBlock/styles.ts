@@ -6,8 +6,8 @@ export const Wrapper = styled.div`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	margin: 0 auto;
-	padding: 20px 20px;
+	margin: 40px auto 0 auto;
+	padding: 20px;
 	animation: ${open} ${transition3};
 	p {
 		font-size: ${(props) => props.theme.typography.size.xSmall};

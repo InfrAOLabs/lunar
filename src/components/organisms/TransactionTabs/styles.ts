@@ -11,10 +11,14 @@ export const Wrapper = styled.div`
 
 export const HeaderWrapper = styled.div`
 	width: 100%;
+	background: ${(props) => props.theme.colors.container.alt1.background};
 `;
 
 export const TabsWrapper = styled.div`
 	width: 100%;
+	display: flex;
+	align-items: center;
+	position: relative;
 `;
 
 export const BodyWrapper = styled.div`
@@ -25,18 +29,13 @@ export const TabsContent = styled.div`
 	width: 100%;
 	display: flex;
 	align-items: center;
-	gap: 20px;
 	position: relative;
+	z-index: 0;
 	white-space: nowrap;
 	overflow-x: auto;
 	overflow-y: hidden;
-	border: 1px solid ${(props) => props.theme.colors.border.primary};
-	background: ${(props) => props.theme.colors.container.alt1.background};
-	border-radius: ${STYLING.dimensions.radius.alt2};
-`;
+	padding: 0 1px 1.5px 1px;
 
-export const TabHeader = styled.div`
-	position: relative;
 `;
 
 export const TabDivider = styled.div`
@@ -76,13 +75,17 @@ export const TabAction = styled.div<{ active: boolean }>`
 		props.active ? props.theme.colors.font.primary : props.theme.colors.font.alt3};
 	cursor: pointer;
 	position: relative;
+	z-index: 1;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	gap: 12.5px;
-	padding: 10px 20px 10px 16.5px;
-	border-top-left-radius: ${STYLING.dimensions.radius.primary};
-	border-top-right-radius: ${STYLING.dimensions.radius.primary};
+	padding: 12.5px 25.5px 10.5px 21.5px;
+    margin: 0 0 -1.5px 0;
+	background: ${(props) => props.active ? props.theme.colors.view.background : 'transparent'};
+	border-bottom: 1px solid ${(props) => props.active ? 'transparent' : props.theme.colors.border.primary};
+	border-top: 2px solid ${(props) => props.active ? props.theme.colors.border.alt5 : 'transparent'};
+
 	white-space: nowrap;
 	transition: all 100ms;
 	
@@ -153,25 +156,66 @@ export const TabAction = styled.div<{ active: boolean }>`
 		}
 	}
 
+	&:before {
+		display: block;
+		content: '';
+		position: absolute;
+		z-index: 1;
+		left: 0;
+		transform: translate(-50%, 0);
+		top: 0;
+		background: ${(props) => props.active ? props.theme.colors.border.primary : 'transparent'};
+		height: 100%;
+		width: 1px;
+		pointer-events: none;
+	}
+	
 	&:after {
 		display: block;
 		content: '';
 		position: absolute;
 		z-index: 1;
-		left: 50%;
+		right: -1px;
 		transform: translate(-50%, 0);
-		bottom: -1.5px;
-		background: ${(props) =>
-		props.active ? props.theme.colors.tabs.active.background : 'transparent'};
-		height: 3.5px;
-		border-radius: ${STYLING.dimensions.radius.primary};
-		width: calc(100% - 30.5px);
+		top: 0;
+		background: ${(props) => props.active ? props.theme.colors.border.primary : 'transparent'};
+		height: 100%;
+		width: 1px;
 		pointer-events: none;
 	}
 `;
 
+export const NewTab = styled(TabAction)`
+	border-bottom: 1px solid ${(props) => props.theme.colors.border.primary} !important;
+`;
+
+export const Placeholder = styled.div`
+	height: 1px;
+	flex: 1;
+	margin: auto 0 -1.5px 0;
+	border-bottom: 1px solid ${(props) => props.theme.colors.border.primary};
+`;
+
+export const PlaceholderFull = styled(Placeholder)`
+  margin: auto -26.5px 0 -26.5px;
+
+  @media (max-width: ${STYLING.cutoffs.initial}) {
+    margin: auto -14.5px 0 -14.5px;
+
+    /* target this element when id="placeholder-start" */
+    &[id='placeholder-start'] {
+      margin: auto -15.5px 0 0;
+    }
+
+    /* target this element when id="placeholder-end" */
+    &[id='placeholder-end'] {
+      margin: auto 0 0 -15.5px;
+    }
+  }
+`;
+
 export const TransactionWrapper = styled.div<{ active: boolean }>`
-	display: ${(props) => props.active ? 'block' : 'none'}
+	display: ${(props) => props.active ? 'block' : 'none'};
 `;
 
 export const ModalWrapper = styled.div`

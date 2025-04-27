@@ -10,7 +10,7 @@ import { URLTabs } from 'components/atoms/URLTabs';
 import { MessageList } from 'components/molecules/MessageList';
 import { MessageResult } from 'components/molecules/MessageResult';
 import { ProcessRead } from 'components/molecules/ProcessRead';
-import { ASSETS, DEFAULT_AO_TAGS, URLS } from 'helpers/config';
+import { ASSETS, DEFAULT_AO_TAGS, TAGS, URLS } from 'helpers/config';
 import { TransactionType } from 'helpers/types';
 import { checkValidAddress, formatCount, formatDate, getByteSizeDisplay, getTagValue } from 'helpers/utils';
 import { useArweaveProvider } from 'providers/ArweaveProvider';
@@ -23,7 +23,6 @@ import { ProcessSource } from '../ProcessSource';
 
 import * as S from './styles';
 
-// TODO: Rerendering on wallet change
 export default function Transaction(props: {
 	txId: string;
 	type: TransactionType;
@@ -117,7 +116,6 @@ export default function Transaction(props: {
 		);
 	};
 
-	// TODO: Process write
 	const TABS = React.useMemo(() => {
 		const tabs = [
 			{
@@ -205,11 +203,11 @@ export default function Transaction(props: {
 											</S.MessageInfoLine>
 											<S.MessageInfoLine>
 												<span>{`${language.blockHeight}: `}</span>
-												<p>{formatCount(txResponse?.node?.block?.height.toString())}</p>
+												<p>{txResponse?.node?.block?.height ? formatCount(txResponse?.node?.block?.height.toString()) : '-'}</p>
 											</S.MessageInfoLine>
 											<S.MessageInfoLine>
 												<span>{`${language.timestamp}: `}</span>
-												<p>{txResponse?.node?.block?.timestamp}</p>
+												<p>{txResponse?.node?.block?.timestamp ?? '-'}</p>
 											</S.MessageInfoLine>
 											<S.MessageInfoLine>
 												<span>{`${language.size}: `}</span>
@@ -268,7 +266,7 @@ export default function Transaction(props: {
 					icon: ASSETS.code,
 					disabled: false,
 					url: URLS.explorerSource(inputTxId),
-					view: () => <ProcessSource processId={inputTxId} />,
+					view: () => <ProcessSource processId={inputTxId} onBoot={getTagValue(txResponse?.node?.tags, TAGS.keys.onBoot)} />,
 				},
 			);
 

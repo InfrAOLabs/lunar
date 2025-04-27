@@ -4,11 +4,12 @@ import { Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 
 import { Button } from 'components/atoms/Button';
+import { FormField } from 'components/atoms/FormField';
 import { IconButton } from 'components/atoms/IconButton';
 import { Loader } from 'components/atoms/Loader';
 import { Notification } from 'components/atoms/Notification';
 import { Editor } from 'components/molecules/Editor';
-import { ASSETS } from 'helpers/config';
+import { ASSETS, TAGS } from 'helpers/config';
 import { GQLNodeResponseType } from 'helpers/types';
 import { checkValidAddress, formatAddress, getTagValue } from 'helpers/utils';
 import { useArweaveProvider } from 'providers/ArweaveProvider';
@@ -36,21 +37,32 @@ export default function ConsoleInstance(props: {
 	const promptRef = React.useRef(null);
 	const loadingRef = React.useRef(false);
 	const consoleRef = React.useRef(null);
+
 	const terminalRef = React.useRef(null);
-	const termInstance = React.useRef(null);
+	const logsRef = React.useRef(null);
+	const hasConnectedRef = React.useRef(false);
+	const terminalInstance = React.useRef(null);
+	const logsInstance = React.useRef(null);
 	const fitAddon = React.useRef<FitAddon | null>(null);
 
-	const [inputProcessId, setInputProcessId] = React.useState<string>(props.processId);
+	const [inputProcessId, setInputProcessId] = React.useState<string>(props.processId ?? '');
 	const [loadingTx, setLoadingTx] = React.useState<boolean>(false);
 	const [txResponse, setTxResponse] = React.useState<GQLNodeResponseType | null>(null);
 	const [loadingOptions, setLoadingOptions] = React.useState<boolean>(false);
 	const [txOptions, setTxOptions] = React.useState<GQLNodeResponseType[] | null>(null);
 
 	const [prompt, setPrompt] = React.useState<string>('> ');
+	const [hasConnected, setHasConnected] = React.useState<boolean>(false);
 	const [fullScreenMode, setFullScreenMode] = React.useState<boolean>(false);
 	const [editorMode, setEditorMode] = React.useState<boolean>(false);
 	const [editorData, setEditorData] = React.useState<string>('');
 	const [error, setError] = React.useState<string | null>(null);
+	const [showResults, setShowResults] = React.useState<boolean>(true);
+
+	const [pageCursor, setPageCursor] = React.useState<string | null>(null);
+	const [cursorHistory, setCursorHistory] = React.useState([]);
+	const [nextCursor, setNextCursor] = React.useState<string | null>(null);
+	const [perPage, _setPerPage] = React.useState<number>(10);
 
 	const [loadingMessage, setLoadingMessage] = React.useState<boolean>(false);
 
@@ -64,36 +76,43 @@ export default function ConsoleInstance(props: {
 	}, []);
 
 	React.useEffect(() => {
-		const onKeyDown = (e: KeyboardEvent) => {
-			if (e.ctrlKey && (e.key === 'e' || e.key === 'E')) {
-				e.preventDefault();
-				setEditorMode((prev) => !prev);
+		if (terminalInstance.current) {
+			if (editorMode) {
+				terminalInstance.current.write(
+					`\r\n\r\n\x1b[90mEditor Open: Hit the checkmark or (Ctrl + L) to evaluate\x1b[0m`
+				);
+				hideCursor();
+				loadingRef.current = true;
+			} else {
+				clearLine();
+				showCursor();
+				terminalInstance.current.write(promptRef.current);
+				loadingRef.current = false;
 			}
-		};
-
-		window.addEventListener('keydown', onKeyDown, true);
-		return () => {
-			window.removeEventListener('keydown', onKeyDown, true);
-		};
-	}, []);
-
-	React.useEffect(() => {
-		if (editorMode && termInstance.current) {
-			termInstance.current.write(`\r\n\r\n\x1b[90mEditor Open: Hit the checkmark or (Ctrl + L) to evaluate\x1b[0m`);
-			termInstance.current.write('\x1b[?25l');
-			loadingRef.current = true;
-		} else {
-			loadingRef.current = false;
 		}
-	}, [editorMode]);
 
-	React.useEffect(() => {
 		loadingRef.current = editorMode;
 	}, [editorMode]);
 
 	React.useEffect(() => {
 		promptRef.current = prompt;
 	}, [prompt]);
+
+	React.useEffect(() => {
+		if (hasConnected) {
+			const onKeyDown = (e: KeyboardEvent) => {
+				if (e.ctrlKey && (e.key === 'e' || e.key === 'E')) {
+					e.preventDefault();
+					setEditorMode((prev) => !prev);
+				}
+			};
+	
+			window.addEventListener('keydown', onKeyDown, true);
+			return () => {
+				window.removeEventListener('keydown', onKeyDown, true);
+			};
+		}
+	}, [hasConnected]);
 
 	React.useEffect(() => {
 		const onFullScreenChange = () => {
@@ -104,6 +123,18 @@ export default function ConsoleInstance(props: {
 			document.removeEventListener('fullscreenchange', onFullScreenChange);
 		};
 	}, []);
+
+	React.useEffect(() => {
+		if (!terminalRef.current || !fitAddon.current) return;
+		const ro = new ResizeObserver(() => {
+			fitAddon.current!.fit();
+		});
+		ro.observe(terminalRef.current);
+
+		return () => {
+			ro.disconnect();
+		};
+	}, [editorMode, showResults]);
 
 	React.useEffect(() => {
 		const onKeyDown = (e: KeyboardEvent) => {
@@ -134,14 +165,6 @@ export default function ConsoleInstance(props: {
 	}, [editorMode, editorData]);
 
 	React.useEffect(() => {
-		if (consoleRef.current && props.active) {
-			setTimeout(() => {
-				consoleRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-			}, 10);
-		}
-	}, [props.active]);
-
-	React.useEffect(() => {
 		(async function () {
 			if (props.active) {
 				if (inputProcessId && checkValidAddress(inputProcessId)) {
@@ -165,12 +188,15 @@ export default function ConsoleInstance(props: {
 					if (arProvider.walletAddress) {
 						setLoadingOptions(true);
 						try {
-							const response = await permawebProvider.libs.getAggregatedGQLData({
+							const gqlResponse = await permawebProvider.libs.getGQLData({
 								owners: [arProvider.walletAddress],
-								tags: [{ name: 'Type', values: ['Process'] }],
+								tags: [{ name: TAGS.keys.type, values: [TAGS.values.process] }],
+								paginator: perPage,
+								...(pageCursor ? { cursor: pageCursor } : {}),
 							});
 
-							setTxOptions(response);
+							setTxOptions(gqlResponse.data);
+							setNextCursor(gqlResponse.data.length >= perPage ? gqlResponse.nextCursor : null);
 						} catch (e: any) {
 							setError(e.message ?? language.errorOccurred);
 						}
@@ -179,24 +205,26 @@ export default function ConsoleInstance(props: {
 				}
 			}
 		})();
-	}, [inputProcessId, arProvider.walletAddress, props.active]);
+	}, [inputProcessId, pageCursor, arProvider.walletAddress, props.active]);
 
 	React.useEffect(() => {
 		(async function () {
 			if (props.active && terminalRef.current && arProvider.wallet && checkValidAddress(inputProcessId)) {
-				fitAddon.current = new FitAddon();
 				await document.fonts.ready;
 
-				termInstance.current = new Terminal({
+				terminalInstance.current = new Terminal({
 					cursorBlink: false,
 					fontFamily: theme.typography.family.alt2,
 					fontSize: 13,
-					fontWeight: 600,
+					fontWeight: 700,
 					theme: getTheme(theme),
 				});
 
-				termInstance.current.loadAddon(fitAddon.current);
-				termInstance.current.open(terminalRef.current);
+				const addon = new FitAddon();
+				fitAddon.current = addon;
+
+				terminalInstance.current.loadAddon(fitAddon.current);
+				terminalInstance.current.open(terminalRef.current);
 				fitAddon.current.fit();
 
 				const handleResize = () => {
@@ -205,31 +233,47 @@ export default function ConsoleInstance(props: {
 
 				window.addEventListener('resize', handleResize);
 
-				termInstance.current.write(`\x1b[32mWelcome to AOS\x1b[0m\r\n\r\n`);
-				termInstance.current.write(`\x1b[90mOpen the editor with: (Ctrl + E) or '.editor'\x1b[0m\r\n\r\n`);
-				termInstance.current.write(`\x1b[90mProcess ID:\x1b[0m \x1b[32m${inputProcessId}\x1b[0m\r\n`);
+				terminalInstance.current.write(`\x1b[32mWelcome to AOS\x1b[0m\r\n\r\n`);
+				terminalInstance.current.write(`\x1b[90mProcess ID:\x1b[0m \x1b[32m${inputProcessId}\x1b[0m\r\n\r\n`);
+				terminalInstance.current.write(`\x1b[90mToggle the editor with: (Ctrl + E) or '.editor'\x1b[0m\r\n`);
+				terminalInstance.current.write(`\r\n\x1b[32mPress Enter\x1b[0m\r\n`);
 
-				await sendMessage(null, 'prompt');
+				hideCursor();
+				terminalInstance.current.focus();
 
 				let commandBuffer = '';
 				let cursorPosition = 0;
 				const commandHistory: string[] = [];
+
 				let historyIndex: number = commandHistory.length;
+				let currentRow = 1;
+				let isCurrentlyWrapped = false;
 
 				const refreshLine = () => {
-					const currentPrompt = promptRef.current;
-					termInstance.current.write(`\x1b[2K\r${currentPrompt}${commandBuffer}`);
-					const moveLeftCount = currentPrompt.length + commandBuffer.length - (currentPrompt.length + cursorPosition);
+					const term = terminalInstance.current!;
+					const rawPrompt = promptRef.current;
+					const cleanPrompt = stripAnsi(rawPrompt);
+
+					if (isCurrentlyWrapped) {
+						// grab exactly the slice for the wrapped row you’re on
+						const sliceStart = term.cols * (currentRow - 1);
+						const wrappedLine = (cleanPrompt + commandBuffer).slice(sliceStart, sliceStart + term.cols);
+						term.write(`\x1b[2K\r${wrappedLine}`);
+					} else {
+						term.write(`\x1b[2K\r${rawPrompt}${commandBuffer}`);
+					}
+
+					const moveLeftCount = cleanPrompt.length + commandBuffer.length - (cleanPrompt.length + cursorPosition);
 					if (moveLeftCount > 0) {
-						termInstance.current.write(`\x1b[${moveLeftCount}D`);
+						terminalInstance.current.write(`\x1b[${moveLeftCount}D`);
 					}
 				};
 
-				termInstance.current.onData(async (data: string) => {
+				terminalInstance.current.onData(async (data: string) => {
 					if (loadingRef.current) return;
 
 					/* Arrow / Control Sequences */
-					if (data.startsWith('\x1b')) {
+					if (data.startsWith('\x1b') && hasConnectedRef.current) {
 						switch (data) {
 							case '\x1b[A' /* Up */:
 								historyIndex = Math.max(0, historyIndex - 1);
@@ -262,48 +306,223 @@ export default function ConsoleInstance(props: {
 
 					/* Enter */
 					if (data === '\r') {
-						if (commandBuffer.trim()) {
-							commandHistory.push(commandBuffer.trim());
-							historyIndex = commandHistory.length;
-							
-							await resolveCommand(commandBuffer);
+						if (!hasConnectedRef.current) {
+							hasConnectedRef.current = true;
+							setHasConnected(true);
+							await sendMessage(null, 'prompt');
+							return;
+						} else {
+							if (commandBuffer.trim()) {
+								commandHistory.push(commandBuffer.trim());
+								historyIndex = commandHistory.length;
+								await resolveCommand(commandBuffer);
+							} else {
+								terminalInstance.current.write(`\r\n${promptRef.current}`);
+							}
+							commandBuffer = '';
+							cursorPosition = 0;
+							currentRow = 1;
+							isCurrentlyWrapped = false;
+							return;
 						}
-						commandBuffer = '';
-						cursorPosition = 0;
-						return;
 					}
 
-					/* Backspace */
 					if (data === '\u007F') {
 						if (cursorPosition > 0) {
+							// 1) Splice out the char and bump cursorPosition
 							commandBuffer = commandBuffer.slice(0, cursorPosition - 1) + commandBuffer.slice(cursorPosition);
 							cursorPosition--;
+
+							// 2) Recompute wrap state
+							const rawPrompt = promptRef.current;
+							const cleanPrompt = stripAnsi(rawPrompt);
+							const cols = terminalInstance.current.cols;
+							const totalLength = cleanPrompt.length + commandBuffer.length;
+
+							// zero-based wrap row: 0 = no wrap, 1 = second physical row, etc.
+							const newRow = Math.floor(totalLength / cols);
+							currentRow = newRow + 1; // since you were using 1-based
+							isCurrentlyWrapped = totalLength > cols; // true once we exceed one line
+
+							// 3) Delegate to your existing renderer
 							refreshLine();
 						}
 						return;
 					}
 
-					/* Insert at cursor position, bump cursor, and redraw */
-					commandBuffer = commandBuffer.slice(0, cursorPosition) + data + commandBuffer.slice(cursorPosition);
-					cursorPosition++;
-					refreshLine();
+					/* Insert */
+					if (hasConnectedRef.current) {
+						commandBuffer = commandBuffer.slice(0, cursorPosition) + data + commandBuffer.slice(cursorPosition);
+						cursorPosition++;
+
+						const rawPrompt = promptRef.current;
+						const cleanPrompt = stripAnsi(rawPrompt);
+						const hasWrapped = cleanPrompt.length + commandBuffer.length > terminalInstance.current.cols * currentRow;
+
+						if (hasWrapped) {
+							const combined = cleanPrompt + commandBuffer;
+							const currentLine = combined.substring(terminalInstance.current.cols * currentRow);
+
+							terminalInstance.current.write(`\r\n${currentLine}`);
+
+							currentRow++;
+							isCurrentlyWrapped = true;
+
+							return;
+						} else refreshLine();
+					}
 				});
 			}
 		})();
 
 		return () => {
-			if (termInstance.current) {
-				termInstance.current.dispose();
+			if (terminalInstance.current) {
+				terminalInstance.current.dispose();
 			}
 		};
 	}, [props.active, inputProcessId, permawebProvider.libs]);
 
+	function stripAnsi(input: string): string {
+		return input.replace(/\x1b\[[0-9;]*[A-Za-z]/g, '');
+	}
+
 	React.useEffect(() => {
-		if (termInstance.current) {
-			termInstance.current.options.theme = getTheme(theme);
-			termInstance.current.refresh(0, termInstance.current.rows - 1);
+		if (!arProvider.walletAddress || !txResponse) return;
+		const hasAccess = txResponse?.node?.owner?.address === arProvider.walletAddress;
+		if (terminalInstance.current) {
+			terminalInstance.current.options.disableStdin = !hasAccess;
+
+			if (!hasAccess) {
+				terminalInstance.current.write(`\r\n\x1b[91mYou do not have access to connect to this process\x1b[0m\r\n`);
+			}
+		}
+	}, [arProvider.walletAddress, txResponse]);
+
+	React.useEffect(() => {
+		if (!showResults || !hasConnected) return;
+
+		if (!logsInstance.current) {
+			logsInstance.current = new Terminal({
+				cursorBlink: false,
+				fontFamily: theme.typography.family.alt2,
+				fontSize: 13,
+				fontWeight: 700,
+				theme: getTheme(theme),
+			});
+			logsInstance.current.loadAddon(fitAddon.current);
+			logsInstance.current.writeln('\x1b[90mResults\x1b[0m');
+			logsInstance.current.options.disableStdin = true;
+			hideCursor(logsInstance);
+		}
+
+		// now that the logsRef DOM node is there, open it and fit:
+		if (logsRef.current) {
+			logsInstance.current.open(logsRef.current);
+			// fitAddon.current.fit();
+			// optional: clear & re‐write “Results” header
+			// logsInstance.current.clear();
+			// logsInstance.current.writeln('\r\n\x1b[90mResults\x1b[0m');
+		}
+
+		fitAddon.current.fit();
+
+		return () => {
+			if (logsInstance.current) {
+				logsInstance.current.dispose();
+			}
+		};
+	}, [showResults, hasConnected]);
+
+	React.useEffect(() => {
+		if (!props.active || !inputProcessId || !arProvider.walletAddress || !txResponse || !hasConnected || !showResults) {
+			return;
+		}
+
+		const hasAccess = txResponse.node.owner.address === arProvider.walletAddress;
+		if (!hasAccess) {
+			return;
+		}
+
+		let cursor: string | null = null;
+		let canceled = false;
+		let isFirstIteration = true;
+
+		(async function () {
+			const args: any = {
+				process: inputProcessId,
+				sort: 'DESC',
+				limit: 1000,
+			};
+
+			while (!canceled) {
+				if (cursor) {
+					args.from = cursor;
+				}
+
+				try {
+					const results = await permawebProvider.deps.ao.results(args);
+
+					if (results?.edges?.length) {
+						const newEdges = results.edges
+							.filter((e) => e.node?.Output?.print)
+							.sort((a, b) => JSON.parse(atob(a.cursor)).ordinate - JSON.parse(atob(b.cursor)).ordinate);
+
+						if (newEdges.length) {
+							if (isFirstIteration) {
+								/* On the very first run only bump the cursor */
+								cursor = newEdges[newEdges.length - 1].cursor;
+								isFirstIteration = false;
+							} else {
+								newEdges.forEach((edge) => {
+									const term = logsInstance.current!;
+									const lines = edge.node.Output.data.split('\n');
+
+									lines.forEach((line) => {
+										term.write('\x1b[2K\r');
+										term.writeln(line);
+									});
+								});
+
+								const lastEdge = newEdges[newEdges.length - 1];
+
+								cursor = lastEdge.cursor;
+								const newPrompt = lastEdge.node.Output.prompt ?? promptRef.current;
+								setPrompt(newPrompt);
+								terminalInstance.current.write(`\x1b[2K\r${newPrompt}`);
+							}
+						}
+					}
+				} catch (e) {
+					console.error(e);
+				}
+
+				await new Promise((r) => setTimeout(r, 2000));
+			}
+		})();
+
+		return () => {
+			canceled = true;
+		};
+	}, [props.active, inputProcessId, arProvider.walletAddress, txResponse, hasConnected, showResults]);
+
+	React.useEffect(() => {
+		if (terminalInstance.current) {
+			terminalInstance.current.options.theme = getTheme(theme);
+			terminalInstance.current.refresh(0, terminalInstance.current.rows - 1);
+		}
+		if (logsInstance.current) {
+			logsInstance.current.options.theme = getTheme(theme);
+			logsInstance.current.refresh(0, logsInstance.current.rows - 1);
 		}
 	}, [theme]);
+
+	// React.useEffect(() => {
+	// 	if (consoleRef.current && props.active) {
+	// 		setTimeout(() => {
+	// 			consoleRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+	// 		}, 10);
+	// 	}
+	// }, [props.active]);
 
 	function handleEditorSend() {
 		if (editorData) sendMessage(editorData);
@@ -312,15 +531,15 @@ export default function ConsoleInstance(props: {
 	async function resolveCommand(data: string | null) {
 		if (data.startsWith('.')) {
 			const command = data.substring(1);
-			
-			switch(command) {
+
+			switch (command) {
 				case 'editor':
 					setEditorMode((prev) => !prev);
 					return;
 				default:
-					termInstance.current.write(`\r\n\x1b[91mCommand Not Supported\x1b[0m\r\n`);
-					termInstance.current.write('\r');
-					termInstance.current.write(promptRef.current);
+					terminalInstance.current.write(`\r\n\x1b[91mCommand Not Supported\x1b[0m\r\n`);
+					terminalInstance.current.write('\r');
+					terminalInstance.current.write(promptRef.current);
 					return;
 			}
 		}
@@ -329,7 +548,7 @@ export default function ConsoleInstance(props: {
 	}
 
 	async function sendMessage(data: string | null, outputType?: 'data' | 'prompt') {
-		if (termInstance.current) {
+		if (terminalInstance.current) {
 			startLoader();
 
 			try {
@@ -340,12 +559,10 @@ export default function ConsoleInstance(props: {
 					useRawData: true,
 				});
 
-				const response = await permawebProvider.ao.result({
+				const response = await permawebProvider.deps.ao.result({
 					process: inputProcessId,
 					message: message,
 				});
-
-				console.log(response);
 
 				stopLoader();
 
@@ -369,26 +586,27 @@ export default function ConsoleInstance(props: {
 					}
 
 					const sanitizedOutput = rawOutput.toString().replace(/\t/g, '  ');
-					termInstance.current.write('\r\x1b[2K');
+					clearLine();
 
 					sanitizedOutput.split('\n').forEach((line: string) => {
 						if (isError) {
-							termInstance.current.write(`\x1b[91m${line}\x1b[0m\r\n`);
+							terminalInstance.current.write(`\x1b[91m${line}\x1b[0m\r\n`);
 						} else {
-							termInstance.current.write(line + '\r\n');
+							terminalInstance.current.write(line + '\r\n');
 						}
 					});
 				}
 
 				const newPrompt = response?.Output?.prompt ?? promptRef.current;
 
-				setPrompt(newPrompt);
-				setEditorData('');
-				termInstance.current.write('\r');
-				termInstance.current.write(newPrompt);
+				if (!editorMode) {
+					setPrompt(newPrompt);
+					terminalInstance.current.write('\r');
+					terminalInstance.current.write(newPrompt);
+				}
 			} catch (e: any) {
 				stopLoader();
-				termInstance.current.write(prompt);
+				terminalInstance.current.write(prompt);
 			}
 		}
 	}
@@ -420,7 +638,6 @@ export default function ConsoleInstance(props: {
 	}
 
 	const spinnerFrames = ['Loading      ', 'Loading.     ', 'Loading..    ', 'Loading...   '];
-
 	let spinnerInterval: ReturnType<typeof setInterval> | null = null;
 	let currentFrame = 0;
 
@@ -429,18 +646,18 @@ export default function ConsoleInstance(props: {
 			clearInterval(spinnerInterval);
 			spinnerInterval = null;
 		}
-		termInstance.current.write('\r\x1b[2K');
-		termInstance.current.write('\x1b[?25h');
+		clearLine();
+		if (!editorMode) showCursor();
 	}
 
 	function startLoader() {
 		setLoadingMessage(true);
 		loadingRef.current = true;
-		termInstance.current.write('\n');
-		termInstance.current.write('\x1b[?25l');
+		terminalInstance.current.write('\n');
+		hideCursor();
 		spinnerInterval = setInterval(() => {
-			termInstance.current.write('\r\x1b[2K');
-			termInstance.current.write(`\x1b[32m${spinnerFrames[currentFrame]}\x1b[0m\r`);
+			clearLine();
+			terminalInstance.current.write(`\x1b[32m${spinnerFrames[currentFrame]}\x1b[0m\r`);
 			currentFrame = (currentFrame + 1) % spinnerFrames.length;
 		}, 135);
 	}
@@ -449,8 +666,51 @@ export default function ConsoleInstance(props: {
 		stopSpinner();
 		loadingRef.current = false;
 		setLoadingMessage(false);
-		termInstance.current.write('\r\x1b[2K');
-		termInstance.current.write('\x1b[?25h');
+		clearLine();
+		if (!editorMode) showCursor();
+	}
+
+	function clearLine() {
+		terminalInstance.current.write('\r\x1b[2K');
+	}
+
+	function showCursor() {
+		terminalInstance.current.write('\x1b[?25h');
+	}
+
+	function hideCursor(instance?: any) {
+		const console = instance ?? terminalInstance;
+		console.current.write('\x1b[?25l');
+	}
+
+	function handleNext() {
+		if (nextCursor) {
+			setCursorHistory((prevHistory) => [...prevHistory, pageCursor]);
+			setPageCursor(nextCursor);
+		}
+	}
+
+	function handlePrevious() {
+		if (cursorHistory.length > 0) {
+			const newHistory = [...cursorHistory];
+			const previousCursor = newHistory.pop();
+			setCursorHistory(newHistory);
+			setPageCursor(previousCursor);
+		}
+	}
+
+	function getPaginator() {
+		return (
+			<S.OptionsPaginator>
+				<Button
+					type={'alt3'}
+					label={language.previous}
+					handlePress={handlePrevious}
+					disabled={cursorHistory.length === 0 || loadingOptions}
+				/>
+				<Button type={'alt3'} label={language.next} handlePress={handleNext} disabled={!nextCursor || loadingOptions} />
+			</S.OptionsPaginator>
+		);
 	}
 
 	function getConsole() {
@@ -460,32 +720,51 @@ export default function ConsoleInstance(props: {
 
 		if (!inputProcessId) {
 			return (
-				<S.OptionsWrapper>
+				<S.OptionsWrapper className={'border-wrapper-alt1 scroll-wrapper'}>
 					<S.OptionsHeader>
-						<p>Select a process to connect with AOS</p>
+						<p>{language.connectToAOS}</p>
+						{(loadingTx || loadingOptions) && <span>{`${language.loading}...`}</span>}
 					</S.OptionsHeader>
-					{loadingOptions ? (
+					<S.OptionsInput>
+						<FormField
+							value={inputProcessId}
+							onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputProcessId(e.target.value)}
+							placeholder={language.processId}
+							invalid={{ status: inputProcessId ? !checkValidAddress(inputProcessId) : false, message: null }}
+							disabled={loadingTx}
+							hideErrorMessage
+							sm
+						/>
+					</S.OptionsInput>
+					{loadingOptions && !txOptions ? (
 						<S.OptionsLoader>
 							<Loader sm relative />
 						</S.OptionsLoader>
 					) : (
 						<>
 							{txOptions && (
-								<S.Options className={'scroll-wrapper-hidden'}>
-									{txOptions.map((tx: GQLNodeResponseType, index: number) => {
-										const name = getTagValue(tx.node.tags, 'Name');
-										return (
-											<Button
-												key={index}
-												type={'primary'}
-												label={name ?? formatAddress(tx.node.id, false)}
-												handlePress={() => setInputProcessId(tx.node.id)}
-												height={42.5}
-												fullWidth
-											/>
-										);
-									})}
-								</S.Options>
+								<>
+									<S.OptionsHeader>
+										<p>{language.yourProcesses}</p>
+									</S.OptionsHeader>
+									<S.Options>
+										{txOptions.map((tx: GQLNodeResponseType, index: number) => {
+											const name = getTagValue(tx.node.tags, 'Name');
+											return (
+												<Button
+													key={index}
+													type={'primary'}
+													label={name ?? formatAddress(tx.node.id, false)}
+													handlePress={() => setInputProcessId(tx.node.id)}
+													disabled={loadingOptions}
+													height={42.5}
+													fullWidth
+												/>
+											);
+										})}
+									</S.Options>
+									{getPaginator()}
+								</>
 							)}
 						</>
 					)}
@@ -494,80 +773,100 @@ export default function ConsoleInstance(props: {
 		}
 
 		return (
-			<S.Console
-				className={`${props.noWrapper && !fullScreenMode ? '' : 'border-wrapper-alt3 '}scroll-wrapper`}
-				noWrapper={props.noWrapper && !fullScreenMode}
-				editorMode={editorMode}
-				ref={terminalRef}
-			/>
+			<S.ConsoleWrapper editorMode={editorMode}>
+				<S.Console className={`scroll-wrapper`} noWrapper={props.noWrapper && !fullScreenMode} ref={terminalRef} />
+				{hasConnected && showResults && (
+					<>
+						<S.ConsoleDivider editorMode={editorMode} />
+						<S.Console className={`scroll-wrapper`} noWrapper={props.noWrapper && !fullScreenMode} ref={logsRef} />
+					</>
+				)}
+			</S.ConsoleWrapper>
 		);
 	}
 
 	return props.active ? (
 		<>
-			<S.Wrapper noWrapper={props.noWrapper} ref={consoleRef}>
-				{editorMode && (
-					<S.Editor className={'fade-in'}>
-						<Editor
-							initialData={''}
-							setEditorData={(data: string) => setEditorData(data)}
-							language={'lua'}
-							loading={loadingMessage}
-							noFullScreen
-						/>
+			{arProvider.walletAddress ? (
+				<>
+					<S.Wrapper noWrapper={props.noWrapper} ref={consoleRef} fullScreenMode={fullScreenMode}>
 						{editorMode && (
-							<S.LoadWrapper noWrapper={props.noWrapper} fullScreenMode={fullScreenMode}>
-								<IconButton
-									type={'alt1'}
-									src={ASSETS.checkmark}
-									handlePress={() => handleEditorSend()}
-									dimensions={{
-										wrapper: 25,
-										icon: 12.5,
-									}}
-									disabled={!editorData}
-									tooltip={`${language.load} (Ctrl + L)`}
-									tooltipPosition={'top-right'}
+							<S.Editor className={'fade-in'} fullScreenMode={fullScreenMode}>
+								<Editor
+									initialData={''}
+									setEditorData={(data: string) => setEditorData(data)}
+									language={'lua'}
+									loading={loadingMessage}
+									noFullScreen
 								/>
-							</S.LoadWrapper>
+								<S.LoadWrapper noWrapper={props.noWrapper} fullScreenMode={fullScreenMode}>
+									<IconButton
+										type={'alt1'}
+										src={ASSETS.checkmark}
+										handlePress={() => handleEditorSend()}
+										dimensions={{
+											wrapper: 25,
+											icon: 12.5,
+										}}
+										disabled={!editorData}
+										tooltip={`${language.load} (Ctrl + L)`}
+										tooltipPosition={'top-right'}
+									/>
+								</S.LoadWrapper>
+							</S.Editor>
 						)}
-					</S.Editor>
-				)}
-				{getConsole()}
-				<S.ActionsWrapper noWrapper={props.noWrapper} fullScreenMode={fullScreenMode}>
-					<IconButton
-						type={'alt1'}
-						src={ASSETS.code}
-						handlePress={() => setEditorMode((prev) => !prev)}
-						dimensions={{
-							wrapper: 25,
-							icon: 12.5,
-						}}
-						tooltip={editorMode ? language.closeEditor : language.openEditor}
-						tooltipPosition={'top-right'}
-					/>
-					<IconButton
-						type={'alt1'}
-						src={ASSETS.fullscreen}
-						handlePress={toggleFullscreen}
-						dimensions={{
-							wrapper: 25,
-							icon: 12.5,
-						}}
-						tooltip={fullScreenMode ? language.exitFullScreen : language.enterFullScreen}
-						tooltipPosition={'top-right'}
-					/>
-				</S.ActionsWrapper>
-			</S.Wrapper>
-			{error && (
-				<Notification
-					type={'warning'}
-					message={error}
-					callback={() => {
-						setError(null);
-						setInputProcessId('');
-					}}
-				/>
+						{getConsole()}
+						<S.ActionsWrapper noWrapper={props.noWrapper} fullScreenMode={fullScreenMode}>
+							<IconButton
+								type={'alt1'}
+								src={showResults ? ASSETS.arrowRight : ASSETS.arrowLeft}
+								handlePress={() => setShowResults((prev) => !prev)}
+								dimensions={{
+									wrapper: 25,
+									icon: 12.5,
+								}}
+								disabled={!hasConnected}
+								tooltip={showResults ? language.hideResults : language.showResults}
+								tooltipPosition={'top-right'}
+							/>
+							<IconButton
+								type={'alt1'}
+								src={ASSETS.code}
+								handlePress={() => setEditorMode((prev) => !prev)}
+								dimensions={{
+									wrapper: 25,
+									icon: 12.5,
+								}}
+								disabled={!hasConnected}
+								tooltip={editorMode ? language.closeEditor : language.openEditor}
+								tooltipPosition={'top-right'}
+							/>
+							<IconButton
+								type={'alt1'}
+								src={ASSETS.fullscreen}
+								handlePress={toggleFullscreen}
+								dimensions={{
+									wrapper: 25,
+									icon: 12.5,
+								}}
+								tooltip={fullScreenMode ? language.exitFullScreen : language.enterFullScreen}
+								tooltipPosition={'top-right'}
+							/>
+						</S.ActionsWrapper>
+					</S.Wrapper>
+					{error && (
+						<Notification
+							type={'warning'}
+							message={error}
+							callback={() => {
+								setError(null);
+								setInputProcessId('');
+							}}
+						/>
+					)}
+				</>
+			) : (
+				<WalletBlock />
 			)}
 		</>
 	) : null;

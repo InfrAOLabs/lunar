@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Modal } from 'components/atoms/Modal';
-import { ASSETS, STORAGE } from 'helpers/config';
+import { ASSETS, LINKS, STORAGE } from 'helpers/config';
 import { getARBalanceEndpoint } from 'helpers/endpoints';
 import { WalletEnum } from 'helpers/types';
 import Othent from 'helpers/wallet';
@@ -12,7 +12,7 @@ import * as S from './styles';
 const WALLET_PERMISSIONS = ['ACCESS_ADDRESS', 'ACCESS_PUBLIC_KEY', 'SIGN_TRANSACTION', 'DISPATCH', 'SIGNATURE'];
 
 const AR_WALLETS = [
-	{ type: WalletEnum.arConnect, label: 'ArConnect', logo: ASSETS.arconnect },
+	{ type: WalletEnum.wander, label: 'Wander', logo: ASSETS.wander },
 	{ type: WalletEnum.othent, label: 'Othent', logo: ASSETS.othent },
 ];
 
@@ -55,14 +55,16 @@ function WalletList(props: { handleConnect: any }) {
 					onClick={() => props.handleConnect(wallet.type)}
 					className={'border-wrapper-primary'}
 				>
+					<S.WalletLogo>
 					<img src={wallet.logo} alt={''} />
+					</S.WalletLogo>
 					<span>{wallet.label}</span>
 				</S.WalletListItem>
 			))}
 			<S.WalletLink>
 				<span>
 					Don't have an Arweave Wallet? You can create one{' '}
-					<a href={'https://arconnect.io'} target={'_blank'}>
+					<a href={LINKS.wander} target={'_blank'}>
 						here.
 					</a>
 				</span>

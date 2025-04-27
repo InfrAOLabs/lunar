@@ -65,7 +65,7 @@ export const Dropdown = styled.div`
 	padding: 11.5px 10px;
 	position: absolute;
 	z-index: 1;
-	top: 42.5px;
+	top: 47.5px;
 	right: -1.5px;
 `;
 

@@ -92,12 +92,12 @@ export default function JSONWriter(props: {
 	}, [currentTheme, themeName]);
 
 	const handleEditorDidMount: OnMount = (editor, monaco) => {
-		editor.onKeyDown((e) => {
-			if ((e.metaKey || e.ctrlKey) && e.keyCode === monaco.KeyCode.Enter) {
-				e.preventDefault();
-				props.handleSubmit(JSON.parse(jsonString));
+		editor.onKeyDown(e => {
+			if ((e.metaKey||e.ctrlKey) && e.keyCode === monaco.KeyCode.Enter) {
+			  const current = editor.getValue();
+			  props.handleSubmit(JSON.parse(current));
 			}
-		});
+		  });
 	};
 
 	function handleChange(value: string) {

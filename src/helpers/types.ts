@@ -57,6 +57,7 @@ export type BatchAGQLResponseType = { [queryKey: string]: DefaultGQLResponseType
 export enum WalletEnum {
 	arConnect = 'arconnect',
 	othent = 'othent',
+	wander = 'wander'
 }
 
 export type FormFieldType = 'number' | 'password';

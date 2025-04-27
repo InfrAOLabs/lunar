@@ -34,6 +34,7 @@ export default function WalletConnect(_props: { callback?: () => void }) {
 	const [showWallet, setShowWallet] = React.useState<boolean>(false);
 	const [showWalletDropdown, setShowWalletDropdown] = React.useState<boolean>(false);
 	const [showThemeSelector, setShowThemeSelector] = React.useState<boolean>(false);
+	const [copied, setCopied] = React.useState<boolean>(false);
 
 	const [label, setLabel] = React.useState<string | null>(null);
 
@@ -59,6 +60,16 @@ export default function WalletConnect(_props: { callback?: () => void }) {
 		}
 	}, [showWallet, arProvider.walletAddress, permawebProvider.profile]);
 
+	const copyAddress = React.useCallback(async (address: string) => {
+		if (address) {
+			if (address.length > 0) {
+				await navigator.clipboard.writeText(address);
+				setCopied(true);
+				setTimeout(() => setCopied(false), 2000);
+			}
+		}
+	}, []);
+
 	function handlePress() {
 		if (arProvider.walletAddress) {
 			setShowWalletDropdown(!showWalletDropdown);
@@ -79,13 +90,13 @@ export default function WalletConnect(_props: { callback?: () => void }) {
 			variants: [
 				{
 					id: 'light-primary',
-					name: 'Light default',
+					name: 'Light Default',
 					background: lightTheme.neutral1,
 					accent1: lightTheme.primary1,
 				},
 				{
 					id: 'light-high-contrast',
-					name: 'Light high contrast',
+					name: 'Light High Contrast',
 					background: lightThemeHighContrast.neutral1,
 					accent1: lightThemeHighContrast.neutral9,
 				},
@@ -109,13 +120,13 @@ export default function WalletConnect(_props: { callback?: () => void }) {
 			variants: [
 				{
 					id: 'dark-primary',
-					name: 'Dark default',
+					name: 'Dark Default',
 					background: darkTheme.neutral1,
 					accent1: darkTheme.primary1,
 				},
 				{
 					id: 'dark-high-contrast',
-					name: 'Dark high contrast',
+					name: 'Dark High Contrast',
 					background: darkThemeHighContrast.neutral1,
 					accent1: darkThemeHighContrast.neutralA1,
 				},
@@ -151,9 +162,6 @@ export default function WalletConnect(_props: { callback?: () => void }) {
 					{showWalletDropdown && (
 						<S.Dropdown className={'border-wrapper-alt1 fade-in scroll-wrapper'}>
 							<S.DHeaderWrapper>
-								{/* <S.PDropdownHeader>
-									<p>{language.profileMenu}</p>
-								</S.PDropdownHeader> */}
 								<S.DHeaderFlex>
 									<Avatar owner={permawebProvider.profile} dimensions={{ wrapper: 32.5, icon: 19.5 }} callback={null} />
 									<S.DHeader>
@@ -162,6 +170,10 @@ export default function WalletConnect(_props: { callback?: () => void }) {
 								</S.DHeaderFlex>
 							</S.DHeaderWrapper>
 							<S.DBodyWrapper>
+								<li onClick={() => copyAddress(arProvider.walletAddress)}>
+									<ReactSVG src={ASSETS.copy} />
+									{copied ? `${language.copied}!` : language.walletAddress}
+								</li>
 								<li onClick={() => permawebProvider.setShowProfileManager(true)}>
 									<ReactSVG src={ASSETS.write} />
 									{language.profile}

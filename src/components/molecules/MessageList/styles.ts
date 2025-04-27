@@ -3,13 +3,14 @@ import styled, { css } from 'styled-components';
 import { STYLING } from 'helpers/config';
 
 export const Container = styled.div`
-	scroll-margin-top: 140px;
+	scroll-margin-top: 80px;
 `;
 
 export const Header = styled.div`
 	padding: 15px;
 	margin: 0;
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
 	justify-content: space-between;
 	gap: 20px;
@@ -23,6 +24,7 @@ export const Header = styled.div`
 export const HeaderMain = styled.div`
 	display: flex;
 	align-items: center;
+	flex-wrap: wrap;
 	gap: 25px;
 
 	p {
@@ -47,6 +49,7 @@ export const HeaderMain = styled.div`
 export const HeaderActions = styled.div`
 	display: flex;
 	align-items: center;
+	flex-wrap: wrap;
 	gap: 12.5px;
 `;
 
@@ -58,17 +61,10 @@ export const FilterWrapper = styled.div`
 `;
 
 export const FilterDropdown = styled.div`
-	max-height: 85vh;
-	width: 325px;
-	max-width: 75vw;
-	padding: 15px;
-	position: absolute;
-	z-index: 1;
-	top: 32.5px;
-	right: 0;
 	display: flex;
 	flex-direction: column;
 	gap: 12.5px;
+	padding: 0 15px 25px 15px;
 `;
 
 export const FilterDropdownHeader = styled.div`
@@ -81,6 +77,13 @@ export const FilterDropdownHeader = styled.div`
 	}
 `;
 
+export const FilterDivider = styled.div`
+	height: 1px;
+	width: 100%;
+	margin: 15px 0;
+	border-top: 1px solid ${(props) => props.theme.colors.border.primary};
+`;
+
 export const FilterDropdownActionSelect = styled.div`
 	width: 100%;
 	display: flex;
@@ -88,14 +91,22 @@ export const FilterDropdownActionSelect = styled.div`
 	gap: 15px;
 
 	button {
-		border-radius: ${STYLING.dimensions.radius.primary} !important;
+		border-radius: ${STYLING.dimensions.radius.alt2} !important;
 	}
+`;
+
+export const FilterApply = styled.div`
+	margin: 15px 0 0 0;
 `;
 
 export const Divider = styled.div`
 	height: 20px;
 	width: 1px;
-	border-right: 1px solid ${(props) => props.theme.colors.border.primary}
+	border-right: 1px solid ${(props) => props.theme.colors.border.primary};
+
+	@media (max-width: ${STYLING.cutoffs.initial}) {
+		display: none;
+	}
 `;
 
 export const Wrapper = styled.div<{ childList?: boolean }>`
@@ -111,6 +122,7 @@ export const HeaderWrapper = styled.div`
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	gap: 15px;
 	padding: 0 15px;
 	border: 1px solid ${(props) => props.theme.colors.border.primary};
 	background: ${(props) => props.theme.colors.container.alt1.background};
@@ -169,6 +181,7 @@ export const ElementWrapper = styled.div<{ open: boolean; lastChild?: boolean }>
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	gap: 15px;
 	padding: 0 15px;
 	cursor: pointer;
 	background: ${(props) => props.theme.colors.container.primary.background};
@@ -232,16 +245,16 @@ export const ElementItem = styled.div`
 `;
 
 export const ID = styled(ElementItem)`
-	min-width: 165px;
-	width: 165px;
+	min-width: 185px;
+	width: 185px;
 	display: flex;
 	align-items: center;
 	gap: 12.5px;
 `;
 
 export const Action = styled(ElementItem)`
-	min-width: 270px;
-	width: 270px;
+	min-width: 200px;
+	width: 200px;
 `;
 
 export const ActionTooltip = styled.div`
@@ -259,8 +272,8 @@ export const ActionTooltip = styled.div`
 `;
 
 export const ActionValue = styled(Action) <{ background?: string }>`
-	min-width: 270px;
-	width: 270px;
+	min-width: 200px;
+	width: 200px;
 	position: relative;
 
 	.action-indicator {
@@ -395,7 +408,9 @@ export const FooterWrapper = styled.div`
 	width: 100%;
 	display: flex;
 	align-items: center;
+	flex-wrap: wrap;
 	justify-content: space-between;
+	gap: 15px;
 	padding: 15px;
 	background: ${(props) => props.theme.colors.container.alt1.background};
 	border-left: 1px solid ${(props) => props.theme.colors.border.primary};
@@ -415,6 +430,23 @@ export const PageCounter = styled.div`
 		font-family: ${(props) => props.theme.typography.family.primary};
 		font-weight: ${(props) => props.theme.typography.weight.bold};
 		color: ${(props) => props.theme.colors.font.alt1};
+	}
+`;
+
+export const DPageCounter = styled(PageCounter)`
+	display: flex;
+	
+	@media (max-width: ${STYLING.cutoffs.secondary}) {
+		display: none;
+	}
+`;
+
+export const MPageCounter = styled(PageCounter)`
+	display: none;
+
+	@media (max-width: ${STYLING.cutoffs.secondary}) {
+		display: flex;
+
 	}
 `;
 

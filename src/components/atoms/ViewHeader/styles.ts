@@ -10,13 +10,13 @@ export const HeaderContent = styled.div`
 	display: flex;
 	justify-content: space-between;
 	flex-wrap: wrap;
-	gap: 20px;
+	gap: 30px 40px;
 
 	h4 {
 		line-height: 1;
 		font-size: ${(props) => props.theme.typography.size.xxLg};
 		font-family: ${(props) => props.theme.typography.family.primary};
-		font-weight: ${(props) => props.theme.typography.weight.bold};
+		font-weight: ${(props) => props.theme.typography.weight.xBold};
 		color: ${(props) => props.theme.colors.font.primary};
 	}
 `

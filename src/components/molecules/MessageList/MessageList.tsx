@@ -15,10 +15,9 @@ import { JSONReader } from 'components/molecules/JSONReader';
 import { ASSETS, DEFAULT_ACTIONS, DEFAULT_MESSAGE_TAGS, URLS } from 'helpers/config';
 import { arweaveEndpoint } from 'helpers/endpoints';
 import { MessageFilterType, TransactionType } from 'helpers/types';
-import { formatCount, getRelativeDate, getTagValue } from 'helpers/utils';
+import { checkValidAddress, formatAddress, formatCount, getRelativeDate, getTagValue } from 'helpers/utils';
 import { useLanguageProvider } from 'providers/LanguageProvider';
 import { usePermawebProvider } from 'providers/PermawebProvider';
-import { CloseHandler } from 'wrappers/CloseHandler';
 
 import * as S from './styles';
 
@@ -61,7 +60,7 @@ function Message(props: {
 
 				if (processId) {
 					try {
-						const messageResult = await permawebProvider.ao.result({
+						const messageResult = await permawebProvider.deps.ao.result({
 							process: processId,
 							message: props.element.node.id,
 						});
@@ -238,13 +237,15 @@ export default function MessageList(props: {
 
 	const tableContainerRef = React.useRef(null);
 
+	const [showFilters, setShowFilters] = React.useState<boolean>(false);
 	const [currentFilter, setCurrentFilter] = React.useState<MessageFilterType>(props.currentFilter ?? 'incoming');
 	const [currentAction, setCurrentAction] = React.useState<string | null>(null);
 	const [actionOptions, setActionOptions] = React.useState<string[]>(
 		Object.keys(DEFAULT_ACTIONS).map((action) => DEFAULT_ACTIONS[action].name)
 	);
 	const [customAction, setCustomAction] = React.useState<string>('');
-	const [showFilterDropdown, setShowFilterDropdown] = React.useState<boolean>(false);
+	const [toggleFilterChange, setToggleFilterChange] = React.useState<boolean>(false);
+
 	const [currentData, setCurrentData] = React.useState<GQLNodeResponseType[] | null>(null);
 	const [loadingMessages, setLoadingMessages] = React.useState<boolean>(false);
 
@@ -256,7 +257,8 @@ export default function MessageList(props: {
 	const [cursorHistory, setCursorHistory] = React.useState([]);
 	const [nextCursor, setNextCursor] = React.useState<string | null>(null);
 	const [pageNumber, setPageNumber] = React.useState(1);
-	const [perPage, _setPerPage] = React.useState(100);
+	const [perPage, setPerPage] = React.useState(50);
+	const [recipient, setRecipient] = React.useState<string>('');
 
 	React.useEffect(() => {
 		(async function () {
@@ -271,6 +273,7 @@ export default function MessageList(props: {
 						}),
 						permawebProvider.libs.getGQLData({
 							tags: [...tags, { name: 'From-Process', values: [props.txId] }],
+							...(recipient && checkValidAddress(recipient) ? { recipients: [recipient] } : {}),
 							paginator: perPage,
 						}),
 					]);
@@ -281,13 +284,13 @@ export default function MessageList(props: {
 				}
 			}
 		})();
-	}, [props.txId, currentAction]);
+	}, [props.txId, toggleFilterChange]);
 
 	React.useEffect(() => {
 		(async function () {
 			const tags = [...DEFAULT_MESSAGE_TAGS];
 			if (currentAction) tags.push({ name: 'Action', values: [currentAction] });
-			
+
 			setLoadingMessages(true);
 			if (props.txId) {
 				try {
@@ -306,6 +309,7 @@ export default function MessageList(props: {
 								gqlResponse = await permawebProvider.libs.getGQLData({
 									tags: [...tags, { name: 'From-Process', values: [props.txId] }],
 									paginator: perPage,
+									...(recipient && checkValidAddress(recipient) ? { recipients: [recipient] } : {}),
 									...(pageCursor ? { cursor: pageCursor } : {}),
 								});
 								break;
@@ -315,7 +319,7 @@ export default function MessageList(props: {
 						setCurrentData(gqlResponse.data);
 						setNextCursor(gqlResponse.data.length >= perPage ? gqlResponse.nextCursor : null);
 					} else {
-						const resultResponse = await permawebProvider.ao.result({
+						const resultResponse = await permawebProvider.deps.ao.result({
 							process: props.recipient,
 							message: props.txId,
 						});
@@ -323,7 +327,7 @@ export default function MessageList(props: {
 						if (resultResponse && !resultResponse.error) {
 							const gqlResponse = await permawebProvider.libs.getGQLData({
 								tags: [
-									...DEFAULT_MESSAGE_TAGS,
+									...tags,
 									{ name: 'From-Process', values: [props.recipient] },
 									{
 										name: 'Reference',
@@ -346,8 +350,10 @@ export default function MessageList(props: {
 
 				const gqlResponse = await permawebProvider.libs.getGQLData({
 					tags: tags,
+					paginator: perPage,
 					minBlock: currentBlock - 20,
 					maxBlock: currentBlock,
+					...(recipient && checkValidAddress(recipient) ? { recipients: [recipient] } : {}),
 					...(pageCursor ? { cursor: pageCursor } : {}),
 				});
 
@@ -357,7 +363,7 @@ export default function MessageList(props: {
 			}
 			setLoadingMessages(false);
 		})();
-	}, [props.txId, currentFilter, currentAction, pageCursor, permawebProvider.libs]);
+	}, [props.txId, currentFilter, toggleFilterChange, pageCursor, permawebProvider.libs]);
 
 	const scrollToTop = () => {
 		if (tableContainerRef.current) {
@@ -383,6 +389,7 @@ export default function MessageList(props: {
 			setCursorHistory(newHistory);
 			setPageCursor(previousCursor);
 			setPageNumber((prevPage) => Math.max(prevPage - 1, 1));
+			scrollToTop();
 		}
 	}
 
@@ -394,13 +401,18 @@ export default function MessageList(props: {
 	}
 
 	function handleFilterChange(filter: MessageFilterType) {
+		if (filter === 'incoming') setRecipient('');
 		setCurrentFilter(filter);
 		handleClear();
 	}
 
 	function handleActionChange(action: string) {
 		setCurrentAction(currentAction === action ? null : action);
-		setShowFilterDropdown(false);
+	}
+
+	function handleFilterUpdate() {
+		setToggleFilterChange((prev) => !prev);
+		setShowFilters(false);
 		handleClear();
 	}
 
@@ -423,9 +435,19 @@ export default function MessageList(props: {
 		);
 	}
 
-	function getPaginator(showPages: boolean) {
+	function getPages() {
 		const count = totalCount ? totalCount : currentFilter === 'incoming' ? incomingCount : outgoingCount;
 		const totalPages = count ? Math.ceil(count / perPage) : 1;
+		return (
+			<>
+				<p>{`Page (${formatCount(pageNumber.toString())} of ${formatCount(totalPages.toString())})`}</p>
+				<S.Divider />
+				<p>{`${!showFilters ? perPage : '-'} per page`}</p>
+			</>
+		);
+	}
+
+	function getPaginator(showPages: boolean) {
 		return (
 			<>
 				<Button
@@ -434,179 +456,226 @@ export default function MessageList(props: {
 					handlePress={handlePrevious}
 					disabled={cursorHistory.length === 0 || loadingMessages}
 				/>
-				{showPages && (
-					<S.PageCounter>
-						<p>{`Page (${formatCount(pageNumber.toString())} of ${formatCount(totalPages.toString())})`}</p>
-						<S.Divider />
-						<p>{`${perPage} per page`}</p>
-					</S.PageCounter>
-				)}
+				{showPages && <S.DPageCounter>{getPages()}</S.DPageCounter>}
 				<Button
 					type={'alt3'}
 					label={language.next}
 					handlePress={handleNext}
 					disabled={!nextCursor || loadingMessages}
 				/>
+				{showPages && <S.MPageCounter>{getPages()}</S.MPageCounter>}
 			</>
 		);
 	}
 
+	const invalidPerPage = perPage <= 0 || perPage > 100;
+
 	return (
-		<S.Container ref={tableContainerRef}>
-			{!props.childList && (
-				<S.Header>
-					<S.HeaderMain>
-						<p>{language.messages}</p>
-						{loadingMessages && (
-							<div className={'loader'}>
-								<Loader xSm relative />
-							</div>
-						)}
-					</S.HeaderMain>
-					<S.HeaderActions>
-						{props.type === 'process' && (
-							<>
-								<Button
-									type={'alt3'}
-									label={`${language.incoming}${incomingCount ? ` (${formatCount(incomingCount.toString())})` : ''}`}
-									handlePress={() => handleFilterChange('incoming')}
-									active={currentFilter === 'incoming'}
-									disabled={loadingMessages}
-								/>
-								<Button
-									type={'alt3'}
-									label={`${language.outgoing}${outgoingCount ? ` (${formatCount(outgoingCount.toString())})` : ''}`}
-									handlePress={() => handleFilterChange('outgoing')}
-									active={currentFilter === 'outgoing'}
-									disabled={loadingMessages}
-								/>
-								<S.Divider />
-							</>
-						)}
-						{currentAction && (
+		<>
+			<S.Container ref={tableContainerRef}>
+				{!props.childList && (
+					<S.Header>
+						<S.HeaderMain>
+							<p>{language.messages}</p>
+							{loadingMessages && (
+								<div className={'loader'}>
+									<Loader xSm relative />
+								</div>
+							)}
+						</S.HeaderMain>
+						<S.HeaderActions>
+							{props.type === 'process' && (
+								<>
+									<Button
+										type={'alt3'}
+										label={`${language.incoming}${incomingCount ? ` (${formatCount(incomingCount.toString())})` : ''}`}
+										handlePress={() => handleFilterChange('incoming')}
+										active={currentFilter === 'incoming'}
+										disabled={loadingMessages}
+									/>
+									<Button
+										type={'alt3'}
+										label={`${language.outgoing}${outgoingCount ? ` (${formatCount(outgoingCount.toString())})` : ''}`}
+										handlePress={() => handleFilterChange('outgoing')}
+										active={currentFilter === 'outgoing'}
+										disabled={loadingMessages}
+									/>
+									<S.Divider />
+								</>
+							)}
+							{currentAction && !showFilters && (
 								<Button
 									type={'alt3'}
 									label={currentAction}
-									handlePress={() => handleActionChange(currentAction)}
+									handlePress={() => {
+										handleActionChange(currentAction);
+										handleFilterUpdate();
+									}}
 									active={true}
 									disabled={loadingMessages}
 									icon={ASSETS.close}
 								/>
 							)}
-						<S.FilterWrapper>
-							<CloseHandler
-								callback={() => {
-									setShowFilterDropdown(false);
-								}}
-								active={showFilterDropdown}
-								disabled={!showFilterDropdown}
-							>
+							{recipient && checkValidAddress(recipient) && !showFilters && (
+								<Button
+									type={'alt3'}
+									label={formatAddress(recipient, false)}
+									handlePress={() => {
+										setRecipient('');
+										handleFilterUpdate();
+									}}
+									active={true}
+									disabled={loadingMessages}
+									icon={ASSETS.close}
+								/>
+							)}
+							<S.FilterWrapper>
 								<Button
 									type={'alt3'}
 									label={language.filter}
-									handlePress={() => setShowFilterDropdown((prev) => !prev)}
-									active={showFilterDropdown}
+									handlePress={() => setShowFilters((prev) => !prev)}
+									active={showFilters}
 									disabled={loadingMessages}
 									icon={ASSETS.filter}
 									iconLeftAlign
 								/>
-								{showFilterDropdown && (
-									<S.FilterDropdown className={'border-wrapper-alt1 fade-in scroll-wrapper'}>
-										<S.FilterDropdownHeader>
-											<p>{language.byAction}</p>
-										</S.FilterDropdownHeader>
-										<S.FilterDropdownActionSelect>
-											{actionOptions.map((action) => {
-												return (
-													<Button
-														key={action}
-														type={'primary'}
-														label={action}
-														handlePress={() => handleActionChange(action)}
-														disabled={loadingMessages}
-														active={currentAction === action}
-														height={35}
-														fullWidth
-													/>
-												);
-											})}
-											<FormField
-												label={language.customAction}
-												value={customAction}
-												onChange={(e: any) => setCustomAction(e.target.value)}
-												disabled={loadingMessages}
-												invalid={{ status: actionOptions.some((action) => action === customAction), message: null }}
-												hideErrorMessage
-											/>
-											<Button
-												type={'alt1'}
-												label={language.submit}
-												handlePress={() => handleActionAdd()}
-												disabled={!customAction || actionOptions.some((action) => action === customAction) || loadingMessages}
-												active={false}
-												height={37.5}
-												fullWidth
-											/>
-										</S.FilterDropdownActionSelect>
-									</S.FilterDropdown>
-								)}
-							</CloseHandler>
-						</S.FilterWrapper>
-						<S.Divider />
-						{getPaginator(false)}
-					</S.HeaderActions>
-				</S.Header>
-			)}
-			{currentData?.length > 0 ? (
-				<S.Wrapper childList={props.childList}>
-					{!props.childList && (
-						<S.HeaderWrapper>
-							<S.ID>
-								<p>{language.id}</p>
-							</S.ID>
-							<S.Action>
-								<p>{language.action}</p>
-							</S.Action>
-							<S.From>
-								<p>{language.from}</p>
-							</S.From>
-							<S.To>
-								<p>{language.to}</p>
-							</S.To>
-							<S.Output>
-								<p>{language.output}</p>
-							</S.Output>
-							<S.Time>
-								<p>{language.time}</p>
-							</S.Time>
-							<S.Results>
-								<p>{language.results}</p>
-							</S.Results>
-						</S.HeaderWrapper>
-					)}
-					<S.BodyWrapper childList={props.childList} isOverallLast={props.isOverallLast}>
-						{currentData.map((element: GQLNodeResponseType, index: number) => {
-							const isLastChild = index === currentData.length - 1;
+							</S.FilterWrapper>
+							<S.Divider />
+							{getPaginator(false)}
+						</S.HeaderActions>
+					</S.Header>
+				)}
+				{currentData?.length > 0 ? (
+					<S.Wrapper childList={props.childList}>
+						{!props.childList && (
+							<S.HeaderWrapper>
+								<S.ID>
+									<p>{language.id}</p>
+								</S.ID>
+								<S.Action>
+									<p>{language.action}</p>
+								</S.Action>
+								<S.From>
+									<p>{language.from}</p>
+								</S.From>
+								<S.To>
+									<p>{language.to}</p>
+								</S.To>
+								<S.Output>
+									<p>{language.output}</p>
+								</S.Output>
+								<S.Time>
+									<p>{language.time}</p>
+								</S.Time>
+								<S.Results>
+									<p>{language.results}</p>
+								</S.Results>
+							</S.HeaderWrapper>
+						)}
+						<S.BodyWrapper childList={props.childList} isOverallLast={props.isOverallLast}>
+							{currentData.map((element: GQLNodeResponseType, index: number) => {
+								const isLastChild = index === currentData.length - 1;
 
-							return (
-								<Message
-									key={element.node.id}
-									element={element}
-									type={props.type}
-									currentFilter={currentFilter}
-									parentId={props.parentId}
-									handleOpen={props.handleMessageOpen ? (id: string) => props.handleMessageOpen(id) : null}
-									lastChild={isLastChild}
-									isOverallLast={props.isOverallLast && isLastChild}
-								/>
-							);
-						})}
-					</S.BodyWrapper>
-				</S.Wrapper>
-			) : (
-				getMessage()
+								return (
+									<Message
+										key={element.node.id}
+										element={element}
+										type={props.type}
+										currentFilter={currentFilter}
+										parentId={props.parentId}
+										handleOpen={props.handleMessageOpen ? (id: string) => props.handleMessageOpen(id) : null}
+										lastChild={isLastChild}
+										isOverallLast={props.isOverallLast && isLastChild}
+									/>
+								);
+							})}
+						</S.BodyWrapper>
+					</S.Wrapper>
+				) : (
+					getMessage()
+				)}
+				{!props.childList && <S.FooterWrapper>{getPaginator(true)}</S.FooterWrapper>}
+			</S.Container>
+			{!props.childList && (
+				<Panel
+					open={showFilters}
+					width={475}
+					header={language.messageFilters}
+					handleClose={() => setShowFilters(false)}
+				>
+					<S.FilterDropdown>
+						<S.FilterDropdownHeader>
+							<p>{language.byAction}</p>
+						</S.FilterDropdownHeader>
+						<S.FilterDropdownActionSelect>
+							{actionOptions.map((action) => {
+								return (
+									<Button
+										key={action}
+										type={'primary'}
+										label={action}
+										handlePress={() => handleActionChange(action)}
+										disabled={loadingMessages}
+										active={currentAction === action}
+										icon={currentAction === action ? ASSETS.close : null}
+										height={40}
+										fullWidth
+									/>
+								);
+							})}
+							<FormField
+								label={language.customAction}
+								value={customAction}
+								onChange={(e: any) => setCustomAction(e.target.value)}
+								disabled={loadingMessages}
+								invalid={{ status: actionOptions.some((action) => action === customAction), message: null }}
+								hideErrorMessage
+							/>
+							<Button
+								type={'alt1'}
+								label={language.submit}
+								handlePress={() => handleActionAdd()}
+								disabled={!customAction || actionOptions.some((action) => action === customAction) || loadingMessages}
+								active={false}
+								height={40}
+								fullWidth
+							/>
+						</S.FilterDropdownActionSelect>
+						<S.FilterDivider />
+						<FormField
+							type={'number'}
+							label={language.resultsPerPage}
+							value={perPage}
+							onChange={(e: any) => setPerPage(e.target.value)}
+							disabled={loadingMessages}
+							invalid={{ status: invalidPerPage, message: invalidPerPage ? 'Value must be between 0 and 100' : null }}
+						/>
+
+						{(currentFilter !== 'incoming' || !props.txId) && (
+							<FormField
+								label={language.recipient}
+								value={recipient}
+								onChange={(e: any) => setRecipient(e.target.value)}
+								disabled={loadingMessages}
+								invalid={{ status: recipient ? !checkValidAddress(recipient) : null, message: null }}
+								hideErrorMessage
+							/>
+						)}
+					
+						<S.FilterApply>
+							<Button
+								type={'alt1'}
+								label={language.applyFilters}
+								handlePress={() => handleFilterUpdate()}
+								disabled={invalidPerPage}
+								active={false}
+								height={37.5}
+								fullWidth
+							/>
+						</S.FilterApply>
+					</S.FilterDropdown>
+				</Panel>
 			)}
-			{!props.childList && <S.FooterWrapper>{getPaginator(true)}</S.FooterWrapper>}
-		</S.Container>
+		</>
 	);
 }

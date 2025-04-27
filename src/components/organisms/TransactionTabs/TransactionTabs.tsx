@@ -3,6 +3,7 @@ import { flushSync } from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ReactSVG } from 'react-svg';
 import { GQLNodeResponseType } from '@permaweb/libs';
+import { useTheme } from 'styled-components';
 
 import { ViewWrapper } from 'app/styles';
 import { Button } from 'components/atoms/Button';
@@ -22,6 +23,7 @@ import * as S from './styles';
 export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 	const location = useLocation();
 	const navigate = useNavigate();
+	const theme = useTheme();
 
 	const tabsRef = React.useRef<HTMLDivElement>(null);
 
@@ -37,6 +39,23 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 	const [activeTabIndex, setActiveTabIndex] = React.useState<number>(getInitialIndex());
 	const [isClearing, setIsClearing] = React.useState<boolean>(false);
 	const [showClearConfirmation, setShowClearConfirmation] = React.useState<boolean>(false);
+
+	React.useEffect(() => {
+		const header = document.getElementById('navigation-header');
+		if (header) {
+			header.style.background = theme.colors.container.alt1.background;
+			header.style.position = 'relative';
+			header.style.boxShadow = `inset 0px 6px 6px -6px ${theme.colors.shadow.primary}`;
+		}
+
+		return () => {
+			if (header) {
+				header.style.background = '';
+				header.style.position = 'sticky';
+				header.style.boxShadow = 'none';
+			}
+		};
+	}, [theme]);
 
 	React.useEffect(() => {
 		const { txId, subPath } = extractTxDetailsFromPath(location.pathname);
@@ -186,6 +205,13 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 
 		setTimeout(() => setIsClearing(false), 50);
 
+		setTimeout(() => {
+			setIsClearing(false);
+			if (tabsRef.current) {
+				tabsRef.current.scrollTo({ left: tabsRef.current.scrollWidth });
+			}
+		}, 0);
+
 		navigate(id ? `${URLS[props.type]}${id}` : URLS[props.type]);
 	};
 
@@ -243,37 +269,32 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 					}
 					return (
 						<React.Fragment key={index}>
-							<S.TabHeader>
-								<S.TabAction active={index === activeTabIndex} onClick={() => handleTabRedirect(index)}>
-									<div className={'icon-wrapper'}>
-										<div className={'normal-icon'}>
-											<ReactSVG src={ASSETS[tx.type]} />
-										</div>
-										<div className={'delete-icon'}>
-											<IconButton
-												type={'primary'}
-												src={ASSETS.close}
-												handlePress={() => {
-													handleDeleteTab(index);
-												}}
-												dimensions={{ wrapper: 10, icon: 10 }}
-											/>
-										</div>
+							<S.TabAction active={index === activeTabIndex} onClick={() => handleTabRedirect(index)}>
+								<div className={'icon-wrapper'}>
+									<div className={'normal-icon'}>
+										<ReactSVG src={ASSETS[tx.type]} />
 									</div>
-									{label}
-								</S.TabAction>
-							</S.TabHeader>
-							{index !== transactions.length - 1 && <S.TabDivider />}
+									<div className={'delete-icon'}>
+										<IconButton
+											type={'primary'}
+											src={ASSETS.close}
+											handlePress={() => {
+												handleDeleteTab(index);
+											}}
+											dimensions={{ wrapper: 10, icon: 10 }}
+										/>
+									</div>
+								</div>
+								{label}
+							</S.TabAction>
 						</React.Fragment>
 					);
 				})}
-				<S.TabDivider />
-				<S.TabAction active={false} onClick={() => handleAddTab()}>
-					<div className={'add-icon'}>
-						<ReactSVG src={ASSETS.add} />
-					</div>
-					{language.new}
-				</S.TabAction>
+				<S.NewTab active={false} onClick={() => handleAddTab()}>
+					<ReactSVG src={ASSETS.add} />
+					{language.newTab}
+				</S.NewTab>
+				<S.Placeholder />
 			</S.TabsContent>
 		);
 	}, [transactions, activeTabIndex, language]);
@@ -326,7 +347,9 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 						]}
 					/>
 					<S.TabsWrapper>
+						<S.PlaceholderFull id={'placeholder-start'} />
 						<ViewWrapper>{tabs}</ViewWrapper>
+						<S.PlaceholderFull id={'placeholder-end'} />
 					</S.TabsWrapper>
 				</S.HeaderWrapper>
 				<ViewWrapper>

@@ -7,7 +7,7 @@ const Console = getLazyImport('Console');
 const Docs = getLazyImport('Docs');
 const NotFound = getLazyImport('NotFound');
 
-import { DOM, URLS } from 'helpers/config';
+import { DOM, LINKS, URLS } from 'helpers/config';
 import { Navigation } from 'navigation/Navigation';
 import { useLanguageProvider } from 'providers/LanguageProvider';
 import { useSettingsProvider } from 'providers/SettingsProvider';
@@ -62,6 +62,9 @@ export default function App() {
 						<S.Footer navigationOpen={settings.sidebarOpen}>
 							<p>
 								{language.app} {new Date().getFullYear()}
+							</p>
+							<p>
+								Built on <a href={LINKS.arweave} target={'_blank'}>Arweave</a> and <a href={LINKS.ao} target={'_blank'}>AO</a>
 							</p>
 						</S.Footer>
 					</S.ViewWrapper>

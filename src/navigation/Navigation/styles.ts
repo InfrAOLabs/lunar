@@ -158,6 +158,7 @@ export const SearchInputWrapper = styled.div`
 	position: relative;
 
 	input {
+		background: transparent;
 		padding: 10px 10px 10px 43.5px !important;
 	}
 
@@ -233,6 +234,11 @@ export const SearchResult = styled.div`
 		&:hover {
 			background: ${(props) => props.theme.colors.container.alt3.background};
 			border: 1px solid ${(props) => props.theme.colors.border.alt4};
+
+			svg {
+				color: ${(props) => props.theme.colors.link.active};
+				fill: ${(props) => props.theme.colors.link.active};
+			}
 		}
 	}
 `;
@@ -268,7 +274,7 @@ export const DNavWrapper = styled.div`
 	align-items: center;
 	gap: 30px;
 
-	@media (max-width: ${STYLING.cutoffs.secondary}) {
+	@media (max-width: ${STYLING.cutoffs.tablet}) {
 		display: none;
 	}
 `;
@@ -296,6 +302,7 @@ export const ActionsWrapper = styled.div`
 	display: flex;
 	align-items: center;
 	gap: 15px;
+	position: relative;
 `;
 
 export const DSearchWrapper = styled.div`
@@ -306,13 +313,24 @@ export const DSearchWrapper = styled.div`
 
 export const MSearchWrapper = styled.div`
 	display: none;
-	position: relative;
 
 	button {
 		padding: 3.5px 0 0 0 !important;
 	}
 
 	@media (max-width: ${STYLING.cutoffs.initial}) {
+		display: block;
+	}
+`;
+
+export const MMenuWrapper = styled.div`
+	display: none;
+
+	button {
+		padding: 3.5px 0 0 0 !important;
+	}
+
+	@media (max-width: ${STYLING.cutoffs.tablet}) {
 		display: block;
 	}
 `;
