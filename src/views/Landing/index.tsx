@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ReactSVG } from 'react-svg';
+import { useTheme } from 'styled-components';
 
 import { ViewWrapper } from 'app/styles';
 import { Button } from 'components/atoms/Button';
@@ -20,19 +21,44 @@ import { Metrics } from './Metrics';
 import * as S from './styles';
 
 export default function Landing() {
+	const theme = useTheme();
+
 	const arProvider = useArweaveProvider();
 	const permawebProvider = usePermawebProvider();
 	const languageProvider = useLanguageProvider();
 	const language = languageProvider.object[languageProvider.current];
 
+	React.useEffect(() => {
+		const header = document.getElementById('navigation-header');
+		if (!header) return;
+
+		const handleScroll = () => {
+			if (window.scrollY > 0) {
+				header.style.borderBottom = `1px solid ${theme.colors.border.primary}`;
+			} else {
+				header.style.borderBottom = 'none';
+			}
+		};
+
+		window.addEventListener('scroll', handleScroll);
+		handleScroll();
+
+		return () => {
+			window.removeEventListener('scroll', handleScroll);
+		};
+	}, [theme.colors.border.primary]);
+
 	return (
 		<S.Wrapper>
 			<S.HeaderWrapper>
-				<ViewHeader header={language.network} actions={[
-					<S.Subheader>
-						<span>AO Legacynet</span>
-					</S.Subheader>
-				]} />
+				<ViewHeader
+					header={language.network}
+					actions={[
+						<S.Subheader>
+							<span>AO Legacynet</span>
+						</S.Subheader>,
+					]}
+				/>
 			</S.HeaderWrapper>
 			<ViewWrapper>
 				<S.BodyWrapper>

@@ -2,6 +2,10 @@ import React from 'react';
 import { JSONTree } from 'react-json-tree';
 import { useTheme } from 'styled-components';
 
+import { IconButton } from 'components/atoms/IconButton';
+import { ASSETS } from 'helpers/config';
+import { useLanguageProvider } from 'providers/LanguageProvider';
+
 import * as S from './styles';
 
 export default function _JSONTree(props: {
@@ -10,28 +14,59 @@ export default function _JSONTree(props: {
 	placeholder?: string;
 	maxHeight?: number;
 	noWrapper?: boolean;
+	noFullScreen?: boolean;
 }) {
 	const currentTheme: any = useTheme();
 
+	const languageProvider = useLanguageProvider();
+	const language = languageProvider.object[languageProvider.current];
+
+	const readerRef = React.useRef(null);
+
 	const [data, setData] = React.useState<object | null>(null);
+	const [copied, setCopied] = React.useState<boolean>(false);
+	const [fullScreenMode, setFullScreenMode] = React.useState<boolean>(false);
+
+	const toggleFullscreen = React.useCallback(async () => {
+		const el = readerRef.current!;
+		if (!document.fullscreenElement) {
+			await el.requestFullscreen?.();
+		} else {
+			await document.exitFullscreen?.();
+		}
+	}, []);
+
+	const copyData = React.useCallback(async () => {
+		if (data) {
+			await navigator.clipboard.writeText(JSON.stringify(data, null, 4));
+			setCopied(true);
+			setTimeout(() => setCopied(false), 2000);
+		}
+	}, [data]);
 
 	React.useEffect(() => {
 		if (props.data) setData(parseJSON(props.data));
 	}, [props.data]);
 
+	React.useEffect(() => {
+		const onFullScreenChange = () => {
+			setFullScreenMode(!!document.fullscreenElement);
+		};
+		document.addEventListener('fullscreenchange', onFullScreenChange);
+		return () => {
+			document.removeEventListener('fullscreenchange', onFullScreenChange);
+		};
+	}, []);
+
 	const parseJSON = (input) => {
-		// Regular expression to match ANSI escape codes
 		const ansiRegex = /\x1B\[[0-9;]*m/g;
 
 		if (typeof input === 'string') {
-			// First, remove ANSI escape codes from the string
 			const strippedInput = input.replace(ansiRegex, '');
 			try {
-				// Attempt to parse further if the stripped string is still JSON
 				const parsed = JSON.parse(strippedInput);
 				return parseJSON(parsed);
 			} catch (e) {
-				// Return the cleaned string if parsing fails
 				return strippedInput;
 			}
 		} else if (Array.isArray(input)) {
@@ -43,7 +78,7 @@ export default function _JSONTree(props: {
 	};
 
 	const theme = {
-		base00: props.noWrapper ? currentTheme.colors.view.background : currentTheme.colors.container.alt1.background,
+		base00: props.noWrapper && !fullScreenMode ? currentTheme.colors.view.background : currentTheme.colors.container.alt1.background,
 		base01: currentTheme.colors.container.alt7.background,
 		base02: currentTheme.colors.container.alt7.background,
 		base03: currentTheme.colors.container.alt7.background,
@@ -63,15 +98,43 @@ export default function _JSONTree(props: {
 
 	return (
 		<S.Wrapper
-			className={`${props.noWrapper ? '' : 'border-wrapper-alt3 '}scroll-wrapper`}
+			className={`${props.noWrapper && !fullScreenMode ? '' : 'border-wrapper-alt3 '}scroll-wrapper`}
 			maxHeight={props.maxHeight}
-			noWrapper={props.noWrapper}
+			noWrapper={props.noWrapper && !fullScreenMode}
+			ref={readerRef}
 		>
-			{props.header && (
-				<S.Header>
-					<p>{props.header}</p>
-				</S.Header>
-			)}
+			<S.Header>
+				<p>{props.header ?? language.output}</p>
+
+				<S.ActionsWrapper>
+					{!props.noFullScreen && (
+						<IconButton
+							type={'alt1'}
+							src={ASSETS.fullscreen}
+							handlePress={toggleFullscreen}
+							dimensions={{
+								wrapper: 25,
+								icon: 12.5,
+							}}
+							tooltip={fullScreenMode ? language.exitFullScreen : language.enterFullScreen}
+							tooltipPosition={'bottom-right'}
+						/>
+					)}
+					<IconButton
+						type={'alt1'}
+						src={ASSETS.copy}
+						handlePress={copyData}
+						disabled={!data}
+						dimensions={{
+							wrapper: 25,
+							icon: 12.5,
+						}}
+						tooltip={copied ? `${language.copied}!` : language.copyJSON}
+						tooltipPosition={'bottom-right'}
+					/>
+				</S.ActionsWrapper>
+			</S.Header>
+
 			{data ? (
 				<JSONTree data={data} hideRoot={true} theme={theme} shouldExpandNodeInitially={() => true} />
 			) : (

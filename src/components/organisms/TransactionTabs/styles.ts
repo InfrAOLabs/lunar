@@ -113,10 +113,7 @@ export const TabAction = styled.div<{ active: boolean }>`
 
 	.delete-icon {
 		display: none;
-	}
-
-	.add-icon {
-		margin: 3.5px 0 0 0;
+		margin: 1.5px 0 0 0;
 	}
 
 	&:hover .normal-icon {
@@ -131,9 +128,9 @@ export const TabAction = styled.div<{ active: boolean }>`
 
 			&:hover {
 				svg {
-			color: ${(props) => props.theme.colors.warning.primary} !important;
-			fill: ${(props) => props.theme.colors.warning.primary} !important;
-		}
+					color: ${(props) => props.theme.colors.warning.primary} !important;
+					fill: ${(props) => props.theme.colors.warning.primary} !important;
+				}
 			}
 		}
 	}
@@ -187,6 +184,10 @@ export const TabAction = styled.div<{ active: boolean }>`
 
 export const NewTab = styled(TabAction)`
 	border-bottom: 1px solid ${(props) => props.theme.colors.border.primary} !important;
+
+	svg {
+		margin: 0 1.5px -1.5px 0;
+	}
 `;
 
 export const Placeholder = styled.div`
@@ -201,13 +202,11 @@ export const PlaceholderFull = styled(Placeholder)`
 
   @media (max-width: ${STYLING.cutoffs.initial}) {
     margin: auto -14.5px 0 -14.5px;
-
-    /* target this element when id="placeholder-start" */
+    
     &[id='placeholder-start'] {
       margin: auto -15.5px 0 0;
     }
-
-    /* target this element when id="placeholder-end" */
+    
     &[id='placeholder-end'] {
       margin: auto 0 0 -15.5px;
     }

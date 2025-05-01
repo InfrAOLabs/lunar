@@ -87,7 +87,7 @@ export type NotificationType = {
 
 export type TransactionType = 'process' | 'message';
 
-export type TransactionTabType = { id: string; label: string; type: TransactionType };
+export type TransactionTabType = { id: string; label: string; type: TransactionType | null };
 
 export type MetricDataPoint = {
 	created_date: string;
@@ -104,3 +104,8 @@ export type MetricDataPoint = {
 }
 
 export type MessageFilterType = 'incoming' | 'outgoing';
+
+export enum MessageVariantEnum {
+	Legacynet = 'ao.TN.1',
+	Mainnet = 'ao.N.1',
+}

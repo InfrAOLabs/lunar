@@ -34,7 +34,7 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 
 	const [transactions, setTransactions] = React.useState<TransactionTabType[]>(() => {
 		const stored = localStorage.getItem(storageKey);
-		return stored && JSON.parse(stored).length > 0 ? JSON.parse(stored) : [{ id: '', label: '', type: 'message' }];
+		return stored && JSON.parse(stored).length > 0 ? JSON.parse(stored) : [{ id: '', label: '', type: null }];
 	});
 	const [activeTabIndex, setActiveTabIndex] = React.useState<number>(getInitialIndex());
 	const [isClearing, setIsClearing] = React.useState<boolean>(false);
@@ -46,6 +46,8 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 			header.style.background = theme.colors.container.alt1.background;
 			header.style.position = 'relative';
 			header.style.boxShadow = `inset 0px 6px 6px -6px ${theme.colors.shadow.primary}`;
+			header.style.borderTop = `0.5px solid ${theme.colors.border.primary}`;
+			header.style.borderBottom = 'none';
 		}
 
 		return () => {
@@ -53,6 +55,7 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 				header.style.background = '';
 				header.style.position = 'sticky';
 				header.style.boxShadow = 'none';
+				header.style.borderTop = 'none';
 			}
 		};
 	}, [theme]);
@@ -191,7 +194,7 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 	};
 
 	const handleAddTab = (id?: string) => {
-		const newTab = { id: id ?? '', label: id ?? '', type: 'message' } as TransactionTabType;
+		const newTab = { id: id ?? '', label: id ?? '', type: null } as TransactionTabType;
 
 		flushSync(() => {
 			setIsClearing(true);
@@ -232,7 +235,7 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 
 		flushSync(() => {
 			setIsClearing(true);
-			setTransactions(updatedTransactions.length > 0 ? updatedTransactions : [{ id: '', label: '', type: 'message' }]);
+			setTransactions(updatedTransactions.length > 0 ? updatedTransactions : [{ id: '', label: '', type: null }]);
 			setActiveTabIndex(newActiveIndex);
 		});
 
@@ -249,7 +252,7 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 	const handleClearTabs = () => {
 		flushSync(() => {
 			setIsClearing(true);
-			setTransactions([{ id: '', label: '', type: 'message' }]);
+			setTransactions([{ id: '', label: '', type: null }]);
 			setActiveTabIndex(0);
 		});
 
@@ -272,7 +275,7 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 							<S.TabAction active={index === activeTabIndex} onClick={() => handleTabRedirect(index)}>
 								<div className={'icon-wrapper'}>
 									<div className={'normal-icon'}>
-										<ReactSVG src={ASSETS[tx.type]} />
+										<ReactSVG src={ASSETS[tx.type] ?? ASSETS.transaction} />
 									</div>
 									<div className={'delete-icon'}>
 										<IconButton
@@ -317,7 +320,6 @@ export default function TransactionTabs(props: { type: 'explorer' | 'aos' }) {
 						processId={tx.id}
 						active={index === activeTabIndex}
 						onTxChange={(newTx: GQLNodeResponseType) => handleTxChange(index, newTx)}
-						noWrapper
 					/>
 				);
 		}

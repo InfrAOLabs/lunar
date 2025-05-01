@@ -2,13 +2,14 @@ import styled from 'styled-components';
 
 import { STYLING } from 'helpers/config';
 
-export const Wrapper = styled.div<{ noWrapper?: boolean, fullScreenMode: boolean }>`
+export const Wrapper = styled.div<{ fullScreenMode: boolean }>`
 	min-height: 500px;
-	height: ${(props) => props.noWrapper ? `calc(100vh - 145px)` : `calc(100vh - 195px)`};
+	height: calc(100vh - 145px);
 	width: 100%;
 	position: relative;
 	display: flex;
-	gap: ${(props) => props.fullScreenMode ? '0' : '25px'};
+	gap: 15px;
+	padding: ${(props) => props.fullScreenMode ? '15px' : '0'};
 	background: ${(props) => props.theme.colors.view.background};
 
 	@media (max-width: ${STYLING.cutoffs.initial}) {
@@ -16,10 +17,10 @@ export const Wrapper = styled.div<{ noWrapper?: boolean, fullScreenMode: boolean
 	}
 `;
 
-export const ActionsWrapper = styled.div<{ noWrapper?: boolean, fullScreenMode: boolean; }>`
+export const ActionsWrapper = styled.div<{ fullScreenMode: boolean; }>`
 	position: absolute;
-	bottom: ${(props) => props.noWrapper && !props.fullScreenMode ? '0' : '20px'};
-	right: ${(props) => props.noWrapper && !props.fullScreenMode ? '0' : '20px'};
+	bottom: 20px;
+	right: 20px;
 
 	display: flex;
 	flex-direction: column;
@@ -42,6 +43,7 @@ export const ConsoleWrapper = styled.div<{ editorMode: boolean }>`
 	display: flex;
 	gap: 15px;
 	flex-direction: ${(props) => props.editorMode ? 'column' : 'row'};
+	position: relative;
 
 	@media (max-width: ${STYLING.cutoffs.initial}) {
 		flex-direction: column;
@@ -62,15 +64,14 @@ export const ConsoleDivider = styled.div<{ editorMode: boolean }>`
 	}
 `;
 
-export const Console = styled.div<{ noWrapper?: boolean }>`
+export const Console = styled.div`
 	height: 100%;
 	flex: 1;
-	overflow: hidden !important; 
 
 	.terminal {
-		padding: ${(props) => props.noWrapper ? '0' : '15px'};
 		height: 100% !important;
-		overflow: hidden !important; 
+		overflow: hidden !important;
+		padding: 15px;
 		span {
 			letter-spacing: 0 !important;
 		}
@@ -92,11 +93,10 @@ export const Console = styled.div<{ noWrapper?: boolean }>`
 	}
 `;
 
-export const Editor = styled.div<{ fullScreenMode: boolean }>`
+export const Editor = styled.div`
 	height: 100%;
 	width: 50%;
 	position: relative;
-	padding: ${(props) => props.fullScreenMode ? '15px' : '0'};
 
 	@media (max-width: ${STYLING.cutoffs.initial}) {
 		width: 100%;

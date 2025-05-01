@@ -25,7 +25,6 @@ export default function ConsoleInstance(props: {
 	processId: string;
 	active: boolean;
 	onTxChange?: (newTx: GQLNodeResponseType) => void;
-	noWrapper?: boolean;
 }) {
 	const theme = useTheme();
 
@@ -43,7 +42,9 @@ export default function ConsoleInstance(props: {
 	const hasConnectedRef = React.useRef(false);
 	const terminalInstance = React.useRef(null);
 	const logsInstance = React.useRef(null);
-	const fitAddon = React.useRef<FitAddon | null>(null);
+
+	const mainFitAddon = React.useRef<FitAddon | null>(null);
+	const logsFitAddon = React.useRef<FitAddon | null>(null);
 
 	const [inputProcessId, setInputProcessId] = React.useState<string>(props.processId ?? '');
 	const [loadingTx, setLoadingTx] = React.useState<boolean>(false);
@@ -75,24 +76,24 @@ export default function ConsoleInstance(props: {
 		}
 	}, []);
 
-	React.useEffect(() => {
-		if (terminalInstance.current) {
-			if (editorMode) {
-				terminalInstance.current.write(
-					`\r\n\r\n\x1b[90mEditor Open: Hit the checkmark or (Ctrl + L) to evaluate\x1b[0m`
-				);
-				hideCursor();
-				loadingRef.current = true;
-			} else {
-				clearLine();
-				showCursor();
-				terminalInstance.current.write(promptRef.current);
-				loadingRef.current = false;
-			}
-		}
+	// React.useEffect(() => {
+	// 	if (terminalInstance.current) {
+	// 		if (editorMode) {
+	// 			terminalInstance.current.write(
+	// 				`\r\n\r\n\x1b[90mEditor Open: Hit the checkmark or (Ctrl + L) to evaluate\x1b[0m`
+	// 			);
+	// 			hideCursor();
+	// 			loadingRef.current = true;
+	// 		} else {
+	// 			clearLine();
+	// 			showCursor();
+	// 			terminalInstance.current.write(promptRef.current);
+	// 			loadingRef.current = false;
+	// 		}
+	// 	}
 
-		loadingRef.current = editorMode;
-	}, [editorMode]);
+	// 	loadingRef.current = editorMode;
+	// }, [editorMode]);
 
 	React.useEffect(() => {
 		promptRef.current = prompt;
@@ -106,7 +107,7 @@ export default function ConsoleInstance(props: {
 					setEditorMode((prev) => !prev);
 				}
 			};
-	
+
 			window.addEventListener('keydown', onKeyDown, true);
 			return () => {
 				window.removeEventListener('keydown', onKeyDown, true);
@@ -125,16 +126,19 @@ export default function ConsoleInstance(props: {
 	}, []);
 
 	React.useEffect(() => {
-		if (!terminalRef.current || !fitAddon.current) return;
 		const ro = new ResizeObserver(() => {
-			fitAddon.current!.fit();
+			if (mainFitAddon.current) mainFitAddon.current.fit();
+			if (logsFitAddon.current) logsFitAddon.current.fit();
 		});
-		ro.observe(terminalRef.current);
+		if (terminalRef.current) ro.observe(terminalRef.current);
+		if (logsRef.current) ro.observe(logsRef.current);
+		return () => ro.disconnect();
+	}, []);
 
-		return () => {
-			ro.disconnect();
-		};
-	}, [editorMode, showResults]);
+	React.useEffect(() => {
+		if (mainFitAddon.current) mainFitAddon.current.fit();
+		if (logsFitAddon.current) logsFitAddon.current.fit();
+	}, [editorMode, showResults, fullScreenMode]);
 
 	React.useEffect(() => {
 		const onKeyDown = (e: KeyboardEvent) => {
@@ -221,14 +225,14 @@ export default function ConsoleInstance(props: {
 				});
 
 				const addon = new FitAddon();
-				fitAddon.current = addon;
+				mainFitAddon.current = addon;
 
-				terminalInstance.current.loadAddon(fitAddon.current);
+				terminalInstance.current.loadAddon(mainFitAddon.current);
 				terminalInstance.current.open(terminalRef.current);
-				fitAddon.current.fit();
+				mainFitAddon.current.fit();
 
 				const handleResize = () => {
-					fitAddon.current?.fit();
+					mainFitAddon.current?.fit();
 				};
 
 				window.addEventListener('resize', handleResize);
@@ -255,7 +259,6 @@ export default function ConsoleInstance(props: {
 					const cleanPrompt = stripAnsi(rawPrompt);
 
 					if (isCurrentlyWrapped) {
-						// grab exactly the slice for the wrapped row you’re on
 						const sliceStart = term.cols * (currentRow - 1);
 						const wrappedLine = (cleanPrompt + commandBuffer).slice(sliceStart, sliceStart + term.cols);
 						term.write(`\x1b[2K\r${wrappedLine}`);
@@ -407,24 +410,23 @@ export default function ConsoleInstance(props: {
 				fontFamily: theme.typography.family.alt2,
 				fontSize: 13,
 				fontWeight: 700,
-				theme: getTheme(theme),
+				theme: getTheme(theme, { useAltBackground: false }),
 			});
-			logsInstance.current.loadAddon(fitAddon.current);
+
+			const addon = new FitAddon();
+			logsFitAddon.current = addon;
+
+			logsInstance.current.loadAddon(logsFitAddon.current);
 			logsInstance.current.writeln('\x1b[90mResults\x1b[0m');
 			logsInstance.current.options.disableStdin = true;
 			hideCursor(logsInstance);
 		}
 
-		// now that the logsRef DOM node is there, open it and fit:
 		if (logsRef.current) {
 			logsInstance.current.open(logsRef.current);
-			// fitAddon.current.fit();
-			// optional: clear & re‐write “Results” header
-			// logsInstance.current.clear();
-			// logsInstance.current.writeln('\r\n\x1b[90mResults\x1b[0m');
 		}
 
-		fitAddon.current.fit();
+		logsFitAddon.current.fit();
 
 		return () => {
 			if (logsInstance.current) {
@@ -511,18 +513,18 @@ export default function ConsoleInstance(props: {
 			terminalInstance.current.refresh(0, terminalInstance.current.rows - 1);
 		}
 		if (logsInstance.current) {
-			logsInstance.current.options.theme = getTheme(theme);
+			logsInstance.current.options.theme = getTheme(theme, { useAltBackground: false });
 			logsInstance.current.refresh(0, logsInstance.current.rows - 1);
 		}
 	}, [theme]);
 
-	// React.useEffect(() => {
-	// 	if (consoleRef.current && props.active) {
-	// 		setTimeout(() => {
-	// 			consoleRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-	// 		}, 10);
-	// 	}
-	// }, [props.active]);
+	React.useEffect(() => {
+		if (consoleRef.current && props.active) {
+			setTimeout(() => {
+				consoleRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			}, 10);
+		}
+	}, [props.active]);
 
 	function handleEditorSend() {
 		if (editorData) sendMessage(editorData);
@@ -611,11 +613,14 @@ export default function ConsoleInstance(props: {
 		}
 	}
 
-	function getTheme(currentTheme: DefaultTheme) {
+	function getTheme(currentTheme: DefaultTheme, args?: { useAltBackground?: boolean }) {
 		return {
-			background: props.noWrapper ? currentTheme.colors.view.background : currentTheme.colors.container.alt1.background,
+			background: args?.useAltBackground
+				? currentTheme.colors.container.alt1.background
+				: currentTheme.colors.view.background,
 			foreground: currentTheme.colors.font.primary,
-			cursor: currentTheme.colors.font.alt1,
+			cursor: currentTheme.colors.font.alt2,
+			cursorAccent: currentTheme.colors.font.alt4,
 			black: currentTheme.colors.editor.alt10,
 			red: currentTheme.colors.editor.primary,
 			green: currentTheme.colors.editor.alt3,
@@ -647,7 +652,9 @@ export default function ConsoleInstance(props: {
 			spinnerInterval = null;
 		}
 		clearLine();
-		if (!editorMode) showCursor();
+		
+		// if (!editorMode) showCursor();
+		showCursor();
 	}
 
 	function startLoader() {
@@ -667,7 +674,9 @@ export default function ConsoleInstance(props: {
 		loadingRef.current = false;
 		setLoadingMessage(false);
 		clearLine();
-		if (!editorMode) showCursor();
+		
+		// if (!editorMode) showCursor();
+		showCursor();
 	}
 
 	function clearLine() {
@@ -774,13 +783,45 @@ export default function ConsoleInstance(props: {
 
 		return (
 			<S.ConsoleWrapper editorMode={editorMode}>
-				<S.Console className={`scroll-wrapper`} noWrapper={props.noWrapper && !fullScreenMode} ref={terminalRef} />
-				{hasConnected && showResults && (
-					<>
-						<S.ConsoleDivider editorMode={editorMode} />
-						<S.Console className={`scroll-wrapper`} noWrapper={props.noWrapper && !fullScreenMode} ref={logsRef} />
-					</>
-				)}
+				<S.Console className={'border-wrapper-alt1 scroll-wrapper'} ref={terminalRef} />
+				{hasConnected && showResults && <S.Console className={'border-wrapper-alt1 scroll-wrapper'} ref={logsRef} />}
+				<S.ActionsWrapper fullScreenMode={fullScreenMode}>
+					<IconButton
+						type={'alt1'}
+						src={showResults ? ASSETS.arrowRight : ASSETS.arrowLeft}
+						handlePress={() => setShowResults((prev) => !prev)}
+						dimensions={{
+							wrapper: 25,
+							icon: 12.5,
+						}}
+						disabled={!hasConnected}
+						tooltip={showResults ? language.hideResults : language.showResults}
+						tooltipPosition={'top-right'}
+					/>
+					<IconButton
+						type={'alt1'}
+						src={ASSETS.code}
+						handlePress={() => setEditorMode((prev) => !prev)}
+						dimensions={{
+							wrapper: 25,
+							icon: 12.5,
+						}}
+						disabled={!hasConnected}
+						tooltip={editorMode ? language.closeEditor : language.openEditor}
+						tooltipPosition={'top-right'}
+					/>
+					<IconButton
+						type={'alt1'}
+						src={ASSETS.fullscreen}
+						handlePress={toggleFullscreen}
+						dimensions={{
+							wrapper: 25,
+							icon: 12.5,
+						}}
+						tooltip={fullScreenMode ? language.exitFullScreen : language.enterFullScreen}
+						tooltipPosition={'top-right'}
+					/>
+				</S.ActionsWrapper>
 			</S.ConsoleWrapper>
 		);
 	}
@@ -789,9 +830,9 @@ export default function ConsoleInstance(props: {
 		<>
 			{arProvider.walletAddress ? (
 				<>
-					<S.Wrapper noWrapper={props.noWrapper} ref={consoleRef} fullScreenMode={fullScreenMode}>
+					<S.Wrapper ref={consoleRef} fullScreenMode={fullScreenMode}>
 						{editorMode && (
-							<S.Editor className={'fade-in'} fullScreenMode={fullScreenMode}>
+							<S.Editor className={'fade-in'}>
 								<Editor
 									initialData={''}
 									setEditorData={(data: string) => setEditorData(data)}
@@ -799,7 +840,7 @@ export default function ConsoleInstance(props: {
 									loading={loadingMessage}
 									noFullScreen
 								/>
-								<S.LoadWrapper noWrapper={props.noWrapper} fullScreenMode={fullScreenMode}>
+								<S.LoadWrapper fullScreenMode={fullScreenMode}>
 									<IconButton
 										type={'alt1'}
 										src={ASSETS.checkmark}
@@ -816,43 +857,6 @@ export default function ConsoleInstance(props: {
 							</S.Editor>
 						)}
 						{getConsole()}
-						<S.ActionsWrapper noWrapper={props.noWrapper} fullScreenMode={fullScreenMode}>
-							<IconButton
-								type={'alt1'}
-								src={showResults ? ASSETS.arrowRight : ASSETS.arrowLeft}
-								handlePress={() => setShowResults((prev) => !prev)}
-								dimensions={{
-									wrapper: 25,
-									icon: 12.5,
-								}}
-								disabled={!hasConnected}
-								tooltip={showResults ? language.hideResults : language.showResults}
-								tooltipPosition={'top-right'}
-							/>
-							<IconButton
-								type={'alt1'}
-								src={ASSETS.code}
-								handlePress={() => setEditorMode((prev) => !prev)}
-								dimensions={{
-									wrapper: 25,
-									icon: 12.5,
-								}}
-								disabled={!hasConnected}
-								tooltip={editorMode ? language.closeEditor : language.openEditor}
-								tooltipPosition={'top-right'}
-							/>
-							<IconButton
-								type={'alt1'}
-								src={ASSETS.fullscreen}
-								handlePress={toggleFullscreen}
-								dimensions={{
-									wrapper: 25,
-									icon: 12.5,
-								}}
-								tooltip={fullScreenMode ? language.exitFullScreen : language.enterFullScreen}
-								tooltipPosition={'top-right'}
-							/>
-						</S.ActionsWrapper>
 					</S.Wrapper>
 					{error && (
 						<Notification

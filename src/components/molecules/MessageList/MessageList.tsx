@@ -103,6 +103,11 @@ function Message(props: {
 
 	function getActionBackground() {
 		const action = getAction();
+
+		if (action.toLowerCase().includes('error')) {
+			return currentTheme.colors.warning.alt1;
+		}
+
 		switch (action) {
 			case DEFAULT_ACTIONS.eval.name:
 				return currentTheme.colors.actions.eval;
@@ -135,18 +140,18 @@ function Message(props: {
 				<S.ID>
 					<IconButton
 						type={'alt1'}
-						src={ASSETS.go}
+						src={ASSETS.newTab}
 						handlePress={() =>
 							props.handleOpen
 								? props.handleOpen(props.element.node.id)
 								: navigate(`${URLS.explorer}${props.element.node.id}`)
 						}
 						dimensions={{
-							wrapper: 22.5,
-							icon: 12.5,
+							wrapper: 20,
+							icon: 11.5,
 						}}
 						tooltip={language.openInNewTab}
-						tooltipPosition={'top-left'}
+						tooltipPosition={'right'}
 					/>
 
 					<TxAddress address={props.element.node.id} />
@@ -191,13 +196,13 @@ function Message(props: {
 					<S.ResultInfo>
 						<S.ResultInfoLine>
 							<S.ResultInfoLineValue>
-								<p>Message: </p>
+								<p>{`${language.message}: `}</p>
 							</S.ResultInfoLineValue>
 							<TxAddress address={props.element.node.id} />
 						</S.ResultInfoLine>
 						<S.ResultInfoLine>
 							<S.ResultInfoLineValue>
-								<p>Action: </p>
+								<p>{`${language.action}: `}</p>
 							</S.ResultInfoLineValue>
 							<S.ResultInfoLineValue>
 								<p>{getAction()}</p>
@@ -661,7 +666,7 @@ export default function MessageList(props: {
 								hideErrorMessage
 							/>
 						)}
-					
+
 						<S.FilterApply>
 							<Button
 								type={'alt1'}

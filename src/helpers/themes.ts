@@ -8,7 +8,7 @@ export const lightTheme = {
 	negative1: '#F16A82',
 	negative2: '#EE4463',
 	neutral1: '#FFFFFF',
-	neutral2: '#F9F9F9',
+	neutral2: '#FAFAFA',
 	neutral3: '#F0F0F0',
 	neutral4: '#E4E4E4',
 	neutral5: '#D6D6D6',

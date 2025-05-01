@@ -79,8 +79,7 @@ export default function Transaction(props: {
 				setTxResponse(responseData ?? null);
 				if (responseData) {
 					if (props.onTxChange) props.onTxChange(responseData);
-				}
-				else {
+				} else {
 					setError(language.txNotFound);
 				}
 			} catch (e: any) {
@@ -187,7 +186,7 @@ export default function Transaction(props: {
 											</S.MessageInfoLine>
 										</S.MessageInfoHeader>
 										<S.MessageInfoBody>
-										<S.MessageInfoLine>
+											<S.MessageInfoLine>
 												<span>{`${language.from}: `}</span>
 												<TxAddress
 													address={getTagValue(txResponse.node.tags, 'From-Process') ?? txResponse.node.owner.address}
@@ -203,7 +202,11 @@ export default function Transaction(props: {
 											</S.MessageInfoLine>
 											<S.MessageInfoLine>
 												<span>{`${language.blockHeight}: `}</span>
-												<p>{txResponse?.node?.block?.height ? formatCount(txResponse?.node?.block?.height.toString()) : '-'}</p>
+												<p>
+													{txResponse?.node?.block?.height
+														? formatCount(txResponse?.node?.block?.height.toString())
+														: '-'}
+												</p>
 											</S.MessageInfoLine>
 											<S.MessageInfoLine>
 												<span>{`${language.timestamp}: `}</span>
@@ -215,7 +218,11 @@ export default function Transaction(props: {
 											</S.MessageInfoLine>
 										</S.MessageInfoBody>
 									</S.MessageInfo>
-									<MessageResult processId={txResponse?.node?.recipient} messageId={inputTxId} />
+									<MessageResult
+										processId={txResponse?.node?.recipient}
+										messageId={inputTxId}
+										variant={getTagValue(txResponse.node.tags, TAGS.keys.variant)}
+									/>
 								</>
 							)}
 						</S.ReadWrapper>
@@ -266,8 +273,10 @@ export default function Transaction(props: {
 					icon: ASSETS.code,
 					disabled: false,
 					url: URLS.explorerSource(inputTxId),
-					view: () => <ProcessSource processId={inputTxId} onBoot={getTagValue(txResponse?.node?.tags, TAGS.keys.onBoot)} />,
-				},
+					view: () => (
+						<ProcessSource processId={inputTxId} onBoot={getTagValue(txResponse?.node?.tags, TAGS.keys.onBoot)} />
+					),
+				}
 			);
 
 			if (arProvider.walletAddress && txResponse?.node?.owner?.address === arProvider.walletAddress) {
@@ -276,7 +285,7 @@ export default function Transaction(props: {
 					icon: ASSETS.console,
 					disabled: false,
 					url: URLS.explorerAOS(inputTxId),
-					view: () => <ConsoleInstance processId={inputTxId} active={true} noWrapper />,
+					view: () => <ConsoleInstance processId={inputTxId} active={true} />,
 				});
 			}
 		}
@@ -287,12 +296,7 @@ export default function Transaction(props: {
 	const transactionTabs = React.useMemo(() => {
 		const matchingTab = TABS.find((tab) => tab.url === currentHash);
 		const activeUrl = matchingTab ? matchingTab.url : TABS[0].url;
-		return (
-			<URLTabs
-				tabs={TABS}
-				activeUrl={activeUrl}
-			/>
-		);
+		return <URLTabs tabs={TABS} activeUrl={activeUrl} />;
 	}, [TABS]);
 
 	function getTransaction() {
@@ -355,9 +359,11 @@ export default function Transaction(props: {
 					</S.SearchWrapper>
 					<S.HeaderActionsWrapper>
 						<S.TxInfoWrapper>
-							<S.UpdateWrapper>
-								<span>{props.type}</span>
-							</S.UpdateWrapper>
+							{props.type && (
+								<S.UpdateWrapper>
+									<span>{props.type}</span>
+								</S.UpdateWrapper>
+							)}
 							{txResponse?.node?.tags && (
 								<S.UpdateWrapper>
 									<span>{getTagValue(txResponse.node.tags, 'Variant')}</span>

@@ -52,6 +52,7 @@ export const ASSETS = {
 	menu: getTxEndpoint('0La3-o2_gGMDbkfV4zVVUMjTYQ7Cn9YWQ2JO-FbjAIk'),
 	message: getTxEndpoint('GDlYmHD-I2AeYRx6VpZGxbRa0UaI1OcC_iBcl6FBOGw'),
 	navigation: getTxEndpoint('uFsSvBhbWZak9j5QWXIdeZ97ky_s0JsaIZ45KVXmD_8'),
+	newTab: getTxEndpoint('8rHxhGbWrv_jPk3Ku_mL6BvTbdTiRLvSNPwOU-neU_I'),
 	paragraph: getTxEndpoint('R18ieTzflNf8U8AGo4E__ZLUOvFjBBhOmRFUFll51Do'),
 	post: getTxEndpoint('nPknvEex1uekCo-HZ-5uzsMw4u_rJzj8wZVK5QI3WKw'),
 	posts: getTxEndpoint('scJ-YfxBggKURU_lF7eLLrKSe9L7cBD1GB1bcIpzKJI'),
@@ -70,6 +71,7 @@ export const ASSETS = {
 	telegram: getTxEndpoint('uerxx9yd8y3DGRIJ4F9TjF4BryagPuINo5-Jo8qmno4'),
 	time: getTxEndpoint('EDfjYP_Fq8XycJ92uVeLDCmOCUMoSoPVbAhfE1ZwCJE'),
 	tools: getTxEndpoint('ORGiGGMr6wIsjVNmWuy9m-CIH8jbY3juwoDLDdxvER8'),
+	transaction: getTxEndpoint('8rHxhGbWrv_jPk3Ku_mL6BvTbdTiRLvSNPwOU-neU_I'),
 	upload: getTxEndpoint('fNHk67l-JsJMKyWvSXoO6Nmcxy1imhlKwACxSMEGKAE'),
 	user: getTxEndpoint('aOk91wDJnZ1xQbQum0MHoaOldAiumdFjdjM4LVM83NQ'),
 	users: getTxEndpoint('LfFkPVJBgBWgJwCtoceyS_EAyYa-r__AjAB5_JAx3aw'),
@@ -85,7 +87,8 @@ export const ASSETS = {
 export const TAGS = {
 	keys: {
 		onBoot: 'On-Boot',
-		type: 'Type'
+		type: 'Type',
+		variant: 'Variant'
 	},
 	values: {
 		eval: 'Eval',
@@ -109,7 +112,7 @@ export const DEFAULT_ACTIONS = {
 
 export const DEFAULT_AO_TAGS = [
 	{ name: 'Data-Protocol', values: ['ao'] },
-	{ name: 'Variant', values: ['ao.TN.1'] },
+	// { name: 'Variant', values: ['ao.TN.1'] }, // TODO
 ]
 
 export const DEFAULT_MESSAGE_TAGS = [{ name: 'Type', values: ['Message'] }, ...DEFAULT_AO_TAGS];

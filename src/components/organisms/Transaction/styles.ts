@@ -69,7 +69,7 @@ export const ReadWrapper = styled.div`
 
 export const MessageInfo = styled.div`
 	width: 100%;
-	padding: 7.5px 15px;
+	
 `;
 
 export const MessageInfoHeader = styled.div`
@@ -77,6 +77,11 @@ export const MessageInfoHeader = styled.div`
 	align-items: center;
 	justify-content: space-between;
 	gap: 15px;
+	background: ${(props) => props.theme.colors.container.alt1.background};
+	border-bottom: 1px solid ${(props) => props.theme.colors.border.primary};
+	border-top-left-radius: ${STYLING.dimensions.radius.alt1};
+	border-top-right-radius: ${STYLING.dimensions.radius.alt1};
+	padding: 15px;
 	p {
 		font-size: ${(props) => props.theme.typography.size.lg};
 		font-family: ${(props) => props.theme.typography.family.primary};
@@ -85,6 +90,7 @@ export const MessageInfoHeader = styled.div`
 	}
 
 	> div {
+		padding: 0 !important;
 		border-right: none !important;
 	}
 `;
@@ -118,7 +124,7 @@ export const MessageInfoLine = styled.div`
 	display: flex;
 	align-items: center;
 	gap: 7.5px;
-	padding: 7.5px 0;
+	padding: 7.5px 15px;;
 	border-right: 1px solid ${(props) => props.theme.colors.border.primary};
 	span {
 		font-size: ${(props) => props.theme.typography.size.xSmall};

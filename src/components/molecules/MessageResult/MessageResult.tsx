@@ -9,7 +9,7 @@ import { usePermawebProvider } from 'providers/PermawebProvider';
 
 import * as S from './styles';
 
-export default function MessageResult(props: { processId: string; messageId: string }) {
+export default function MessageResult(props: { processId: string; messageId: string; variant: any }) {
 	const permawebProvider = usePermawebProvider();
 
 	const languageProvider = useLanguageProvider();
@@ -24,11 +24,10 @@ export default function MessageResult(props: { processId: string; messageId: str
 				try {
 					const messageFetch = await fetch(getTxEndpoint(props.messageId));
 					const rawMessage = await messageFetch.text();
-					
+
 					try {
 						setData(JSON.parse(rawMessage));
-					}
-					catch {}
+					} catch {}
 
 					const messageResult = await permawebProvider.deps.ao.result({
 						process: props.processId,
@@ -42,18 +41,16 @@ export default function MessageResult(props: { processId: string; messageId: str
 		})();
 	}, [result]);
 
-	console.log(data)
-
 	return (
 		<S.Wrapper>
 			{result ? (
 				<>
-				{data && typeof(data) === 'object' && <JSONReader data={data} header={language.data} maxHeight={600} />}
-				<JSONReader data={result} header={language.result} maxHeight={600} />
+					{data && typeof data === 'object' && <JSONReader data={data} header={language.data} maxHeight={600} />}
+					<JSONReader data={result} header={language.result} maxHeight={600} />
 				</>
 			) : (
 				<Loader sm relative />
 			)}
 		</S.Wrapper>
-	)
+	);
 }

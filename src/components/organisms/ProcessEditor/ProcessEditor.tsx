@@ -89,7 +89,7 @@ export default function ProcessEditor(props: { processId: string; type: 'read' |
 				/>
 			</S.EditorWrapper>
 			<S.ResultWrapper>
-				<JSONReader data={output} header={language.response} placeholder={'Run to get a response'} />
+				<JSONReader data={output} header={language.response} placeholder={language.runForResponse} noFullScreen />
 			</S.ResultWrapper>
 		</S.Wrapper>
 	);
