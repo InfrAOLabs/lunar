@@ -12,7 +12,7 @@ import { useArweaveProvider } from './ArweaveProvider';
 import { useLanguageProvider } from './LanguageProvider';
 
 interface PermawebContextState {
-	deps: { ao: any, arweave: any, signer: any };
+	deps: { ao: any; arweave: any; signer: any };
 	libs: any;
 	profile: ProfileType;
 	showProfileManager: boolean;
@@ -53,8 +53,8 @@ export function PermawebProvider(props: { children: React.ReactNode }) {
 		const signer = arProvider.wallet ? createSigner(arProvider.wallet) : null;
 
 		const depsToUse = { ao, arweave, signer };
-		
-		setDeps(depsToUse)
+
+		setDeps(depsToUse);
 		setLibs(PermawebLibs.init(depsToUse));
 	}, [arProvider.wallet]);
 
@@ -73,8 +73,7 @@ export function PermawebProvider(props: { children: React.ReactNode }) {
 				} catch (e: any) {
 					console.error(e);
 				}
-			}
-			else {
+			} else {
 				setProfile(null);
 			}
 		})();

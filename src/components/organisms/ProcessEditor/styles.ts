@@ -22,7 +22,6 @@ export const ResultWrapper = styled.div`
 	height: 100%;
 	flex: 1;
 
-
 	> * {
 		&:first-child {
 			height: 100%;

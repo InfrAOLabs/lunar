@@ -98,14 +98,14 @@ export default function _Editor(props: {
 	}, []);
 
 	React.useEffect(() => {
-			const onFullScreenChange = () => {
-				setFullScreenMode(!!document.fullscreenElement);
-			};
-			document.addEventListener('fullscreenchange', onFullScreenChange);
-			return () => {
-				document.removeEventListener('fullscreenchange', onFullScreenChange);
-			};
-		}, []);
+		const onFullScreenChange = () => {
+			setFullScreenMode(!!document.fullscreenElement);
+		};
+		document.addEventListener('fullscreenchange', onFullScreenChange);
+		return () => {
+			document.removeEventListener('fullscreenchange', onFullScreenChange);
+		};
+	}, []);
 
 	React.useEffect(() => {
 		const onKeyDown = (e: KeyboardEvent) => {

@@ -78,7 +78,10 @@ export default function _JSONTree(props: {
 	};
 
 	const theme = {
-		base00: props.noWrapper && !fullScreenMode ? currentTheme.colors.view.background : currentTheme.colors.container.alt1.background,
+		base00:
+			props.noWrapper && !fullScreenMode
+				? currentTheme.colors.view.background
+				: currentTheme.colors.container.alt1.background,
 		base01: currentTheme.colors.container.alt7.background,
 		base02: currentTheme.colors.container.alt7.background,
 		base03: currentTheme.colors.container.alt7.background,

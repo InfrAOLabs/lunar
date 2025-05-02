@@ -61,9 +61,9 @@ export default function Metrics() {
 			) : (
 				<>
 					<S.Placeholder className={'border-wrapper-alt3'} />
-					<S.Placeholder className={'border-wrapper-alt3'}/>
-					<S.Placeholder className={'border-wrapper-alt3'}/>
-					<S.Placeholder className={'border-wrapper-alt3'}/>
+					<S.Placeholder className={'border-wrapper-alt3'} />
+					<S.Placeholder className={'border-wrapper-alt3'} />
+					<S.Placeholder className={'border-wrapper-alt3'} />
 				</>
 			)}
 		</S.Wrapper>

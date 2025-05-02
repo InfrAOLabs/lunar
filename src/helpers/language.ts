@@ -131,6 +131,6 @@ export const language = {
 		view: `View`,
 		walletAddress: `Wallet Address`,
 		write: `Write`,
-		yourProcesses: `Your processes`
+		yourProcesses: `Your processes`,
 	},
 };

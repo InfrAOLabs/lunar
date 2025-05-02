@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 
-export const Wrapper = styled.div<{ maxHeight?: number, noWrapper?: boolean }>`
-	max-height: ${(props) => props.maxHeight ? `${props.maxHeight.toString()}px` : 'none'};
-	padding: ${(props) => props.noWrapper ? '0' : '10px 15px 15px 15px'};
+export const Wrapper = styled.div<{ maxHeight?: number; noWrapper?: boolean }>`
+	max-height: ${(props) => (props.maxHeight ? `${props.maxHeight.toString()}px` : 'none')};
+	padding: ${(props) => (props.noWrapper ? '0' : '10px 15px 15px 15px')};
 	font-family: ${(props) => props.theme.typography.family.alt2};
 	font-weight: ${(props) => props.theme.typography.weight.bold};
 	font-size: ${(props) => props.theme.typography.size.xxSmall};
@@ -44,11 +44,11 @@ export const Placeholder = styled.div`
 `;
 
 export const ActionsWrapper = styled.div`
-  width: fit-content;
-  display: flex;
-  gap: 15px;
+	width: fit-content;
+	display: flex;
+	gap: 15px;
 
 	button {
 		padding: 3.5px 0 0 0 !important;
 	}
-`
+`;

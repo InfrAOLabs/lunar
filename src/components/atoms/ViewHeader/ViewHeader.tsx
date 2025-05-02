@@ -10,14 +10,14 @@ export default function ViewHeader(props: IProps) {
 		<S.HeaderWrapper>
 			<ViewWrapper>
 				<S.HeaderContent>
-				<h4>{props.header}</h4>
-				{props.actions && (
-					<S.HeaderActions>
-						{props.actions.map((action: React.ReactNode, index: number) => (
-							<React.Fragment key={index}>{action}</React.Fragment>
-						))}
-					</S.HeaderActions>
-				)}
+					<h4>{props.header}</h4>
+					{props.actions && (
+						<S.HeaderActions>
+							{props.actions.map((action: React.ReactNode, index: number) => (
+								<React.Fragment key={index}>{action}</React.Fragment>
+							))}
+						</S.HeaderActions>
+					)}
 				</S.HeaderContent>
 			</ViewWrapper>
 		</S.HeaderWrapper>

@@ -57,7 +57,7 @@ export type BatchAGQLResponseType = { [queryKey: string]: DefaultGQLResponseType
 export enum WalletEnum {
 	arConnect = 'arconnect',
 	othent = 'othent',
-	wander = 'wander'
+	wander = 'wander',
 }
 
 export type FormFieldType = 'number' | 'password';
@@ -101,7 +101,7 @@ export type MetricDataPoint = {
 	tx_count_rolling: number;
 	processes_rolling: number;
 	modules_rolling: number;
-}
+};
 
 export type MessageFilterType = 'incoming' | 'outgoing';
 

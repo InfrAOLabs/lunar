@@ -18,7 +18,7 @@ export const Content = styled.div`
 
 	max-width: ${STYLING.cutoffs.max};
 	padding: 0 25px;
-    margin: 0 auto;
+	margin: 0 auto;
 
 	display: flex;
 	align-items: center;
@@ -198,7 +198,7 @@ export const SearchOutputPlaceholder = styled.div`
 	padding: 20px 15px;
 	background: ${(props) => props.theme.colors.container.alt1.background};
 	border-radius: ${STYLING.dimensions.radius.primary};
-    border: 1px solid ${(props) => props.theme.colors.border.primary};
+	border: 1px solid ${(props) => props.theme.colors.border.primary};
 	p {
 		color: ${(props) => props.theme.colors.font.alt1};
 		font-size: ${(props) => props.theme.typography.size.xxSmall} !important;
@@ -218,7 +218,7 @@ export const SearchResult = styled.div`
 		background: ${(props) => props.theme.colors.container.alt1.background};
 		border-radius: ${STYLING.dimensions.radius.primary};
 		border: 1px solid ${(props) => props.theme.colors.border.primary};
-		
+
 		font-size: ${(props) => props.theme.typography.size.xSmall} !important;
 		font-weight: ${(props) => props.theme.typography.weight.bold} !important;
 		font-family: ${(props) => props.theme.typography.family.primary} !important;
@@ -230,7 +230,7 @@ export const SearchResult = styled.div`
 			color: ${(props) => props.theme.colors.link.color};
 			fill: ${(props) => props.theme.colors.link.color};
 		}
-		
+
 		&:hover {
 			background: ${(props) => props.theme.colors.container.alt3.background};
 			border: 1px solid ${(props) => props.theme.colors.border.alt4};
@@ -281,7 +281,7 @@ export const DNavWrapper = styled.div`
 
 export const DNavLink = styled.div<{ active: boolean }>`
 	a {
-		color: ${(props) => props.active ? props.theme.colors.font.primary : props.theme.colors.font.alt1};
+		color: ${(props) => (props.active ? props.theme.colors.font.primary : props.theme.colors.font.alt1)};
 		font-family: ${(props) => props.theme.typography.family.alt1};
 		font-size: ${(props) => props.theme.typography.size.small};
 		font-weight: ${(props) => props.theme.typography.weight.bold};
@@ -289,7 +289,7 @@ export const DNavLink = styled.div<{ active: boolean }>`
 		letter-spacing: 0.35px;
 
 		padding: 0 0 2.5px 0;
-		border-bottom: 2.5px solid ${(props) => props.active ? props.theme.colors.border.alt5 : 'transparent'};
+		border-bottom: 2.5px solid ${(props) => (props.active ? props.theme.colors.border.alt5 : 'transparent')};
 
 		&:hover {
 			color: ${(props) => props.theme.colors.font.primary};

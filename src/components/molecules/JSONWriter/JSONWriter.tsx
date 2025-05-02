@@ -47,7 +47,7 @@ export default function JSONWriter(props: {
 	const themes = {
 		light: 'editorLight',
 		dark: 'editorDark',
-	}
+	};
 
 	const handleBeforeMount: BeforeMount = (monaco) => {
 		monacoRef.current = monaco;
@@ -92,12 +92,12 @@ export default function JSONWriter(props: {
 	}, [currentTheme, themeName]);
 
 	const handleEditorDidMount: OnMount = (editor, monaco) => {
-		editor.onKeyDown(e => {
-			if ((e.metaKey||e.ctrlKey) && e.keyCode === monaco.KeyCode.Enter) {
-			  const current = editor.getValue();
-			  props.handleSubmit(JSON.parse(current));
+		editor.onKeyDown((e) => {
+			if ((e.metaKey || e.ctrlKey) && e.keyCode === monaco.KeyCode.Enter) {
+				const current = editor.getValue();
+				props.handleSubmit(JSON.parse(current));
 			}
-		  });
+		});
 	};
 
 	function handleChange(value: string) {
@@ -151,7 +151,7 @@ export default function JSONWriter(props: {
 								horizontalScrollbarSize: 12,
 								arrowSize: 10,
 								useShadows: false,
-							  }
+							},
 						}}
 					/>
 				</S.Editor>

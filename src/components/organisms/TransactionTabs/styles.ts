@@ -35,7 +35,6 @@ export const TabsContent = styled.div`
 	overflow-x: auto;
 	overflow-y: hidden;
 	padding: 0 1px 1.5px 1px;
-
 `;
 
 export const TabDivider = styled.div`
@@ -48,10 +47,10 @@ export const TabDivider = styled.div`
 export const DeleteAction = styled.div`
 	display: none;
 	position: absolute;
-    right: 4.5px;
-    right: 0;
-    bottom: 50%;
-    transform: translate(0, 25%);
+	right: 4.5px;
+	right: 0;
+	bottom: 50%;
+	transform: translate(0, 25%);
 	svg {
 		margin: 3.5px 0 0 0 !important;
 	}
@@ -71,8 +70,7 @@ export const TabAction = styled.div<{ active: boolean }>`
 	font-size: ${(props) => props.theme.typography.size.xSmall};
 	font-weight: ${(props) => props.theme.typography.weight.bold};
 	font-family: ${(props) => props.theme.typography.family.primary};
-	color: ${(props) =>
-		props.active ? props.theme.colors.font.primary : props.theme.colors.font.alt3};
+	color: ${(props) => (props.active ? props.theme.colors.font.primary : props.theme.colors.font.alt3)};
 	cursor: pointer;
 	position: relative;
 	z-index: 1;
@@ -81,14 +79,14 @@ export const TabAction = styled.div<{ active: boolean }>`
 	align-items: center;
 	gap: 12.5px;
 	padding: 12.5px 25.5px 10.5px 21.5px;
-    margin: 0 0 -1.5px 0;
-	background: ${(props) => props.active ? props.theme.colors.view.background : 'transparent'};
-	border-bottom: 1px solid ${(props) => props.active ? 'transparent' : props.theme.colors.border.primary};
-	border-top: 2px solid ${(props) => props.active ? props.theme.colors.border.alt5 : 'transparent'};
+	margin: 0 0 -1.5px 0;
+	background: ${(props) => (props.active ? props.theme.colors.view.background : 'transparent')};
+	border-bottom: 1px solid ${(props) => (props.active ? 'transparent' : props.theme.colors.border.primary)};
+	border-top: 2px solid ${(props) => (props.active ? props.theme.colors.border.alt5 : 'transparent')};
 
 	white-space: nowrap;
 	transition: all 100ms;
-	
+
 	.icon-wrapper {
 		position: relative;
 		width: 12.5px;
@@ -122,7 +120,7 @@ export const TabAction = styled.div<{ active: boolean }>`
 
 	&:hover .delete-icon {
 		display: block;
-		
+
 		button {
 			background: transparent !important;
 
@@ -138,10 +136,8 @@ export const TabAction = styled.div<{ active: boolean }>`
 	svg {
 		height: 12.5px;
 		width: 12.5px;
-		color: ${(props) =>
-		props.active ? props.theme.colors.font.primary : props.theme.colors.font.alt3};
-		fill: ${(props) =>
-		props.active ? props.theme.colors.font.primary : props.theme.colors.font.alt3};
+		color: ${(props) => (props.active ? props.theme.colors.font.primary : props.theme.colors.font.alt3)};
+		fill: ${(props) => (props.active ? props.theme.colors.font.primary : props.theme.colors.font.alt3)};
 	}
 
 	&:hover {
@@ -161,12 +157,12 @@ export const TabAction = styled.div<{ active: boolean }>`
 		left: 0;
 		transform: translate(-50%, 0);
 		top: 0;
-		background: ${(props) => props.active ? props.theme.colors.border.primary : 'transparent'};
+		background: ${(props) => (props.active ? props.theme.colors.border.primary : 'transparent')};
 		height: 100%;
 		width: 1px;
 		pointer-events: none;
 	}
-	
+
 	&:after {
 		display: block;
 		content: '';
@@ -175,7 +171,7 @@ export const TabAction = styled.div<{ active: boolean }>`
 		right: -1px;
 		transform: translate(-50%, 0);
 		top: 0;
-		background: ${(props) => props.active ? props.theme.colors.border.primary : 'transparent'};
+		background: ${(props) => (props.active ? props.theme.colors.border.primary : 'transparent')};
 		height: 100%;
 		width: 1px;
 		pointer-events: none;
@@ -198,23 +194,23 @@ export const Placeholder = styled.div`
 `;
 
 export const PlaceholderFull = styled(Placeholder)`
-  margin: auto -26.5px 0 -26.5px;
+	margin: auto -26.5px 0 -26.5px;
 
-  @media (max-width: ${STYLING.cutoffs.initial}) {
-    margin: auto -14.5px 0 -14.5px;
-    
-    &[id='placeholder-start'] {
-      margin: auto -15.5px 0 0;
-    }
-    
-    &[id='placeholder-end'] {
-      margin: auto 0 0 -15.5px;
-    }
-  }
+	@media (max-width: ${STYLING.cutoffs.initial}) {
+		margin: auto -14.5px 0 -14.5px;
+
+		&[id='placeholder-start'] {
+			margin: auto -15.5px 0 0;
+		}
+
+		&[id='placeholder-end'] {
+			margin: auto 0 0 -15.5px;
+		}
+	}
 `;
 
 export const TransactionWrapper = styled.div<{ active: boolean }>`
-	display: ${(props) => props.active ? 'block' : 'none'};
+	display: ${(props) => (props.active ? 'block' : 'none')};
 `;
 
 export const ModalWrapper = styled.div`

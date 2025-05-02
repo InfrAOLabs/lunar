@@ -19,7 +19,7 @@ export const HeaderContent = styled.div`
 		font-weight: ${(props) => props.theme.typography.weight.xBold};
 		color: ${(props) => props.theme.colors.font.primary};
 	}
-`
+`;
 
 export const HeaderActions = styled.div`
 	display: flex;

@@ -33,18 +33,18 @@ export const HeaderMain = styled.div`
 		font-weight: ${(props) => props.theme.typography.weight.bold};
 		color: ${(props) => props.theme.colors.font.primary};
 	}
-	
+
 	.update-wrapper {
 		padding: 2.5px 25px;
 	}
-	
+
 	.loader {
 		> div {
 			height: fit-content;
 			width: fit-content;
 		}
 	}
-`
+`;
 
 export const HeaderActions = styled.div`
 	display: flex;
@@ -112,7 +112,8 @@ export const Divider = styled.div`
 export const Wrapper = styled.div<{ childList?: boolean }>`
 	width: 100%;
 	overflow: auto;
-	background: ${(props) => props.childList ? props.theme.colors.container.alt2.background : props.theme.colors.container.primary.background};
+	background: ${(props) =>
+		props.childList ? props.theme.colors.container.alt2.background : props.theme.colors.container.primary.background};
 `;
 
 export const HeaderWrapper = styled.div`
@@ -150,29 +151,23 @@ export const BodyWrapper = styled.div<{
 	isOverallLast?: boolean;
 }>`
 	width: 100%;
-  
+
 	> *:last-child {
-	  border-bottom: 1px solid
-		${(props) =>
-		props.childList && !props.isOverallLast
-			? props.theme.colors.border.alt4
-			: props.theme.colors.border.primary} !important;
+		border-bottom: 1px solid
+			${(props) =>
+				props.childList && !props.isOverallLast
+					? props.theme.colors.border.alt4
+					: props.theme.colors.border.primary} !important;
 	}
-  
+
 	.message-list-element {
-	  border-left: 1px solid
-		${(props) =>
-		props.childList
-			? props.theme.colors.border.alt4
-			: props.theme.colors.border.primary};
-	  border-right: 1px solid
-		${(props) =>
-		props.childList
-			? props.theme.colors.border.alt4
-			: props.theme.colors.border.primary};
-	  border-bottom: 1px solid ${(props) => props.theme.colors.border.primary};
+		border-left: 1px solid
+			${(props) => (props.childList ? props.theme.colors.border.alt4 : props.theme.colors.border.primary)};
+		border-right: 1px solid
+			${(props) => (props.childList ? props.theme.colors.border.alt4 : props.theme.colors.border.primary)};
+		border-bottom: 1px solid ${(props) => props.theme.colors.border.primary};
 	}
-  `;
+`;
 export const ElementWrapper = styled.div<{ open: boolean; lastChild?: boolean }>`
 	height: 40px;
 	min-width: 100%;
@@ -195,7 +190,7 @@ export const ElementWrapper = styled.div<{ open: boolean; lastChild?: boolean }>
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
-	
+
 	&:hover {
 		background: ${(props) => props.theme.colors.container.primary.active};
 		border-left: 1px solid ${(props) => props.theme.colors.border.alt4} !important;
@@ -204,7 +199,7 @@ export const ElementWrapper = styled.div<{ open: boolean; lastChild?: boolean }>
 	}
 
 	&:hover::after {
-		content: "";
+		content: '';
 		position: absolute;
 		height: 1px;
 		width: calc(100% + 2px);
@@ -215,18 +210,18 @@ export const ElementWrapper = styled.div<{ open: boolean; lastChild?: boolean }>
 		border-top: 1px solid ${(props) => props.theme.colors.border.alt4};
 		transition: all 100ms;
 	}
-	
+
 	${(props) =>
 		props.open &&
 		css`
 			border-left: 1px solid ${props.theme.colors.border.alt4} !important;
 			border-right: 1px solid ${props.theme.colors.border.alt4} !important;
 			border-bottom: 1px solid ${props.theme.colors.border.alt4} !important;
-			
+
 			background: ${props.theme.colors.container.primary.active};
 
 			&::after {
-				content: "";
+				content: '';
 				position: absolute;
 				height: 1px;
 				width: calc(100% + 2px);
@@ -261,7 +256,7 @@ export const ActionTooltip = styled.div`
 	position: absolute;
 	z-index: 2;
 	top: 2.5px;
-    left: calc(100% + 10px);
+	left: calc(100% + 10px);
 	display: none;
 	white-space: nowrap;
 
@@ -271,7 +266,7 @@ export const ActionTooltip = styled.div`
 	}
 `;
 
-export const ActionValue = styled(Action) <{ background?: string }>`
+export const ActionValue = styled(Action)<{ background?: string }>`
 	min-width: 200px;
 	width: 200px;
 	position: relative;
@@ -283,7 +278,7 @@ export const ActionValue = styled(Action) <{ background?: string }>`
 		justify-content: center;
 		align-items: center;
 		padding: 2.15px 7.5px;
-		background: ${(props) => props.background ? props.background : props.theme.colors.container.alt8.background};
+		background: ${(props) => (props.background ? props.background : props.theme.colors.container.alt8.background)};
 		border-radius: ${STYLING.dimensions.radius.alt2};
 
 		&:hover {
@@ -292,7 +287,7 @@ export const ActionValue = styled(Action) <{ background?: string }>`
 			}
 		}
 	}
-	
+
 	p {
 		max-width: 100%;
 		color: ${(props) => props.theme.colors.font.light1};
@@ -333,7 +328,8 @@ export const Output = styled(ElementItem)`
 
 	button {
 		padding: 4.5px 12.5px !important
-;	}
+;
+	}
 `;
 
 export const Time = styled(ElementItem)`
@@ -345,7 +341,7 @@ export const Time = styled(ElementItem)`
 	}
 `;
 
-export const Results = styled(ElementItem) <{ open?: boolean }>`
+export const Results = styled(ElementItem)<{ open?: boolean }>`
 	min-width: 90px;
 	width: 90px;
 	justify-content: flex-end;
@@ -353,7 +349,7 @@ export const Results = styled(ElementItem) <{ open?: boolean }>`
 		height: 15px;
 		width: 15px;
 		margin: 3.5px 0 0 0;
-		transform: rotate(${(props) => props.open ? '180deg' : '0deg'});
+		transform: rotate(${(props) => (props.open ? '180deg' : '0deg')});
 		transition: transform 0.15s ease-in-out;
 	}
 `;
@@ -415,7 +411,7 @@ export const FooterWrapper = styled.div`
 	background: ${(props) => props.theme.colors.container.alt1.background};
 	border-left: 1px solid ${(props) => props.theme.colors.border.primary};
 	border-right: 1px solid ${(props) => props.theme.colors.border.primary};
-	border-bottom: 1px solid ${(props) => props.theme.colors.border.primary} !important;	
+	border-bottom: 1px solid ${(props) => props.theme.colors.border.primary} !important;
 	border-bottom-left-radius: ${STYLING.dimensions.radius.alt1};
 	border-bottom-right-radius: ${STYLING.dimensions.radius.alt1};
 `;
@@ -425,7 +421,9 @@ export const PageCounter = styled.div`
 	align-items: center;
 	gap: 7.5px;
 
-	p, label, input {
+	p,
+	label,
+	input {
 		font-size: ${(props) => props.theme.typography.size.xxSmall};
 		font-family: ${(props) => props.theme.typography.family.primary};
 		font-weight: ${(props) => props.theme.typography.weight.bold};
@@ -435,7 +433,7 @@ export const PageCounter = styled.div`
 
 export const DPageCounter = styled(PageCounter)`
 	display: flex;
-	
+
 	@media (max-width: ${STYLING.cutoffs.secondary}) {
 		display: none;
 	}
@@ -446,16 +444,19 @@ export const MPageCounter = styled(PageCounter)`
 
 	@media (max-width: ${STYLING.cutoffs.secondary}) {
 		display: flex;
-
 	}
 `;
 
 export const UpdateWrapper = styled.div<{ childList?: boolean }>`
-	padding: ${(props) => props.childList ? '15px' : '0 15px 15px 15px'};
-	border-left: 1px solid ${(props) => props.childList ? props.theme.colors.border.alt4 : props.theme.colors.border.primary};
-	border-right: 1px solid ${(props) => props.childList ? props.theme.colors.border.alt4 : props.theme.colors.border.primary};
-	border-bottom: 1px solid ${(props) => (props.childList) ? props.theme.colors.border.alt4 : props.theme.colors.border.primary} !important;	
-	background: ${(props) => props.childList ? props.theme.colors.container.alt2.background : props.theme.colors.container.primary.background};
+	padding: ${(props) => (props.childList ? '15px' : '0 15px 15px 15px')};
+	border-left: 1px solid
+		${(props) => (props.childList ? props.theme.colors.border.alt4 : props.theme.colors.border.primary)};
+	border-right: 1px solid
+		${(props) => (props.childList ? props.theme.colors.border.alt4 : props.theme.colors.border.primary)};
+	border-bottom: 1px solid
+		${(props) => (props.childList ? props.theme.colors.border.alt4 : props.theme.colors.border.primary)} !important;
+	background: ${(props) =>
+		props.childList ? props.theme.colors.container.alt2.background : props.theme.colors.container.primary.background};
 
 	p {
 		font-size: ${(props) => props.theme.typography.size.xSmall};

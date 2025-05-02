@@ -97,16 +97,16 @@ export default function URLTabs(props: IUProps) {
 					})}
 				</S.Tabs>
 				<S.EndWrapper>
-				{!props.noUrlCopy && (
-					<Button
-					type={'primary'}
-					label={urlCopied ? `${language.copied}!` : language.copyFullUrl}
-					handlePress={() => copyUrl()}
-					icon={ASSETS.copy}
-					iconLeftAlign
-				/>
-				)}
-				{props.endComponent && props.endComponent}
+					{!props.noUrlCopy && (
+						<Button
+							type={'primary'}
+							label={urlCopied ? `${language.copied}!` : language.copyFullUrl}
+							handlePress={() => copyUrl()}
+							icon={ASSETS.copy}
+							iconLeftAlign
+						/>
+					)}
+					{props.endComponent && props.endComponent}
 				</S.EndWrapper>
 			</S.TabsHeader>
 			<S.Content>

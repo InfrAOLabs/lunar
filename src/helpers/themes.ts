@@ -57,7 +57,7 @@ export const lightTheme = {
 		debitNotice: '#d43b7a',
 		none: '#474747',
 		other: '#6086e3',
-	}
+	},
 };
 
 export const lightThemeHighContrast = {
@@ -117,7 +117,7 @@ export const lightThemeHighContrast = {
 		debitNotice: '#d43b7a',
 		none: '#474747',
 		other: '#6086e3',
-	}
+	},
 };
 
 export const lightThemeAlt1 = {
@@ -177,7 +177,7 @@ export const lightThemeAlt1 = {
 		debitNotice: '#d43b7a',
 		none: '#474747',
 		other: '#6086e3',
-	}
+	},
 };
 
 export const lightThemeAlt2 = {
@@ -237,7 +237,7 @@ export const lightThemeAlt2 = {
 		debitNotice: '#d43b7a',
 		none: '#474747',
 		other: '#6086e3',
-	}
+	},
 };
 
 export const darkTheme = {
@@ -297,7 +297,7 @@ export const darkTheme = {
 		debitNotice: '#d43b7a',
 		none: '#474747',
 		other: '#6086e3',
-	}
+	},
 };
 
 export const darkThemeHighContrast = {
@@ -357,7 +357,7 @@ export const darkThemeHighContrast = {
 		debitNotice: '#d43b7a',
 		none: '#474747',
 		other: '#6086e3',
-	}
+	},
 };
 
 export const darkThemeAlt1 = {
@@ -417,7 +417,7 @@ export const darkThemeAlt1 = {
 		debitNotice: '#d43b7a',
 		none: '#474747',
 		other: '#6086e3',
-	}
+	},
 };
 
 export const darkThemeAlt2 = {
@@ -477,7 +477,7 @@ export const darkThemeAlt2 = {
 		debitNotice: '#d43b7a',
 		none: '#474747',
 		other: '#6086e3',
-	}
+	},
 };
 
 export const theme = (currentTheme: any): DefaultTheme => ({

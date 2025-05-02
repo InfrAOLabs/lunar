@@ -319,14 +319,14 @@ export const CenteredWrapper = styled.div`
 `;
 
 export const ViewWrapper = styled.div`
-		width: 100%;
-    max-width: ${STYLING.cutoffs.max};
-		padding: 0 25px;
-    margin: 0 auto;
+	width: 100%;
+	max-width: ${STYLING.cutoffs.max};
+	padding: 0 25px;
+	margin: 0 auto;
 
-		@media (max-width: ${STYLING.cutoffs.initial}) {
-			padding: 0 15px;
-		}
+	@media (max-width: ${STYLING.cutoffs.initial}) {
+		padding: 0 15px;
+	}
 `;
 
 export const MessageWrapper = styled.div`
@@ -359,7 +359,7 @@ export const Footer = styled.footer<{ navigationOpen: boolean }>`
 		font-weight: ${(props) => props.theme.typography.weight.bold};
 		color: ${(props) => props.theme.colors.font.alt2};
 	}
-	
+
 	a {
 		font-size: ${(props) => props.theme.typography.size.xSmall};
 		font-family: ${(props) => props.theme.typography.family.alt1};

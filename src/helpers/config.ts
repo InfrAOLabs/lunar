@@ -88,7 +88,7 @@ export const TAGS = {
 	keys: {
 		onBoot: 'On-Boot',
 		type: 'Type',
-		variant: 'Variant'
+		variant: 'Variant',
 	},
 	values: {
 		eval: 'Eval',
@@ -97,9 +97,9 @@ export const TAGS = {
 		transfer: 'Transfer',
 		debitNotice: 'Debit-Notice',
 		creditNotice: 'Credit-Notice',
-		process: 'Process'
-	}
-}
+		process: 'Process',
+	},
+};
 
 export const DEFAULT_ACTIONS = {
 	eval: { name: TAGS.values.eval },
@@ -108,12 +108,12 @@ export const DEFAULT_ACTIONS = {
 	transfer: { name: TAGS.values.transfer },
 	debitNotice: { name: TAGS.values.debitNotice },
 	creditNotice: { name: TAGS.values.creditNotice },
-}
+};
 
 export const DEFAULT_AO_TAGS = [
 	{ name: 'Data-Protocol', values: ['ao'] },
 	// { name: 'Variant', values: ['ao.TN.1'] }, // TODO
-]
+];
 
 export const DEFAULT_MESSAGE_TAGS = [{ name: 'Type', values: ['Message'] }, ...DEFAULT_AO_TAGS];
 
@@ -163,8 +163,8 @@ function createURLs() {
 	const base = `/`;
 
 	const docs = `${base}docs/`;
-	const explorer = `${base}explorer/`
-	const aos = `${base}aos/`
+	const explorer = `${base}explorer/`;
+	const aos = `${base}aos/`;
 
 	return {
 		base: base,
@@ -187,5 +187,5 @@ export const URLS = createURLs();
 export const LINKS = {
 	arweave: `https://arweave.org`,
 	ao: `https://ao.arweave.net`,
-	wander: `https://wander.app`
-}
+	wander: `https://wander.app`,
+};

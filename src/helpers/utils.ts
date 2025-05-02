@@ -75,9 +75,11 @@ export function formatDate(dateArg: string | number | null, dateType: 'dateStrin
 	}
 
 	return fullTime
-		? `${date.toLocaleString('default', { month: 'long' })} ${date.getDate()}, ${date.getUTCFullYear()} ${date.getHours() % 12 || 12
-		}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')} ${date.getHours() >= 12 ? 'PM' : 'AM'
-		}`
+		? `${date.toLocaleString('default', { month: 'long' })} ${date.getDate()}, ${date.getUTCFullYear()} ${
+				date.getHours() % 12 || 12
+		  }:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')} ${
+				date.getHours() >= 12 ? 'PM' : 'AM'
+		  }`
 		: `${date.toLocaleString('default', { month: 'long' })} ${date.getDate()}, ${date.getUTCFullYear()}`;
 }
 
@@ -189,12 +191,7 @@ export function getByteSizeDisplay(bytes: number): string {
 	const i = Math.floor(Math.log(bytes) / Math.log(1000));
 	const value = bytes / Math.pow(1000, i);
 
-	const unit =
-		i === 0
-			? bytes === 1
-				? 'Byte'
-				: 'Bytes'
-			: sizes[i];
+	const unit = i === 0 ? (bytes === 1 ? 'Byte' : 'Bytes') : sizes[i];
 
 	return `${value} ${unit}`;
 }
@@ -206,12 +203,12 @@ export function isMac(): boolean {
 export function validateUrl(url: string) {
 	const urlPattern = new RegExp(
 		'^(https?:\\/\\/)?' + // Optional protocol
-		'((([a-zA-Z\\d]([a-zA-Z\\d-]*[a-zA-Z\\d])*)\\.)+[a-zA-Z]{2,}|' + // Domain name
-		'localhost|' + // OR localhost
-		'\\d{1,3}(\\.\\d{1,3}){3})' + // OR IPv4
-		'(\\:\\d+)?(\\/[-a-zA-Z\\d%_.~+]*)*' + // Optional port and path
-		'(\\?[;&a-zA-Z\\d%_.~+=-]*)?' + // Optional query
-		'(\\#[-a-zA-Z\\d_]*)?$', // Optional fragment
+			'((([a-zA-Z\\d]([a-zA-Z\\d-]*[a-zA-Z\\d])*)\\.)+[a-zA-Z]{2,}|' + // Domain name
+			'localhost|' + // OR localhost
+			'\\d{1,3}(\\.\\d{1,3}){3})' + // OR IPv4
+			'(\\:\\d+)?(\\/[-a-zA-Z\\d%_.~+]*)*' + // Optional port and path
+			'(\\?[;&a-zA-Z\\d%_.~+=-]*)?' + // Optional query
+			'(\\#[-a-zA-Z\\d_]*)?$', // Optional fragment
 		'i'
 	);
 	return urlPattern.test(url);

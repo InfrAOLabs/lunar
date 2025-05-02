@@ -12,7 +12,7 @@ import * as S from './styles';
 export default function ProcessEditor(props: { processId: string; type: 'read' | 'write' }) {
 	const permawebProvider = usePermawebProvider();
 	const arProvider = useArweaveProvider();
-	
+
 	const languageProvider = useLanguageProvider();
 	const language = languageProvider.object[languageProvider.current];
 
@@ -55,9 +55,9 @@ export default function ProcessEditor(props: { processId: string; type: 'read' |
 				case 'write':
 					const result = await permawebProvider.deps.ao.result({
 						process: messageToSend.process,
-						message: response
+						message: response,
 					});
-					setOutput(result)
+					setOutput(result);
 					break;
 			}
 		} catch (e: any) {
@@ -67,7 +67,7 @@ export default function ProcessEditor(props: { processId: string; type: 'read' |
 	}
 
 	if (props.type === 'write' && !arProvider.wallet) {
-		return <WalletBlock />
+		return <WalletBlock />;
 	}
 
 	return (

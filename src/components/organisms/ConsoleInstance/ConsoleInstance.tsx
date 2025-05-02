@@ -652,7 +652,7 @@ export default function ConsoleInstance(props: {
 			spinnerInterval = null;
 		}
 		clearLine();
-		
+
 		// if (!editorMode) showCursor();
 		showCursor();
 	}
@@ -674,7 +674,7 @@ export default function ConsoleInstance(props: {
 		loadingRef.current = false;
 		setLoadingMessage(false);
 		clearLine();
-		
+
 		// if (!editorMode) showCursor();
 		showCursor();
 	}

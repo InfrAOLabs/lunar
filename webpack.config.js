@@ -26,7 +26,7 @@ module.exports = {
 			overlay: {
 				errors: true,
 				warnings: false,
-			}
+			},
 		},
 	},
 	optimization:

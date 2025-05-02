@@ -9,7 +9,7 @@ export const Wrapper = styled.div<{ fullScreenMode: boolean }>`
 	position: relative;
 	display: flex;
 	gap: 15px;
-	padding: ${(props) => props.fullScreenMode ? '15px' : '0'};
+	padding: ${(props) => (props.fullScreenMode ? '15px' : '0')};
 	background: ${(props) => props.theme.colors.view.background};
 
 	@media (max-width: ${STYLING.cutoffs.initial}) {
@@ -17,7 +17,7 @@ export const Wrapper = styled.div<{ fullScreenMode: boolean }>`
 	}
 `;
 
-export const ActionsWrapper = styled.div<{ fullScreenMode: boolean; }>`
+export const ActionsWrapper = styled.div<{ fullScreenMode: boolean }>`
 	position: absolute;
 	bottom: 20px;
 	right: 20px;
@@ -34,15 +34,15 @@ export const ActionsWrapper = styled.div<{ fullScreenMode: boolean; }>`
 export const LoadWrapper = styled(ActionsWrapper)`
 	bottom: 20px;
 	right: 27.5px;
-	bottom: ${(props) => props.fullScreenMode ? '30px' : '20px'};
-	right: ${(props) => props.fullScreenMode ? '42.5px' : '27.5px'};
+	bottom: ${(props) => (props.fullScreenMode ? '30px' : '20px')};
+	right: ${(props) => (props.fullScreenMode ? '42.5px' : '27.5px')};
 `;
 
 export const ConsoleWrapper = styled.div<{ editorMode: boolean }>`
-	width: ${(props) => props.editorMode ? '50%' : '100%'};
+	width: ${(props) => (props.editorMode ? '50%' : '100%')};
 	display: flex;
 	gap: 15px;
-	flex-direction: ${(props) => props.editorMode ? 'column' : 'row'};
+	flex-direction: ${(props) => (props.editorMode ? 'column' : 'row')};
 	position: relative;
 
 	@media (max-width: ${STYLING.cutoffs.initial}) {
@@ -51,10 +51,10 @@ export const ConsoleWrapper = styled.div<{ editorMode: boolean }>`
 `;
 
 export const ConsoleDivider = styled.div<{ editorMode: boolean }>`
-	height: ${(props) => props.editorMode ? '1px' : '100%'};
-	width: ${(props) => props.editorMode ? '100%' : '1px'};
-	border-top: 1px solid ${(props) => props.editorMode ? props.theme.colors.border.primary : 'transparent'};
-	border-left: 1px solid ${(props) => props.editorMode ? 'transparent' : props.theme.colors.border.primary};
+	height: ${(props) => (props.editorMode ? '1px' : '100%')};
+	width: ${(props) => (props.editorMode ? '100%' : '1px')};
+	border-top: 1px solid ${(props) => (props.editorMode ? props.theme.colors.border.primary : 'transparent')};
+	border-left: 1px solid ${(props) => (props.editorMode ? 'transparent' : props.theme.colors.border.primary)};
 
 	@media (max-width: ${STYLING.cutoffs.initial}) {
 		height: 1px;
@@ -79,7 +79,7 @@ export const Console = styled.div`
 
 	.xterm-rows {
 		height: 100% !important;
-		overflow: hidden !important; 
+		overflow: hidden !important;
 		letter-spacing: 0;
 	}
 
@@ -155,7 +155,7 @@ export const Options = styled.div`
 
 	button {
 		border-radius: ${STYLING.dimensions.radius.primary} !important;
-	 }
+	}
 `;
 
 export const OptionsPaginator = styled.div`

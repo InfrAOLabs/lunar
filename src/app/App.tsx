@@ -64,7 +64,14 @@ export default function App() {
 								{language.app} {new Date().getFullYear()}
 							</p>
 							<p>
-								Built on <a href={LINKS.arweave} target={'_blank'}>Arweave</a> and <a href={LINKS.ao} target={'_blank'}>AO</a>
+								Built on{' '}
+								<a href={LINKS.arweave} target={'_blank'}>
+									Arweave
+								</a>{' '}
+								and{' '}
+								<a href={LINKS.ao} target={'_blank'}>
+									AO
+								</a>
 							</p>
 						</S.Footer>
 					</S.ViewWrapper>

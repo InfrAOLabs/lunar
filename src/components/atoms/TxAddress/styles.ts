@@ -20,7 +20,7 @@ export const Wrapper = styled.div<{ disabled: boolean }>`
 	}
 
 	&:hover {
-			cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
+		cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
 		p {
 			color: ${(props) => (props.disabled ? props.theme.colors.font.alt1 : props.theme.colors.link.active)} !important;
 		}

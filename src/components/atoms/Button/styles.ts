@@ -36,7 +36,7 @@ export const Wrapper = styled.div`
 			display: block;
 		}
 	}
-	
+
 	.info {
 		padding: 0px 10px 3.5px 10px !important;
 	}

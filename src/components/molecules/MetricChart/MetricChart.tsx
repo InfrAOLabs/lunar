@@ -18,16 +18,7 @@ import { formatCount, formatDate } from 'helpers/utils';
 
 import * as S from './styles';
 
-ChartJS.register(
-	CategoryScale,
-	LinearScale,
-	PointElement,
-	LineElement,
-	Title,
-	Tooltip,
-	Legend,
-	Filler
-);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
 const crosshairPlugin = {
 	id: 'crosshairPlugin',
@@ -172,7 +163,6 @@ export default function MetricChart(props: {
 		},
 		[currentValue]
 	);
-
 
 	const options = {
 		responsive: true,

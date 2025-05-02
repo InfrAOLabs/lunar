@@ -161,19 +161,19 @@ export const Alt1 = styled(Primary)`
 				? props.theme.colors.button.primary.disabled.background
 				: props.theme.colors.button.primary.active.background};
 
-svg {
-		color: ${(props) =>
-			props.active
-				? props.theme.colors.font.light1
-				: props.disabled
-				? props.theme.colors.button.primary.disabled.color
-				: props.theme.colors.button.primary.active.color};
-		fill: ${(props) =>
-			props.active
-				? props.theme.colors.font.light1
-				: props.disabled
-				? props.theme.colors.button.primary.disabled.color
-				: props.theme.colors.button.primary.active.color};
-	}
+		svg {
+			color: ${(props) =>
+				props.active
+					? props.theme.colors.font.light1
+					: props.disabled
+					? props.theme.colors.button.primary.disabled.color
+					: props.theme.colors.button.primary.active.color};
+			fill: ${(props) =>
+				props.active
+					? props.theme.colors.font.light1
+					: props.disabled
+					? props.theme.colors.button.primary.disabled.color
+					: props.theme.colors.button.primary.active.color};
+		}
 	}
 `;

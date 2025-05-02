@@ -11,10 +11,7 @@ import * as S from './styles';
 
 const WALLET_PERMISSIONS = ['ACCESS_ADDRESS', 'ACCESS_PUBLIC_KEY', 'SIGN_TRANSACTION', 'DISPATCH', 'SIGNATURE'];
 
-const AR_WALLETS = [
-	{ type: WalletEnum.wander, label: 'Wander', logo: ASSETS.wander },
-	{ type: WalletEnum.othent, label: 'Othent', logo: ASSETS.othent },
-];
+const AR_WALLETS = [{ type: WalletEnum.wander, label: 'Wander', logo: ASSETS.wander }];
 
 interface ArweaveContextState {
 	wallets: { type: WalletEnum; logo: string }[];
@@ -56,7 +53,7 @@ function WalletList(props: { handleConnect: any }) {
 					className={'border-wrapper-primary'}
 				>
 					<S.WalletLogo>
-					<img src={wallet.logo} alt={''} />
+						<img src={wallet.logo} alt={''} />
 					</S.WalletLogo>
 					<span>{wallet.label}</span>
 				</S.WalletListItem>

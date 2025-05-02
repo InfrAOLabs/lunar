@@ -27,7 +27,7 @@ export const HeaderActionsWrapper = styled.div`
 	display: flex;
 	align-items: center;
 	gap: 20px;
-`
+`;
 
 export const BodyWrapper = styled.div`
 	width: 100%;
@@ -69,7 +69,6 @@ export const ReadWrapper = styled.div`
 
 export const MessageInfo = styled.div`
 	width: 100%;
-	
 `;
 
 export const MessageInfoHeader = styled.div`
@@ -106,13 +105,13 @@ export const MessageInfoBody = styled.div`
 			text-align: right;
 			border-right: none;
 		}
-		
+
 		&:first-child,
 		&:nth-child(2),
 		&:nth-child(3) {
 			border-bottom: 1px solid ${(props) => props.theme.colors.border.primary};
 		}
-		
+
 		&:nth-child(2),
 		&:nth-child(5) {
 			padding: 7.5px 15px;
@@ -124,7 +123,7 @@ export const MessageInfoLine = styled.div`
 	display: flex;
 	align-items: center;
 	gap: 7.5px;
-	padding: 7.5px 15px;;
+	padding: 7.5px 15px;
 	border-right: 1px solid ${(props) => props.theme.colors.border.primary};
 	span {
 		font-size: ${(props) => props.theme.typography.size.xSmall};
@@ -148,7 +147,7 @@ export const Section = styled.div`
 	height: fit-content;
 	flex: 1;
 	padding: 15px;
-	
+
 	@media (max-width: ${STYLING.cutoffs.initial}) {
 		width: 100%;
 	}
@@ -179,8 +178,8 @@ export const SectionHeaderFull = styled(SectionHeader)`
 	border-top: 1px solid ${(props) => props.theme.colors.border.primary};
 	border-right: 1px solid ${(props) => props.theme.colors.border.primary};
 	border-left: 1px solid ${(props) => props.theme.colors.border.primary};
-    border-top-right-radius: ${STYLING.dimensions.radius.alt1};
-    border-top-left-radius: ${STYLING.dimensions.radius.alt1};
+	border-top-right-radius: ${STYLING.dimensions.radius.alt1};
+	border-top-left-radius: ${STYLING.dimensions.radius.alt1};
 `;
 
 export const SectionFullUpdateWrapper = styled.div`
@@ -318,7 +317,7 @@ export const MessagesPlaceholder = styled.div`
 	padding: 0 15px 15px 15px;
 	border-left: 1px solid ${(props) => props.theme.colors.border.primary};
 	border-right: 1px solid ${(props) => props.theme.colors.border.primary};
-	border-bottom: 1px solid ${(props) => props.theme.colors.border.primary};	
+	border-bottom: 1px solid ${(props) => props.theme.colors.border.primary};
 	border-bottom-left-radius: ${STYLING.dimensions.radius.alt1};
 	border-bottom-right-radius: ${STYLING.dimensions.radius.alt1};
 
@@ -365,17 +364,18 @@ export const PlaceholderDescription = styled.div`
 	align-items: center;
 	gap: 10px;
 
-	p,span {
+	p,
+	span {
 		text-align: center;
 	}
-	
+
 	p {
 		font-size: ${(props) => props.theme.typography.size.small};
 		font-family: ${(props) => props.theme.typography.family.primary};
 		font-weight: ${(props) => props.theme.typography.weight.bold};
 		color: ${(props) => props.theme.colors.font.primary};
 	}
-	
+
 	span {
 		display: block;
 		max-width: 350px;
