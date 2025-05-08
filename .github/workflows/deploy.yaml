@@ -1,38 +1,38 @@
-name: Deploy To Arweave & ARNS
+name: publish
 
 on:
   push:
     branches:
-      - main
+      - 'main'
+      - 'staging'
 
 jobs:
-  Arweave-build-and-deploy:
+  publish:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
-
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: '22.x'
-
       - name: Clean lockfile (if needed)
         run: rm -rf package-lock.json node_modules
-
-      - name: Check required secrets
-        run: |
-          if [ -z "$DEPLOY_KEY" ]; then
-            echo "Error: DEPLOY_KEY secret is required but not set"
-            exit 1
-          fi
+      - run: npm install
+      - run: npm run deploy:main
         env:
           DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build and Deploy to Arweave
-        run: npm run deploy:main
+  publish-staging:
+    if: github.ref == 'refs/heads/staging'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '22.x'
+      - name: Clean lockfile (if needed)
+        run: rm -rf package-lock.json node_modules
+      - run: npm install
+      - run: npm run deploy:staging
         env:
           DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
