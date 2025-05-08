@@ -4,7 +4,7 @@ name: Deploy To Arweave & ARNS
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   Arweave-build-and-deploy:
