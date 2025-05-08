@@ -34,7 +34,7 @@ export default function ProcessRead(props: { processId: string; autoRun: boolean
 			setReadLog([]);
 			setErrorLog([]);
 			try {
-				const response = await fetch(`https://cu.ao-testnet.xyz/results/${props.processId}`, {
+				const response = await fetch(`https://ur-cu.randao.net/results/${props.processId}`, {
 					method: 'GET',
 				});
 

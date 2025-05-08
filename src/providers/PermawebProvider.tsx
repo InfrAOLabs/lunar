@@ -48,7 +48,10 @@ export function PermawebProvider(props: { children: React.ReactNode }) {
 	const [refreshProfileTrigger, setRefreshProfileTrigger] = React.useState<boolean>(false);
 
 	React.useEffect(() => {
-		const ao = connect({ MODE: 'legacy' });
+		const ao = connect({
+			MODE: 'legacy',
+			CU_URL: 'https://ur-cu.randao.net',
+		});
 		const arweave = Arweave.init({});
 		const signer = arProvider.wallet ? createSigner(arProvider.wallet) : null;
 
