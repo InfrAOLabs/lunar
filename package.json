@@ -13,7 +13,7 @@
 		"test:verbose": "npm test -- --verbose",
 		"test:coverage": "CI=true npm test -- --env=jsdom --coverage",
 		"build": "cross-env NODE_ENV=production webpack",
-		"deploy:main": "npm run build && permaweb-deploy $DEPLOY_ANT_PROCESS_ID --undername $DEPLOY_UNDERNAME",
+		"deploy:main": "npm run build && permaweb-deploy --ant-process $DEPLOY_ANT_PROCESS_ID --undername $DEPLOY_UNDERNAME",
 		"deploy-undername": "permaweb-deploy --deploy-folder ./build --ant-process $DEPLOY_ANT_PROCESS_ID --undername $DEPLOY_UNDERNAME",
 		"deploy:staging": "npm run build && permaweb-deploy $DEPLOY_ANT_PROCESS_ID --undername $DEPLOY_UNDERNAME --undername staging",
 		"prepare": "husky install"
