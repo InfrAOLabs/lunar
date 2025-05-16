@@ -4,6 +4,7 @@ import { useTheme } from 'styled-components';
 
 import { IconButton } from 'components/atoms/IconButton';
 import { ASSETS } from 'helpers/config';
+import { stripAnsiChars } from 'helpers/utils';
 import { useLanguageProvider } from 'providers/LanguageProvider';
 
 import * as S from './styles';
@@ -59,10 +60,8 @@ export default function _JSONTree(props: {
 	}, []);
 
 	const parseJSON = (input) => {
-		const ansiRegex = /\x1B\[[0-9;]*m/g;
-
 		if (typeof input === 'string') {
-			const strippedInput = input.replace(ansiRegex, '');
+			const strippedInput = stripAnsiChars(input);
 			try {
 				const parsed = JSON.parse(strippedInput);
 				return parseJSON(parsed);

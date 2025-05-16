@@ -7,7 +7,7 @@ import { MessageList } from 'components/molecules/MessageList';
 import { useLanguageProvider } from 'providers/LanguageProvider';
 
 import { Metrics } from './Metrics';
-import { Nodes } from './Nodes';
+// import { Nodes } from './Nodes';
 import * as S from './styles';
 
 export default function Landing() {
@@ -53,7 +53,7 @@ export default function Landing() {
 					<Metrics />
 				</ViewWrapper>
 			</S.NetworkWrapper>
-			<S.NodesWrapper>
+			{/* <S.NodesWrapper>
 				<S.HeaderWrapper>
 					<ViewHeader
 						header={language.nodes}
@@ -67,7 +67,7 @@ export default function Landing() {
 				<ViewWrapper>
 					<Nodes />
 				</ViewWrapper>
-			</S.NodesWrapper>
+			</S.NodesWrapper> */}
 			<S.MessagesWrapper>
 				<ViewWrapper>
 					<MessageList />

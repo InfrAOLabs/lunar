@@ -13,11 +13,13 @@ import { Panel } from 'components/atoms/Panel';
 import { TxAddress } from 'components/atoms/TxAddress';
 import { JSONReader } from 'components/molecules/JSONReader';
 import { ASSETS, DEFAULT_ACTIONS, DEFAULT_MESSAGE_TAGS, URLS } from 'helpers/config';
-import { arweaveEndpoint } from 'helpers/endpoints';
+import { arweaveEndpoint, getTxEndpoint } from 'helpers/endpoints';
 import { MessageFilterType, TransactionType } from 'helpers/types';
 import { checkValidAddress, formatAddress, formatCount, getRelativeDate, getTagValue } from 'helpers/utils';
 import { useLanguageProvider } from 'providers/LanguageProvider';
 import { usePermawebProvider } from 'providers/PermawebProvider';
+
+import { Editor } from '../Editor';
 
 import * as S from './styles';
 
@@ -39,6 +41,10 @@ function Message(props: {
 	const language = languageProvider.object[languageProvider.current];
 
 	const [open, setOpen] = React.useState<boolean>(false);
+
+	const [data, setData] = React.useState<any>(null);
+	const [showViewData, setShowViewData] = React.useState<boolean>(false);
+
 	const [result, setResult] = React.useState<any>(null);
 	const [showViewResult, setShowViewResult] = React.useState<boolean>(false);
 
@@ -72,6 +78,69 @@ function Message(props: {
 			}
 		})();
 	}, [result, showViewResult, props.currentFilter]);
+
+	React.useEffect(() => {
+		(async function () {
+			if (!data && setShowViewData) {
+				let processId: string = props.element.node.recipient;
+
+				if (props.parentId) {
+					switch (props.currentFilter) {
+						case 'incoming':
+							processId = props.parentId;
+							break;
+						case 'outgoing':
+							processId = props.element.node.recipient;
+							break;
+					}
+				}
+
+				if (processId) {
+					try {
+						const messageFetch = await fetch(getTxEndpoint(props.element.node.id));
+						const rawMessage = await messageFetch.text();
+
+						const raw = rawMessage ?? '';
+						const trimmed = raw.trim();
+
+						if (trimmed === '') {
+							setData(language.noData);
+						} else {
+							try {
+								const parsed = JSON.parse(trimmed);
+
+								const isEmptyArray = Array.isArray(parsed) && parsed.length === 0;
+								const isEmptyObject =
+									parsed && typeof parsed === 'object' && !Array.isArray(parsed) && Object.keys(parsed).length === 0;
+
+								if (isEmptyArray || isEmptyObject) {
+									setData(language.noData);
+								} else {
+									setData(parsed);
+								}
+							} catch {
+								setData(trimmed);
+							}
+						}
+
+						const messageResult = await permawebProvider.deps.ao.result({
+							process: processId,
+							message: props.element.node.id,
+						});
+						setResult(messageResult);
+					} catch (e: any) {
+						console.error(e);
+					}
+				}
+			}
+		})();
+	}, [data, showViewData]);
+
+	function handleShowViewData(e: any) {
+		e.preventDefault();
+		e.stopPropagation();
+		setShowViewData((prev) => !prev);
+	}
 
 	function handleShowViewResult(e: any) {
 		e.preventDefault();
@@ -128,6 +197,64 @@ function Message(props: {
 		}
 	}
 
+	function getData() {
+		if (!data) return null;
+
+		if (typeof data === 'object') {
+			return <JSONReader data={data} header={language.data} maxHeight={600} />;
+		}
+
+		return <Editor initialData={data} header={language.data} language={'lua'} readOnly loading={false} />;
+	}
+
+	function getMessageOverlay() {
+		let open = false;
+		let header = null;
+		let handleClose = () => {};
+		let content = null;
+
+		if (showViewData) {
+			open = true;
+			header = language.input;
+			handleClose = () => setShowViewData(false);
+			content = getData();
+		} else if (showViewResult) {
+			open = true;
+			header = language.result;
+			handleClose = () => setShowViewResult(false);
+			content = <JSONReader data={result} header={language.output} noWrapper />;
+		}
+
+		return (
+			<Panel open={open} width={550} header={header} handleClose={handleClose}>
+				<S.ResultWrapper>
+					{showViewResult && (
+						<S.ResultInfo>
+							<S.ResultInfoLine>
+								<S.ResultInfoLineValue>
+									<p>{`${language.message}: `}</p>
+								</S.ResultInfoLineValue>
+								<TxAddress address={props.element.node.id} />
+							</S.ResultInfoLine>
+							<S.ResultInfoLine>
+								<S.ResultInfoLineValue>
+									<p>{`${language.action}: `}</p>
+								</S.ResultInfoLineValue>
+								<S.ResultInfoLineValue>
+									<p>{getAction()}</p>
+								</S.ResultInfoLineValue>
+							</S.ResultInfoLine>
+						</S.ResultInfo>
+					)}
+					<S.ResultOutput>{data || result ? <>{content}</> : <p>{`${language.loading}...`}</p>}</S.ResultOutput>
+					<S.ResultActions>
+						<Button type={'primary'} label={language.close} handlePress={handleClose} />
+					</S.ResultActions>
+				</S.ResultWrapper>
+			</Panel>
+		);
+	}
+
 	return (
 		<>
 			<S.ElementWrapper
@@ -166,6 +293,9 @@ function Message(props: {
 				</S.ActionValue>
 				{getFrom()}
 				{getTo()}
+				<S.Input>
+					<Button type={'alt3'} label={language.view} handlePress={(e) => handleShowViewData(e)} />
+				</S.Input>
 				<S.Output>
 					<Button type={'alt3'} label={language.view} handlePress={(e) => handleShowViewResult(e)} />
 				</S.Output>
@@ -190,37 +320,7 @@ function Message(props: {
 					isOverallLast={props.isOverallLast && props.lastChild}
 				/>
 			)}
-
-			<Panel open={showViewResult} width={550} header={language.result} handleClose={() => setShowViewResult(false)}>
-				<S.ResultWrapper>
-					<S.ResultInfo>
-						<S.ResultInfoLine>
-							<S.ResultInfoLineValue>
-								<p>{`${language.message}: `}</p>
-							</S.ResultInfoLineValue>
-							<TxAddress address={props.element.node.id} />
-						</S.ResultInfoLine>
-						<S.ResultInfoLine>
-							<S.ResultInfoLineValue>
-								<p>{`${language.action}: `}</p>
-							</S.ResultInfoLineValue>
-							<S.ResultInfoLineValue>
-								<p>{getAction()}</p>
-							</S.ResultInfoLineValue>
-						</S.ResultInfoLine>
-					</S.ResultInfo>
-					<S.ResultOutput>
-						{result ? (
-							<JSONReader data={result} header={language.output} noWrapper />
-						) : (
-							<p>{`${language.loading}...`}</p>
-						)}
-					</S.ResultOutput>
-					<S.ResultActions>
-						<Button type={'primary'} label={language.close} handlePress={() => setShowViewResult(false)} />
-					</S.ResultActions>
-				</S.ResultWrapper>
-			</Panel>
+			{getMessageOverlay()}
 		</>
 	);
 }
@@ -566,6 +666,9 @@ export default function MessageList(props: {
 								<S.To>
 									<p>{language.to}</p>
 								</S.To>
+								<S.Input>
+									<p>{language.input}</p>
+								</S.Input>
 								<S.Output>
 									<p>{language.output}</p>
 								</S.Output>

@@ -318,9 +318,23 @@ export const From = styled(ElementItem)`
 	}
 `;
 
+export const Input = styled(ElementItem)`
+	min-width: 75px;
+	width: 75px;
+	justify-content: center;
+	p {
+		text-align: right;
+	}
+
+	button {
+		padding: 4.5px 12.5px !important
+;
+	}
+`;
+
 export const Output = styled(ElementItem)`
-	min-width: 100px;
-	width: 100px;
+	min-width: 75px;
+	width: 75px;
 	justify-content: center;
 	p {
 		text-align: right;
@@ -333,8 +347,8 @@ export const Output = styled(ElementItem)`
 `;
 
 export const Time = styled(ElementItem)`
-	min-width: 165px;
-	width: 165px;
+	min-width: 105px;
+	width: 105px;
 	justify-content: flex-end;
 	p {
 		text-align: right;
@@ -342,8 +356,8 @@ export const Time = styled(ElementItem)`
 `;
 
 export const Results = styled(ElementItem)<{ open?: boolean }>`
-	min-width: 90px;
-	width: 90px;
+	min-width: 65px;
+	width: 65px;
 	justify-content: flex-end;
 	svg {
 		height: 15px;
@@ -390,6 +404,11 @@ export const ResultOutput = styled.div`
 		font-weight: ${(props) => props.theme.typography.weight.bold};
 		color: ${(props) => props.theme.colors.font.primary};
 	}
+`;
+
+export const Editor = styled.div`
+	height: 600px;
+	width: 100%;
 `;
 
 export const ResultActions = styled.div`
