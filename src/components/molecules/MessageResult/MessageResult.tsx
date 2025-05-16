@@ -7,6 +7,8 @@ import { checkValidAddress } from 'helpers/utils';
 import { useLanguageProvider } from 'providers/LanguageProvider';
 import { usePermawebProvider } from 'providers/PermawebProvider';
 
+import { Editor } from '../Editor';
+
 import * as S from './styles';
 
 export default function MessageResult(props: { processId: string; messageId: string; variant: any }) {
@@ -25,9 +27,28 @@ export default function MessageResult(props: { processId: string; messageId: str
 					const messageFetch = await fetch(getTxEndpoint(props.messageId));
 					const rawMessage = await messageFetch.text();
 
-					try {
-						setData(JSON.parse(rawMessage));
-					} catch {}
+					const raw = rawMessage ?? '';
+					const trimmed = raw.trim();
+
+					if (trimmed === '') {
+						setData(language.noData);
+					} else {
+						try {
+							const parsed = JSON.parse(trimmed);
+
+							const isEmptyArray = Array.isArray(parsed) && parsed.length === 0;
+							const isEmptyObject =
+								parsed && typeof parsed === 'object' && !Array.isArray(parsed) && Object.keys(parsed).length === 0;
+
+							if (isEmptyArray || isEmptyObject) {
+								setData(language.noData);
+							} else {
+								setData(parsed);
+							}
+						} catch {
+							setData(trimmed);
+						}
+					}
 
 					const messageResult = await permawebProvider.deps.ao.result({
 						process: props.processId,
@@ -41,11 +62,21 @@ export default function MessageResult(props: { processId: string; messageId: str
 		})();
 	}, [result]);
 
+	function getData() {
+		if (!data) return null;
+
+		if (typeof data === 'object') {
+			return <JSONReader data={data} header={language.data} maxHeight={600} />;
+		}
+
+		return <Editor initialData={data} header={language.data} language={'lua'} readOnly loading={false} />;
+	}
+
 	return (
 		<S.Wrapper>
 			{result ? (
 				<>
-					{data && typeof data === 'object' && <JSONReader data={data} header={language.data} maxHeight={600} />}
+					{getData()}
 					<JSONReader data={result} header={language.result} maxHeight={600} />
 				</>
 			) : (
