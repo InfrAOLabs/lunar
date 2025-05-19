@@ -1,6 +1,8 @@
 import React, { lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
+const viewModules = (import.meta as any).glob('../views/**/index.tsx');
+
 const Landing = getLazyImport('Landing');
 const Explorer = getLazyImport('Explorer');
 const Console = getLazyImport('Console');
