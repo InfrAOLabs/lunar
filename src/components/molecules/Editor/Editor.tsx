@@ -17,6 +17,7 @@ export default function _Editor(props: {
 	noFullScreen?: boolean;
 	setEditorData?: (data: string) => void;
 	header?: string;
+	useFixedHeight?: boolean;
 	loading: boolean;
 }) {
 	const currentTheme: any = useTheme();
@@ -28,6 +29,7 @@ export default function _Editor(props: {
 	const monacoRef = React.useRef<typeof import('monaco-editor') | null>(null);
 	const themeName = currentTheme.scheme === 'dark' ? 'editorDark' : 'editorLight';
 
+	const [height, setHeight] = React.useState(0);
 	const [data, setData] = React.useState(props.initialData);
 	const [fullScreenMode, setFullScreenMode] = React.useState<boolean>(false);
 
@@ -142,9 +144,9 @@ export default function _Editor(props: {
 		monaco.editor.setTheme(themeName);
 	}, [currentTheme, themeName]);
 
-	const [height, setHeight] = React.useState(0);
-
 	const handleEditorMount: OnMount = (editor) => {
+		if (props.useFixedHeight) return;
+
 		const disp = editor.onDidContentSizeChange((e) => {
 			setHeight(e.contentHeight);
 		});
@@ -160,7 +162,8 @@ export default function _Editor(props: {
 			)}
 			<S.EditorWrapper
 				ref={editorRef}
-				style={{ width: '100%', height: `${height}px`, overflow: 'hidden' }}
+				style={{ width: '100%', height: props.useFixedHeight ? '100%' : `${height}px`, overflow: 'hidden' }}
+				useFixedHeight={props.useFixedHeight}
 				className={'border-wrapper-alt2 scroll-wrapper'}
 			>
 				<S.Editor>
@@ -172,7 +175,7 @@ export default function _Editor(props: {
 						beforeMount={handleBeforeMount}
 						onMount={handleEditorMount}
 						theme={themeName}
-						loading={<div />}
+						loading={null}
 						options={{
 							readOnly: props.loading || props.readOnly,
 							automaticLayout: true,

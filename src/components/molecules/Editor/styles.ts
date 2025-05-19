@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
 export const Wrapper = styled.div`
+	height: 100%;
 	width: 100%;
 	display: flex;
 	flex-direction: column;
@@ -22,9 +23,9 @@ export const Header = styled.div`
 	}
 `;
 
-export const EditorWrapper = styled.div`
+export const EditorWrapper = styled.div<{ useFixedHeight: boolean }>`
 	min-height: 125px;
-	max-height: calc(100vh - 190px);
+	max-height: ${(props) => (props.useFixedHeight ? '100%' : 'calc(100vh - 190px)')};
 	width: 100%;
 	display: flex;
 	align-items: flex-start;

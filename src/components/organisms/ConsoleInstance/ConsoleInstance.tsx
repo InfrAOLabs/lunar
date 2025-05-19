@@ -76,25 +76,6 @@ export default function ConsoleInstance(props: {
 		}
 	}, []);
 
-	// React.useEffect(() => {
-	// 	if (terminalInstance.current) {
-	// 		if (editorMode) {
-	// 			terminalInstance.current.write(
-	// 				`\r\n\r\n\x1b[90mEditor Open: Hit the checkmark or (Ctrl + L) to evaluate\x1b[0m`
-	// 			);
-	// 			hideCursor();
-	// 			loadingRef.current = true;
-	// 		} else {
-	// 			clearLine();
-	// 			showCursor();
-	// 			terminalInstance.current.write(promptRef.current);
-	// 			loadingRef.current = false;
-	// 		}
-	// 	}
-
-	// 	loadingRef.current = editorMode;
-	// }, [editorMode]);
-
 	React.useEffect(() => {
 		promptRef.current = prompt;
 	}, [prompt]);
@@ -332,22 +313,18 @@ export default function ConsoleInstance(props: {
 
 					if (data === '\u007F') {
 						if (cursorPosition > 0) {
-							// 1) Splice out the char and bump cursorPosition
 							commandBuffer = commandBuffer.slice(0, cursorPosition - 1) + commandBuffer.slice(cursorPosition);
 							cursorPosition--;
 
-							// 2) Recompute wrap state
 							const rawPrompt = promptRef.current;
 							const cleanPrompt = stripAnsi(rawPrompt);
 							const cols = terminalInstance.current.cols;
 							const totalLength = cleanPrompt.length + commandBuffer.length;
 
-							// zero-based wrap row: 0 = no wrap, 1 = second physical row, etc.
 							const newRow = Math.floor(totalLength / cols);
-							currentRow = newRow + 1; // since you were using 1-based
-							isCurrentlyWrapped = totalLength > cols; // true once we exceed one line
+							currentRow = newRow + 1;
+							isCurrentlyWrapped = totalLength > cols;
 
-							// 3) Delegate to your existing renderer
 							refreshLine();
 						}
 						return;
@@ -526,8 +503,8 @@ export default function ConsoleInstance(props: {
 		}
 	}, [props.active]);
 
-	function handleEditorSend() {
-		if (editorData) sendMessage(editorData);
+	async function handleEditorSend() {
+		if (editorData) await sendMessage(editorData);
 	}
 
 	async function resolveCommand(data: string | null) {
@@ -601,11 +578,9 @@ export default function ConsoleInstance(props: {
 
 				const newPrompt = response?.Output?.prompt ?? promptRef.current;
 
-				if (!editorMode) {
-					setPrompt(newPrompt);
-					terminalInstance.current.write('\r');
-					terminalInstance.current.write(newPrompt);
-				}
+				setPrompt(newPrompt);
+				terminalInstance.current.write('\r');
+				terminalInstance.current.write(newPrompt);
 			} catch (e: any) {
 				stopLoader();
 				terminalInstance.current.write(prompt);
@@ -653,7 +628,6 @@ export default function ConsoleInstance(props: {
 		}
 		clearLine();
 
-		// if (!editorMode) showCursor();
 		showCursor();
 	}
 
@@ -675,7 +649,6 @@ export default function ConsoleInstance(props: {
 		setLoadingMessage(false);
 		clearLine();
 
-		// if (!editorMode) showCursor();
 		showCursor();
 	}
 
@@ -830,7 +803,7 @@ export default function ConsoleInstance(props: {
 		<>
 			{arProvider.walletAddress ? (
 				<>
-					<S.Wrapper ref={consoleRef} fullScreenMode={fullScreenMode}>
+					<S.Wrapper ref={consoleRef} fullScreenMode={fullScreenMode} useFixedHeight={false}>
 						{editorMode && (
 							<S.Editor className={'fade-in'}>
 								<Editor
@@ -839,6 +812,7 @@ export default function ConsoleInstance(props: {
 									language={'lua'}
 									loading={loadingMessage}
 									noFullScreen
+									useFixedHeight
 								/>
 								<S.LoadWrapper fullScreenMode={fullScreenMode}>
 									<IconButton
