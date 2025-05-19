@@ -136,6 +136,10 @@ function Message(props: {
 		})();
 	}, [data, showViewData]);
 
+	const excludedTagNames = ['Type', 'Authority', 'Module', 'Scheduler'];
+	const filteredTags =
+		props?.element?.node?.tags?.filter((tag: { name: string }) => !excludedTagNames.includes(tag.name)) || [];
+
 	function handleShowViewData(e: any) {
 		e.preventDefault();
 		e.stopPropagation();
@@ -148,7 +152,7 @@ function Message(props: {
 		setShowViewResult((prev) => !prev);
 	}
 
-	function getAction() {
+	function getActionLabel() {
 		return getTagValue(props.element.node.tags, 'Action') ?? language.none;
 	}
 
@@ -171,7 +175,7 @@ function Message(props: {
 	}
 
 	function getActionBackground() {
-		const action = getAction();
+		const action = getActionLabel();
 
 		if (action.toLowerCase().includes('error')) {
 			return currentTheme.colors.warning.alt1;
@@ -197,6 +201,19 @@ function Message(props: {
 		}
 	}
 
+	function getAction(useMaxWidth: boolean) {
+		return (
+			<S.ActionValue background={getActionBackground()} useMaxWidth={useMaxWidth}>
+				<div className={'action-indicator'}>
+					<p>{getActionLabel()}</p>
+					<S.ActionTooltip className={'info'}>
+						<span>{getActionLabel()}</span>
+					</S.ActionTooltip>
+				</div>
+			</S.ActionValue>
+		);
+	}
+
 	function getData() {
 		if (!data) return null;
 
@@ -206,6 +223,24 @@ function Message(props: {
 
 		return <Editor initialData={data} header={language.data} language={'lua'} readOnly loading={false} />;
 	}
+
+	const OverlayLine = ({ label, value, render }: { label: string; value: any; render?: (v: any) => JSX.Element }) => {
+		const defaultRender = (v: any) => {
+			if (typeof v === 'string' && checkValidAddress(v)) {
+				return <TxAddress address={v} />;
+			}
+			return <p>{v}</p>;
+		};
+
+		const renderContent = render || defaultRender;
+
+		return (
+			<S.OverlayLine>
+				<span>{label}</span>
+				{value ? renderContent(value) : <p>-</p>}
+			</S.OverlayLine>
+		);
+	};
 
 	function getMessageOverlay() {
 		let open = false;
@@ -227,30 +262,32 @@ function Message(props: {
 
 		return (
 			<Panel open={open} width={550} header={header} handleClose={handleClose}>
-				<S.ResultWrapper>
-					{showViewResult && (
-						<S.ResultInfo>
-							<S.ResultInfoLine>
-								<S.ResultInfoLineValue>
-									<p>{`${language.message}: `}</p>
-								</S.ResultInfoLineValue>
-								<TxAddress address={props.element.node.id} />
-							</S.ResultInfoLine>
-							<S.ResultInfoLine>
-								<S.ResultInfoLineValue>
-									<p>{`${language.action}: `}</p>
-								</S.ResultInfoLineValue>
-								<S.ResultInfoLineValue>
-									<p>{getAction()}</p>
-								</S.ResultInfoLineValue>
-							</S.ResultInfoLine>
-						</S.ResultInfo>
-					)}
-					<S.ResultOutput>{data || result ? <>{content}</> : <p>{`${language.loading}...`}</p>}</S.ResultOutput>
-					<S.ResultActions>
+				<S.OverlayWrapper>
+					<S.OverlayInfo>
+						<S.OverlayInfoLine>
+							<S.OverlayInfoLineValue>
+								<p>{`${language.message}: `}</p>
+							</S.OverlayInfoLineValue>
+							<TxAddress address={props.element.node.id} />
+						</S.OverlayInfoLine>
+						<S.OverlayInfoLine>{getAction(false)}</S.OverlayInfoLine>
+						{showViewData && (
+							<S.OverlayTagsWrapper className={'border-wrapper-alt3'}>
+								<S.OverlayTagsHeader>
+									<p>{language.tags}</p>
+								</S.OverlayTagsHeader>
+								{filteredTags.map((tag: { name: string; value: string }, index: number) => (
+									<OverlayLine key={index} label={tag.name} value={tag.value} />
+								))}
+							</S.OverlayTagsWrapper>
+						)}
+					</S.OverlayInfo>
+
+					<S.OverlayOutput>{data || result ? <>{content}</> : <p>{`${language.loading}...`}</p>}</S.OverlayOutput>
+					<S.OverlayActions>
 						<Button type={'primary'} label={language.close} handlePress={handleClose} />
-					</S.ResultActions>
-				</S.ResultWrapper>
+					</S.OverlayActions>
+				</S.OverlayWrapper>
 			</Panel>
 		);
 	}
@@ -283,14 +320,7 @@ function Message(props: {
 
 					<TxAddress address={props.element.node.id} />
 				</S.ID>
-				<S.ActionValue background={getActionBackground()}>
-					<div className={'action-indicator'}>
-						<p>{getAction()}</p>
-						<S.ActionTooltip className={'info'}>
-							<span>{getAction()}</span>
-						</S.ActionTooltip>
-					</div>
-				</S.ActionValue>
+				{getAction(true)}
 				{getFrom()}
 				{getTo()}
 				<S.Input>
