@@ -48,21 +48,12 @@ function Message(props: {
 	const [result, setResult] = React.useState<any>(null);
 	const [showViewResult, setShowViewResult] = React.useState<boolean>(false);
 
+	console.log(showViewResult);
+
 	React.useEffect(() => {
 		(async function () {
 			if (!result && showViewResult) {
 				let processId: string = props.element.node.recipient;
-
-				if (props.parentId) {
-					switch (props.currentFilter) {
-						case 'incoming':
-							processId = props.parentId;
-							break;
-						case 'outgoing':
-							processId = props.element.node.recipient;
-							break;
-					}
-				}
 
 				if (processId) {
 					try {
@@ -82,55 +73,34 @@ function Message(props: {
 	React.useEffect(() => {
 		(async function () {
 			if (!data && setShowViewData) {
-				let processId: string = props.element.node.recipient;
+				try {
+					const messageFetch = await fetch(getTxEndpoint(props.element.node.id));
+					const rawMessage = await messageFetch.text();
 
-				if (props.parentId) {
-					switch (props.currentFilter) {
-						case 'incoming':
-							processId = props.parentId;
-							break;
-						case 'outgoing':
-							processId = props.element.node.recipient;
-							break;
-					}
-				}
+					const raw = rawMessage ?? '';
+					const trimmed = raw.trim();
 
-				if (processId) {
-					try {
-						const messageFetch = await fetch(getTxEndpoint(props.element.node.id));
-						const rawMessage = await messageFetch.text();
+					if (trimmed === '') {
+						setData(language.noData);
+					} else {
+						try {
+							const parsed = JSON.parse(trimmed);
 
-						const raw = rawMessage ?? '';
-						const trimmed = raw.trim();
+							const isEmptyArray = Array.isArray(parsed) && parsed.length === 0;
+							const isEmptyObject =
+								parsed && typeof parsed === 'object' && !Array.isArray(parsed) && Object.keys(parsed).length === 0;
 
-						if (trimmed === '') {
-							setData(language.noData);
-						} else {
-							try {
-								const parsed = JSON.parse(trimmed);
-
-								const isEmptyArray = Array.isArray(parsed) && parsed.length === 0;
-								const isEmptyObject =
-									parsed && typeof parsed === 'object' && !Array.isArray(parsed) && Object.keys(parsed).length === 0;
-
-								if (isEmptyArray || isEmptyObject) {
-									setData(language.noData);
-								} else {
-									setData(parsed);
-								}
-							} catch {
-								setData(trimmed);
+							if (isEmptyArray || isEmptyObject) {
+								setData(language.noData);
+							} else {
+								setData(parsed);
 							}
+						} catch {
+							setData(trimmed);
 						}
-
-						const messageResult = await permawebProvider.deps.ao.result({
-							process: processId,
-							message: props.element.node.id,
-						});
-						setResult(messageResult);
-					} catch (e: any) {
-						console.error(e);
 					}
+				} catch (e: any) {
+					console.error(e);
 				}
 			}
 		})();
@@ -247,17 +217,20 @@ function Message(props: {
 		let header = null;
 		let handleClose = () => {};
 		let content = null;
+		let loading = true;
 
 		if (showViewData) {
 			open = true;
 			header = language.input;
 			handleClose = () => setShowViewData(false);
 			content = getData();
+			if (data) loading = false;
 		} else if (showViewResult) {
 			open = true;
 			header = language.result;
 			handleClose = () => setShowViewResult(false);
 			content = <JSONReader data={result} header={language.output} noWrapper />;
+			if (result) loading = false;
 		}
 
 		return (
@@ -282,8 +255,7 @@ function Message(props: {
 							</S.OverlayTagsWrapper>
 						)}
 					</S.OverlayInfo>
-
-					<S.OverlayOutput>{data || result ? <>{content}</> : <p>{`${language.loading}...`}</p>}</S.OverlayOutput>
+					<S.OverlayOutput>{loading ? <p>{`${language.loading}...`}</p> : <>{content}</>}</S.OverlayOutput>
 					<S.OverlayActions>
 						<Button type={'primary'} label={language.close} handlePress={handleClose} />
 					</S.OverlayActions>

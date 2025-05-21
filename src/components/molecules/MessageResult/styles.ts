@@ -8,6 +8,6 @@ export const Wrapper = styled.div`
 `;
 
 export const Editor = styled.div`
-	height: 600px;
+	height: fit-content;
 	width: 100%;
 `;

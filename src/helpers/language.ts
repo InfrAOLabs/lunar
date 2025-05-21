@@ -78,6 +78,7 @@ export const language = {
 		nodes: `Nodes`,
 		none: `None`,
 		noData: `No Data`,
+		noDataToDisplay: `No data to display`,
 		openEditor: `Open Editor`,
 		openInNewTab: `Open in new tab`,
 		outgoing: `Outgoing`,

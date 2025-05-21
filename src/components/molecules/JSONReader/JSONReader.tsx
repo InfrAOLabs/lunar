@@ -141,7 +141,7 @@ export default function _JSONTree(props: {
 				<JSONTree data={data} hideRoot={true} theme={theme} shouldExpandNodeInitially={() => true} />
 			) : (
 				<S.Placeholder>
-					<p>{props.placeholder ?? 'No data to display'}</p>
+					<p>{props.placeholder ?? language.noDataToDisplay}</p>
 				</S.Placeholder>
 			)}
 		</S.Wrapper>

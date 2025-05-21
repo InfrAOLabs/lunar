@@ -69,7 +69,11 @@ export default function MessageResult(props: { processId: string; messageId: str
 			return <JSONReader data={data} header={language.data} maxHeight={600} />;
 		}
 
-		return <Editor initialData={data} header={language.data} language={'lua'} readOnly loading={false} />;
+		return (
+			<S.Editor>
+				<Editor initialData={data} header={language.data} language={'lua'} readOnly loading={false} />
+			</S.Editor>
+		);
 	}
 
 	return (
