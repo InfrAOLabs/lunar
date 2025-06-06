@@ -1,6 +1,7 @@
 import React from 'react';
 import { ReactSVG } from 'react-svg';
-import { GQLNodeResponseType } from '@permaweb/libs';
+
+import { Types } from '@permaweb/libs';
 
 import { FormField } from 'components/atoms/FormField';
 import { IconButton } from 'components/atoms/IconButton';
@@ -27,7 +28,7 @@ export default function Transaction(props: {
 	txId: string;
 	type: TransactionType;
 	active: boolean;
-	onTxChange?: (newTx: GQLNodeResponseType) => void;
+	onTxChange?: (newTx: Types.GQLNodeResponseType) => void;
 	handleMessageOpen: (id: string) => void;
 }) {
 	const arProvider = useArweaveProvider();
@@ -39,7 +40,7 @@ export default function Transaction(props: {
 
 	const [inputTxId, setInputTxId] = React.useState<string>(props.txId);
 	const [loadingTx, setLoadingTx] = React.useState<boolean>(false);
-	const [txResponse, setTxResponse] = React.useState<GQLNodeResponseType | null>(null);
+	const [txResponse, setTxResponse] = React.useState<Types.GQLNodeResponseType | null>(null);
 	const [hasFetched, setHasFetched] = React.useState<boolean>(false);
 	const [error, setError] = React.useState<string | null>(null);
 

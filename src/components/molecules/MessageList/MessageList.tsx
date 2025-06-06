@@ -2,8 +2,9 @@ import React from 'react';
 import { flushSync } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { ReactSVG } from 'react-svg';
-import { DefaultGQLResponseType, GQLNodeResponseType } from '@permaweb/libs';
 import { useTheme } from 'styled-components';
+
+import { DefaultGQLResponseType, GQLNodeResponseType } from '@permaweb/libs';
 
 import { Button } from 'components/atoms/Button';
 import { FormField } from 'components/atoms/FormField';
@@ -47,8 +48,6 @@ function Message(props: {
 
 	const [result, setResult] = React.useState<any>(null);
 	const [showViewResult, setShowViewResult] = React.useState<boolean>(false);
-
-	console.log(showViewResult);
 
 	React.useEffect(() => {
 		(async function () {

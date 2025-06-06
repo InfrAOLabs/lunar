@@ -2,18 +2,14 @@ import React from 'react';
 
 import { Button } from 'components/atoms/Button';
 import { Loader } from 'components/atoms/Loader';
-import { TxAddress } from 'components/atoms/TxAddress';
 import { JSONReader } from 'components/molecules/JSONReader';
-import { checkValidAddress, formatAddress, formatMs } from 'helpers/utils';
-import { useLanguageProvider } from 'providers/LanguageProvider';
+import { checkValidAddress, formatMs } from 'helpers/utils';
 import { usePermawebProvider } from 'providers/PermawebProvider';
 
 import * as S from './styles';
 
 export default function ProcessRead(props: { processId: string; autoRun: boolean; hideOutput?: boolean }) {
 	const permawebProvider = usePermawebProvider();
-	const languageProvider = useLanguageProvider();
-	const language = languageProvider.object[languageProvider.current];
 
 	const [cuLocation, setCuLocation] = React.useState(null);
 	const [startTime, setStartTime] = React.useState(null);
@@ -77,6 +73,7 @@ export default function ProcessRead(props: { processId: string; autoRun: boolean
 
 				tick();
 
+				await new Promise((r) => setTimeout(r, 1000));
 				const response = await permawebProvider.libs.readProcess({
 					processId: props.processId,
 					action: 'Info',

@@ -215,6 +215,7 @@ export function validateUrl(url: string) {
 }
 
 export function stripAnsiChars(input: string) {
+	if (!input) return null;
 	const ansiRegex = /\x1B\[[0-9;]*m/g;
-	return input.replace(ansiRegex, '');
+	return input.toString().replace(ansiRegex, '');
 }

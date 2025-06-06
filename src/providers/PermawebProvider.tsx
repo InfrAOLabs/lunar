@@ -1,8 +1,8 @@
 import React from 'react';
-import PermawebLibs, { ProfileType } from '@permaweb/libs';
 
 import Arweave from 'arweave';
 import { connect, createSigner } from '@permaweb/aoconnect';
+import PermawebLibs, { ProfileType } from '@permaweb/libs';
 
 import { Panel } from 'components/atoms/Panel';
 import { ProfileManager } from 'components/organisms/ProfileManager';

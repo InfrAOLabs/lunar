@@ -7,7 +7,6 @@ import { MessageList } from 'components/molecules/MessageList';
 import { useLanguageProvider } from 'providers/LanguageProvider';
 
 import { Metrics } from './Metrics';
-// import { Nodes } from './Nodes';
 import * as S from './styles';
 
 export default function Landing() {

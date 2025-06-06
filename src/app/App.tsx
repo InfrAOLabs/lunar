@@ -1,7 +1,7 @@
 import React, { lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
-const viewModules = (import.meta as any).glob('../views/**/index.tsx');
+const views = (import.meta as any).glob('../views/**/index.tsx');
 
 const Landing = getLazyImport('Landing');
 const Explorer = getLazyImport('Explorer');
@@ -17,11 +17,16 @@ import { useSettingsProvider } from 'providers/SettingsProvider';
 import * as S from './styles';
 
 function getLazyImport(view: string) {
-	return lazy(() =>
-		import(`../views/${view}/index.tsx`).then((module) => ({
-			default: module.default,
-		}))
-	);
+	const key = `../views/${view}/index.tsx`;
+	const loader = views[key];
+	if (!loader) {
+		throw new Error(`View not found: ${view}`);
+	}
+
+	return lazy(async () => {
+		const module = await loader();
+		return { default: module.default };
+	});
 }
 
 export default function App() {

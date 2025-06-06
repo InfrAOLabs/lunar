@@ -1,5 +1,6 @@
 import React from 'react';
-import { GQLNodeResponseType } from '@permaweb/libs';
+
+import { Types } from '@permaweb/libs';
 
 import { Loader } from 'components/atoms/Loader';
 import { Editor } from 'components/molecules/Editor';
@@ -33,13 +34,15 @@ export default function ProcessSource(props: { processId: string; onBoot?: strin
 						});
 
 						if (gqlResponse?.data) {
-							const sorted = [...gqlResponse.data].slice().sort((a: GQLNodeResponseType, b: GQLNodeResponseType) => {
-								const aSize = Number(a.node.data.size);
-								const bSize = Number(b.node.data.size);
-								if (aSize < bSize) return 1;
-								if (aSize > bSize) return -1;
-								return 0;
-							});
+							const sorted = [...gqlResponse.data]
+								.slice()
+								.sort((a: Types.GQLNodeResponseType, b: Types.GQLNodeResponseType) => {
+									const aSize = Number(a.node.data.size);
+									const bSize = Number(b.node.data.size);
+									if (aSize < bSize) return 1;
+									if (aSize > bSize) return -1;
+									return 0;
+								});
 
 							const foundSrcTx = sorted[0].node.id;
 							const srcResponse = await fetch(getTxEndpoint(foundSrcTx));
@@ -56,7 +59,6 @@ export default function ProcessSource(props: { processId: string; onBoot?: strin
 
 	React.useEffect(() => {
 		if (src && editorRef.current) {
-			console.log(editorRef);
 			setTimeout(() => {
 				editorRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
 			}, 10);
