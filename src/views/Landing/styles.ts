@@ -6,7 +6,26 @@ export const Wrapper = styled.div`
 	width: 100%;
 	display: flex;
 	flex-direction: column;
-	gap: 2.5px;
+	gap: 25px;
+`;
+
+export const NetworkWrapper = styled.div`
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+`;
+
+export const NodesWrapper = styled.div`
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+`;
+
+export const MessagesWrapper = styled.div`
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	margin: 15px 0 0 0;
 `;
 
 export const HeaderWrapper = styled.div``;

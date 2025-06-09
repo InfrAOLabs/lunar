@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 import { STYLING } from 'helpers/config';
 
-export const Wrapper = styled.div<{ fullScreenMode: boolean }>`
+export const Wrapper = styled.div<{ fullScreenMode: boolean; useFixedHeight: boolean }>`
 	min-height: 500px;
 	height: calc(100vh - 145px);
 	width: 100%;

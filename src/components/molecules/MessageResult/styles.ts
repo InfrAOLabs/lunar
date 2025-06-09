@@ -6,3 +6,8 @@ export const Wrapper = styled.div`
 	flex-direction: column;
 	gap: 25px;
 `;
+
+export const Editor = styled.div`
+	height: fit-content;
+	width: 100%;
+`;

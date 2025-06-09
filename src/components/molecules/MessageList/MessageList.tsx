@@ -2,8 +2,9 @@ import React from 'react';
 import { flushSync } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { ReactSVG } from 'react-svg';
-import { DefaultGQLResponseType, GQLNodeResponseType } from '@permaweb/libs';
 import { useTheme } from 'styled-components';
+
+import { DefaultGQLResponseType, GQLNodeResponseType } from '@permaweb/libs';
 
 import { Button } from 'components/atoms/Button';
 import { FormField } from 'components/atoms/FormField';
@@ -13,11 +14,13 @@ import { Panel } from 'components/atoms/Panel';
 import { TxAddress } from 'components/atoms/TxAddress';
 import { JSONReader } from 'components/molecules/JSONReader';
 import { ASSETS, DEFAULT_ACTIONS, DEFAULT_MESSAGE_TAGS, URLS } from 'helpers/config';
-import { arweaveEndpoint } from 'helpers/endpoints';
+import { arweaveEndpoint, getTxEndpoint } from 'helpers/endpoints';
 import { MessageFilterType, TransactionType } from 'helpers/types';
 import { checkValidAddress, formatAddress, formatCount, getRelativeDate, getTagValue } from 'helpers/utils';
 import { useLanguageProvider } from 'providers/LanguageProvider';
 import { usePermawebProvider } from 'providers/PermawebProvider';
+
+import { Editor } from '../Editor';
 
 import * as S from './styles';
 
@@ -39,6 +42,10 @@ function Message(props: {
 	const language = languageProvider.object[languageProvider.current];
 
 	const [open, setOpen] = React.useState<boolean>(false);
+
+	const [data, setData] = React.useState<any>(null);
+	const [showViewData, setShowViewData] = React.useState<boolean>(false);
+
 	const [result, setResult] = React.useState<any>(null);
 	const [showViewResult, setShowViewResult] = React.useState<boolean>(false);
 
@@ -46,17 +53,6 @@ function Message(props: {
 		(async function () {
 			if (!result && showViewResult) {
 				let processId: string = props.element.node.recipient;
-
-				if (props.parentId) {
-					switch (props.currentFilter) {
-						case 'incoming':
-							processId = props.parentId;
-							break;
-						case 'outgoing':
-							processId = props.element.node.recipient;
-							break;
-					}
-				}
 
 				if (processId) {
 					try {
@@ -73,13 +69,59 @@ function Message(props: {
 		})();
 	}, [result, showViewResult, props.currentFilter]);
 
+	React.useEffect(() => {
+		(async function () {
+			if (!data && setShowViewData) {
+				try {
+					const messageFetch = await fetch(getTxEndpoint(props.element.node.id));
+					const rawMessage = await messageFetch.text();
+
+					const raw = rawMessage ?? '';
+					const trimmed = raw.trim();
+
+					if (trimmed === '') {
+						setData(language.noData);
+					} else {
+						try {
+							const parsed = JSON.parse(trimmed);
+
+							const isEmptyArray = Array.isArray(parsed) && parsed.length === 0;
+							const isEmptyObject =
+								parsed && typeof parsed === 'object' && !Array.isArray(parsed) && Object.keys(parsed).length === 0;
+
+							if (isEmptyArray || isEmptyObject) {
+								setData(language.noData);
+							} else {
+								setData(parsed);
+							}
+						} catch {
+							setData(trimmed);
+						}
+					}
+				} catch (e: any) {
+					console.error(e);
+				}
+			}
+		})();
+	}, [data, showViewData]);
+
+	const excludedTagNames = ['Type', 'Authority', 'Module', 'Scheduler'];
+	const filteredTags =
+		props?.element?.node?.tags?.filter((tag: { name: string }) => !excludedTagNames.includes(tag.name)) || [];
+
+	function handleShowViewData(e: any) {
+		e.preventDefault();
+		e.stopPropagation();
+		setShowViewData((prev) => !prev);
+	}
+
 	function handleShowViewResult(e: any) {
 		e.preventDefault();
 		e.stopPropagation();
 		setShowViewResult((prev) => !prev);
 	}
 
-	function getAction() {
+	function getActionLabel() {
 		return getTagValue(props.element.node.tags, 'Action') ?? language.none;
 	}
 
@@ -102,7 +144,7 @@ function Message(props: {
 	}
 
 	function getActionBackground() {
-		const action = getAction();
+		const action = getActionLabel();
 
 		if (action.toLowerCase().includes('error')) {
 			return currentTheme.colors.warning.alt1;
@@ -126,6 +168,99 @@ function Message(props: {
 			default:
 				return currentTheme.colors.actions.other;
 		}
+	}
+
+	function getAction(useMaxWidth: boolean) {
+		return (
+			<S.ActionValue background={getActionBackground()} useMaxWidth={useMaxWidth}>
+				<div className={'action-indicator'}>
+					<p>{getActionLabel()}</p>
+					<S.ActionTooltip className={'info'}>
+						<span>{getActionLabel()}</span>
+					</S.ActionTooltip>
+				</div>
+			</S.ActionValue>
+		);
+	}
+
+	function getData() {
+		if (!data) return null;
+
+		if (typeof data === 'object') {
+			return <JSONReader data={data} header={language.data} maxHeight={600} />;
+		}
+
+		return <Editor initialData={data} header={language.data} language={'lua'} readOnly loading={false} />;
+	}
+
+	const OverlayLine = ({ label, value, render }: { label: string; value: any; render?: (v: any) => JSX.Element }) => {
+		const defaultRender = (v: any) => {
+			if (typeof v === 'string' && checkValidAddress(v)) {
+				return <TxAddress address={v} />;
+			}
+			return <p>{v}</p>;
+		};
+
+		const renderContent = render || defaultRender;
+
+		return (
+			<S.OverlayLine>
+				<span>{label}</span>
+				{value ? renderContent(value) : <p>-</p>}
+			</S.OverlayLine>
+		);
+	};
+
+	function getMessageOverlay() {
+		let open = false;
+		let header = null;
+		let handleClose = () => {};
+		let content = null;
+		let loading = true;
+
+		if (showViewData) {
+			open = true;
+			header = language.input;
+			handleClose = () => setShowViewData(false);
+			content = getData();
+			if (data) loading = false;
+		} else if (showViewResult) {
+			open = true;
+			header = language.result;
+			handleClose = () => setShowViewResult(false);
+			content = <JSONReader data={result} header={language.output} noWrapper />;
+			if (result) loading = false;
+		}
+
+		return (
+			<Panel open={open} width={550} header={header} handleClose={handleClose}>
+				<S.OverlayWrapper>
+					<S.OverlayInfo>
+						<S.OverlayInfoLine>
+							<S.OverlayInfoLineValue>
+								<p>{`${language.message}: `}</p>
+							</S.OverlayInfoLineValue>
+							<TxAddress address={props.element.node.id} />
+						</S.OverlayInfoLine>
+						<S.OverlayInfoLine>{getAction(false)}</S.OverlayInfoLine>
+						{showViewData && (
+							<S.OverlayTagsWrapper className={'border-wrapper-alt3'}>
+								<S.OverlayTagsHeader>
+									<p>{language.tags}</p>
+								</S.OverlayTagsHeader>
+								{filteredTags.map((tag: { name: string; value: string }, index: number) => (
+									<OverlayLine key={index} label={tag.name} value={tag.value} />
+								))}
+							</S.OverlayTagsWrapper>
+						)}
+					</S.OverlayInfo>
+					<S.OverlayOutput>{loading ? <p>{`${language.loading}...`}</p> : <>{content}</>}</S.OverlayOutput>
+					<S.OverlayActions>
+						<Button type={'primary'} label={language.close} handlePress={handleClose} />
+					</S.OverlayActions>
+				</S.OverlayWrapper>
+			</Panel>
+		);
 	}
 
 	return (
@@ -156,16 +291,12 @@ function Message(props: {
 
 					<TxAddress address={props.element.node.id} />
 				</S.ID>
-				<S.ActionValue background={getActionBackground()}>
-					<div className={'action-indicator'}>
-						<p>{getAction()}</p>
-						<S.ActionTooltip className={'info'}>
-							<span>{getAction()}</span>
-						</S.ActionTooltip>
-					</div>
-				</S.ActionValue>
+				{getAction(true)}
 				{getFrom()}
 				{getTo()}
+				<S.Input>
+					<Button type={'alt3'} label={language.view} handlePress={(e) => handleShowViewData(e)} />
+				</S.Input>
 				<S.Output>
 					<Button type={'alt3'} label={language.view} handlePress={(e) => handleShowViewResult(e)} />
 				</S.Output>
@@ -190,37 +321,7 @@ function Message(props: {
 					isOverallLast={props.isOverallLast && props.lastChild}
 				/>
 			)}
-
-			<Panel open={showViewResult} width={550} header={language.result} handleClose={() => setShowViewResult(false)}>
-				<S.ResultWrapper>
-					<S.ResultInfo>
-						<S.ResultInfoLine>
-							<S.ResultInfoLineValue>
-								<p>{`${language.message}: `}</p>
-							</S.ResultInfoLineValue>
-							<TxAddress address={props.element.node.id} />
-						</S.ResultInfoLine>
-						<S.ResultInfoLine>
-							<S.ResultInfoLineValue>
-								<p>{`${language.action}: `}</p>
-							</S.ResultInfoLineValue>
-							<S.ResultInfoLineValue>
-								<p>{getAction()}</p>
-							</S.ResultInfoLineValue>
-						</S.ResultInfoLine>
-					</S.ResultInfo>
-					<S.ResultOutput>
-						{result ? (
-							<JSONReader data={result} header={language.output} noWrapper />
-						) : (
-							<p>{`${language.loading}...`}</p>
-						)}
-					</S.ResultOutput>
-					<S.ResultActions>
-						<Button type={'primary'} label={language.close} handlePress={() => setShowViewResult(false)} />
-					</S.ResultActions>
-				</S.ResultWrapper>
-			</Panel>
+			{getMessageOverlay()}
 		</>
 	);
 }
@@ -566,6 +667,9 @@ export default function MessageList(props: {
 								<S.To>
 									<p>{language.to}</p>
 								</S.To>
+								<S.Input>
+									<p>{language.input}</p>
+								</S.Input>
 								<S.Output>
 									<p>{language.output}</p>
 								</S.Output>

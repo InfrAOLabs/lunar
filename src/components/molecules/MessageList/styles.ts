@@ -266,14 +266,14 @@ export const ActionTooltip = styled.div`
 	}
 `;
 
-export const ActionValue = styled(Action)<{ background?: string }>`
+export const ActionValue = styled(Action)<{ background?: string; useMaxWidth: boolean }>`
 	min-width: 200px;
 	width: 200px;
 	position: relative;
 
 	.action-indicator {
 		position: relative;
-		width: 105px;
+		width: ${(props) => (props.useMaxWidth ? '105px' : 'fit-content')};
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -290,8 +290,9 @@ export const ActionValue = styled(Action)<{ background?: string }>`
 
 	p {
 		max-width: 100%;
-		color: ${(props) => props.theme.colors.font.light1};
-		font-size: ${(props) => props.theme.typography.size.xxSmall};
+		color: ${(props) => props.theme.colors.font.light1} !important;
+		font-size: ${(props) => props.theme.typography.size.xxSmall} !important;
+		font-weight: ${(props) => props.theme.typography.weight.bold} !important;
 		text-align: center;
 		white-space: nowrap;
 		overflow: hidden;
@@ -318,9 +319,23 @@ export const From = styled(ElementItem)`
 	}
 `;
 
+export const Input = styled(ElementItem)`
+	min-width: 75px;
+	width: 75px;
+	justify-content: center;
+	p {
+		text-align: right;
+	}
+
+	button {
+		padding: 4.5px 12.5px !important
+;
+	}
+`;
+
 export const Output = styled(ElementItem)`
-	min-width: 100px;
-	width: 100px;
+	min-width: 75px;
+	width: 75px;
 	justify-content: center;
 	p {
 		text-align: right;
@@ -333,8 +348,8 @@ export const Output = styled(ElementItem)`
 `;
 
 export const Time = styled(ElementItem)`
-	min-width: 165px;
-	width: 165px;
+	min-width: 115px;
+	width: 115px;
 	justify-content: flex-end;
 	p {
 		text-align: right;
@@ -342,8 +357,8 @@ export const Time = styled(ElementItem)`
 `;
 
 export const Results = styled(ElementItem)<{ open?: boolean }>`
-	min-width: 90px;
-	width: 90px;
+	min-width: 65px;
+	width: 65px;
 	justify-content: flex-end;
 	svg {
 		height: 15px;
@@ -354,25 +369,80 @@ export const Results = styled(ElementItem)<{ open?: boolean }>`
 	}
 `;
 
-export const ResultWrapper = styled.div`
+export const OverlayWrapper = styled.div`
 	display: flex;
 	flex-direction: column;
 	gap: 15px;
 	padding: 0 20px 20px 20px;
 `;
 
-export const ResultInfo = styled.div`
+export const OverlayTagsWrapper = styled.div`
 	display: flex;
 	flex-direction: column;
-	gap: 10px;
+	gap: 7.5px;
+	padding: 15px;
+	margin: 2.5px 0 0 0;
 `;
 
-export const ResultInfoLine = styled.div`
+export const OverlayTagsHeader = styled.div`
+	margin: 0 0 2.5px 0;
+	p {
+		font-size: ${(props) => props.theme.typography.size.small};
+		font-family: ${(props) => props.theme.typography.family.primary};
+		font-weight: ${(props) => props.theme.typography.weight.bold};
+	}
+`;
+
+export const OverlayLine = styled.div`
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+
+	p,
+	span {
+		font-size: ${(props) => props.theme.typography.size.xSmall};
+		font-family: ${(props) => props.theme.typography.family.primary};
+		font-weight: ${(props) => props.theme.typography.weight.bold};
+	}
+
+	p {
+		color: ${(props) => props.theme.colors.font.primary};
+		text-align: right;
+		text-align: right;
+		max-width: 65%;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	span {
+		color: ${(props) => props.theme.colors.font.alt1};
+	}
+
+	@media (max-width: ${STYLING.cutoffs.secondary}) {
+		flex-direction: column;
+		align-items: flex-start;
+		justify-content: flex-start;
+		gap: 5px;
+
+		p {
+			text-align: left;
+		}
+	}
+`;
+
+export const OverlayInfo = styled.div`
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+`;
+
+export const OverlayInfoLine = styled.div`
 	display: flex;
 	gap: 7.5px;
 `;
 
-export const ResultInfoLineValue = styled.div`
+export const OverlayInfoLineValue = styled.div`
 	p {
 		font-size: ${(props) => props.theme.typography.size.xSmall};
 		font-family: ${(props) => props.theme.typography.family.primary};
@@ -381,7 +451,7 @@ export const ResultInfoLineValue = styled.div`
 	}
 `;
 
-export const ResultOutput = styled.div`
+export const OverlayOutput = styled.div`
 	width: 100%;
 
 	p {
@@ -392,12 +462,17 @@ export const ResultOutput = styled.div`
 	}
 `;
 
-export const ResultActions = styled.div`
+export const OverlayActions = styled.div`
 	width: fit-content;
 	display: flex;
 	align-items: center;
 	gap: 15px;
 	margin: 5px 0 0 auto;
+`;
+
+export const Editor = styled.div`
+	height: 600px;
+	width: 100%;
 `;
 
 export const FooterWrapper = styled.div`

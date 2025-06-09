@@ -1,10 +1,11 @@
 import React from 'react';
-import Editor, { BeforeMount } from '@monaco-editor/react';
+import Editor, { BeforeMount, OnMount } from '@monaco-editor/react';
 import { DefaultTheme, useTheme } from 'styled-components';
 
 import { IconButton } from 'components/atoms/IconButton';
 import { Loader } from 'components/atoms/Loader';
 import { ASSETS } from 'helpers/config';
+import { stripAnsiChars } from 'helpers/utils';
 import { useLanguageProvider } from 'providers/LanguageProvider';
 
 import * as S from './styles';
@@ -15,6 +16,8 @@ export default function _Editor(props: {
 	readOnly?: boolean;
 	noFullScreen?: boolean;
 	setEditorData?: (data: string) => void;
+	header?: string;
+	useFixedHeight?: boolean;
 	loading: boolean;
 }) {
 	const currentTheme: any = useTheme();
@@ -26,6 +29,7 @@ export default function _Editor(props: {
 	const monacoRef = React.useRef<typeof import('monaco-editor') | null>(null);
 	const themeName = currentTheme.scheme === 'dark' ? 'editorDark' : 'editorLight';
 
+	const [height, setHeight] = React.useState(0);
 	const [data, setData] = React.useState(props.initialData);
 	const [fullScreenMode, setFullScreenMode] = React.useState<boolean>(false);
 
@@ -140,17 +144,38 @@ export default function _Editor(props: {
 		monaco.editor.setTheme(themeName);
 	}, [currentTheme, themeName]);
 
+	const handleEditorMount: OnMount = (editor) => {
+		if (props.useFixedHeight) return;
+
+		const disp = editor.onDidContentSizeChange((e) => {
+			setHeight(e.contentHeight);
+		});
+		return () => disp.dispose();
+	};
+
 	return data !== null ? (
 		<S.Wrapper>
-			<S.EditorWrapper ref={editorRef} className={'border-wrapper-alt2 scroll-wrapper'}>
+			{props.header && (
+				<S.Header>
+					<p>{props.header}</p>
+				</S.Header>
+			)}
+			<S.EditorWrapper
+				ref={editorRef}
+				style={{ width: '100%', height: props.useFixedHeight ? '100%' : `${height}px`, overflow: 'hidden' }}
+				useFixedHeight={props.useFixedHeight}
+				className={'border-wrapper-alt2 scroll-wrapper'}
+			>
 				<S.Editor>
 					<Editor
 						height={'100%'}
 						defaultLanguage={props.language}
-						value={data}
+						value={stripAnsiChars(data)}
 						onChange={(value) => setData(value)}
 						beforeMount={handleBeforeMount}
+						onMount={handleEditorMount}
 						theme={themeName}
+						loading={null}
 						options={{
 							readOnly: props.loading || props.readOnly,
 							automaticLayout: true,
@@ -162,6 +187,7 @@ export default function _Editor(props: {
 							fontFamily: currentTheme.typography.family.alt2,
 							fontSize: currentTheme.typography.size.xxSmall,
 							fontWeight: '600',
+							scrollBeyondLastLine: false,
 							scrollbar: {
 								verticalSliderSize: 8,
 								horizontalSliderSize: 8,

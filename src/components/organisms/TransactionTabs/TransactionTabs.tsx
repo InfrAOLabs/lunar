@@ -2,8 +2,9 @@ import React from 'react';
 import { flushSync } from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ReactSVG } from 'react-svg';
-import { GQLNodeResponseType } from '@permaweb/libs';
 import { useTheme } from 'styled-components';
+
+import { GQLNodeResponseType } from '@permaweb/libs';
 
 import { ViewWrapper } from 'app/styles';
 import { Button } from 'components/atoms/Button';

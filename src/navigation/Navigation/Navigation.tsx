@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ReactSVG } from 'react-svg';
-import { GQLNodeResponseType } from '@permaweb/libs';
 import { debounce } from 'lodash';
+
+import { GQLNodeResponseType } from '@permaweb/libs';
 
 import { FormField } from 'components/atoms/FormField';
 import { IconButton } from 'components/atoms/IconButton';
