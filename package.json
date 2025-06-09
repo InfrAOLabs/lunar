@@ -13,7 +13,7 @@
 		"test:verbose": "npm test -- --verbose",
 		"test:coverage": "CI=true npm test -- --env=jsdom --coverage",
 		"build": "NODE_ENV=production vite build",
-		"deploy:main": "npm run build && permaweb-deploy --arns-name lunar",
+		"deploy:main": "npm run build && permaweb-deploy --arns-name infrao --undername lunar",
 		"deploy:staging": "npm run build && permaweb-deploy --arns-name lunar --undername staging",
 		"prepare": "husky install"
 	},
