@@ -6,15 +6,15 @@
 	"author": "",
 	"license": "ISC",
 	"scripts": {
-		"start:development": "cross-env NODE_ENV=development webpack serve --port 4000",
-		"start:staging": "cross-env NODE_ENV=staging webpack serve --port 4000",
+		"start:development": "NODE_ENV=development vite",
+		"start:staging": "NODE_ENV=development vite",
 		"format": "eslint --fix . && npx prettier --write .",
 		"test": "npm test",
 		"test:verbose": "npm test -- --verbose",
 		"test:coverage": "CI=true npm test -- --env=jsdom --coverage",
-		"build": "NODE_ENV=production webpack",
-		"deploy:main": "npm run build && permaweb-deploy --ant-process RAYZTOwekImmk9YawBDkzQHSXmJXxjsJ-QuWHRqAgLY --undername lunar",
-		"deploy:staging": "npm run build && permaweb-deploy --ant-process RAYZTOwekImmk9YawBDkzQHSXmJXxjsJ-QuWHRqAgLY --undername staging",
+		"build": "NODE_ENV=production vite build",
+		"deploy:main": "npm run build && permaweb-deploy --arns-name lunar",
+		"deploy:staging": "npm run build && permaweb-deploy --arns-name lunar --undername staging",
 		"prepare": "husky install"
 	},
 	"dependencies": {
